@@ -1232,7 +1232,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [musicAutoDucking, setMusicAutoDucking] = useState(true);
     const [isMicDuckingEnabled, setIsMicDuckingEnabled] = useState(false);
     const [isUserSpeaking, setIsUserSpeaking] = useState(false);
-    
+
     const [musicDuckRatio, setMusicDuckRatio] = useState(0.1);  // volume ratio when TTS speaks
     const [musicIdleRatio, setMusicIdleRatio] = useState(0.59); // volume ratio when not speaking
     const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
@@ -1398,7 +1398,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 micDuckingStreamRef.current = null;
             }
             if (micDuckingAudioCtxRef.current) {
-                micDuckingAudioCtxRef.current.close().catch(() => {});
+                micDuckingAudioCtxRef.current.close().catch(() => { });
                 micDuckingAudioCtxRef.current = null;
             }
             setIsUserSpeaking(false);
@@ -1440,7 +1440,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     if (average > 10) {
                         setIsUserSpeaking(true);
                         if (userSpeakingTimeoutRef.current) clearTimeout(userSpeakingTimeoutRef.current);
-                        
+
                         // Hold the ducking for 1 second after voice drops below threshold
                         userSpeakingTimeoutRef.current = setTimeout(() => {
                             if (isMounted) setIsUserSpeaking(false);
@@ -1448,7 +1448,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     }
                     micDuckingAnimFrameRef.current = requestAnimationFrame(checkAudioLevel);
                 };
-                
+
                 checkAudioLevel();
             } catch (err) {
                 console.warn("Mic ducking requires microphone permissions.", err);
@@ -1467,7 +1467,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 micDuckingStreamRef.current = null;
             }
             if (micDuckingAudioCtxRef.current) {
-                micDuckingAudioCtxRef.current.close().catch(() => {});
+                micDuckingAudioCtxRef.current.close().catch(() => { });
                 micDuckingAudioCtxRef.current = null;
             }
             setIsUserSpeaking(false);
@@ -3701,10 +3701,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </div>
 
                                     {/* Options Area with Side Navigation */}
-                                    <div className="relative w-full max-w-[1200px] flex justify-center mt-6 md:mt-8 mb-4 mx-auto">
+                                    <div className="relative w-full max-w-[1200px] flex justify-center mt-4 md:mt-4 mb-1 mx-auto">
                                         {/* Exp Toggle */}
                                         {q.explanation && (
-                                            <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-0 z-[45] group hidden md:flex flex-col gap-4 items-center">
+                                            <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-[-60px] md:top-[-80px] z-[45] group hidden md:flex flex-col gap-4 items-center">
                                                 <button
                                                     onClick={() => setIsManualExpOpen(!isManualExpOpen)}
                                                     className={`p-3 rounded-full shadow-lg backdrop-blur-sm border transition-all hover:scale-110 active:scale-95 ${isManualExpOpen ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600' : 'bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600'}`}
@@ -3893,10 +3893,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             <div className={letterClasses} style={{ fontSize: 'var(--opt-size)' }}>
                                                                 {optLetter}
                                                             </div>
-                                                            <div className={`prose dark:prose-invert max-w-none ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white'} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug [&>p]:whitespace-nowrap [&>p]:overflow-hidden [&>p]:text-ellipsis flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`} style={{ 
+                                                            <div className={`prose dark:prose-invert max-w-none ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white'} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug [&>p]:whitespace-nowrap [&>p]:overflow-hidden [&>p]:text-ellipsis flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`} style={{
                                                                 '--opt-color': optTextColor !== 'default' ? optTextColor : undefined,
                                                                 '--opt-size': (() => {
-                                                                    const maxOptLen = parsedOptions.length > 0 ? Math.max(...parsedOptions.map((o:any) => o.text?.length || 0)) : 1;
+                                                                    const maxOptLen = parsedOptions.length > 0 ? Math.max(...parsedOptions.map((o: any) => o.text?.length || 0)) : 1;
                                                                     const isGrid = optionsLayout === 'grid';
                                                                     const cardWidth = isGrid ? 'min(45vw, 500px)' : 'min(94vw, 1000px)';
                                                                     return `min(var(--base-opt-size), calc((${cardWidth} - 100px) * 1.2 / ${Math.max(1, maxOptLen)}))`;
@@ -3974,7 +3974,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     {((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && q.explanation && (
                                         <div className="w-full max-w-5xl mt-6 animate-in fade-in slide-in-from-bottom-8 duration-700 !print-color-adjust-exact">
                                             <div className="bg-white dark:bg-gray-800 p-6 pt-10 md:p-8 md:pt-10 rounded-t-2xl rounded-b-[0.5rem] border-2 border-t-4 border-[#34A853]/30 border-t-[#34A853] dark:border-[#34A853]/40 dark:border-t-[#34A853] shadow-xl relative overflow-visible transition-colors duration-500">
-                                                
+
                                                 {/* Top Center Badge */}
                                                 <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#34A853] to-emerald-600 text-white px-8 py-2 rounded-full font-bold text-lg md:text-xl shadow-[0_4px_12px_rgba(52,168,83,0.3)] flex items-center gap-2 border-[4px] border-white dark:border-gray-800 z-10 whitespace-nowrap !print-color-adjust-exact">
                                                     <span className="text-xl md:text-2xl drop-shadow-md">💡</span>
@@ -5422,14 +5422,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     ` }} />
 
                     {/* Floating Quick Pen Tool (Left Edge) */}
-                    <motion.div drag dragMomentum={false} className="absolute left-3 md:left-5 top-18 md:top-20 z-[70] flex flex-row gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300 cursor-move bg-white/50 dark:bg-gray-800/50 backdrop-blur-md p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-700">
+                    <motion.div drag dragMomentum={false} className="absolute left-3 md:left-5 top-18 md:top-20 z-[70] flex flex-row gap-1 items-center animate-in slide-in-from-left-10 fade-in duration-300 cursor-move bg-transparent p-1 rounded-full">
                         {/* Clear Markings Button (Left) */}
                         <button
                             onClick={clearCanvas}
-                            className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors bg-transparent rounded-full hover:bg-red-500/10"
+                            className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors bg-transparent rounded-full hover:bg-red-500/10"
                             title="Clear All Markings"
                         >
-                            <Eraser className="w-5 h-5 md:w-6 md:h-6" />
+                            <Eraser className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
 
                         {/* Main Pen Toggle Button */}
@@ -5442,13 +5442,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     setIsPenActive(true);
                                 }
                             }}
-                            className={`p-3 rounded-full transition-all ${(isPenActive && drawingTool === 'pen')
+                            className={`p-1.5 rounded-full transition-all ${(isPenActive && drawingTool === 'pen')
                                 ? 'bg-transparent text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(37,99,235,0.8)]'
                                 : 'bg-transparent text-gray-400 dark:text-gray-500 hover:bg-gray-500/10'
                                 }`}
                             title="Quick Pen Toggle"
                         >
-                            <Pen className="w-5 h-5 md:w-6 md:h-6" />
+                            <Pen className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
 
                         {/* Preset Colors (Visible when Pen is active, expands horizontally) */}
@@ -6080,18 +6080,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                                 {optLetter}
                                                                             </div>
                                                                             <div className={`prose dark:prose-invert max-w-none w-full leading-snug flex-1 font-bold text-[length:min(calc(var(--q-size)*0.85),calc((min(45vw,500px)-100px)*1.2/${Math.max(1, maxOptLen)}))] [&_*]:!text-[length:min(calc(var(--q-size)*0.85),calc((min(45vw,500px)-100px)*1.2/${Math.max(1, maxOptLen)}))] [&_*]:!leading-snug [&_*]:!m-0 [&_*]:whitespace-nowrap [&_*]:overflow-hidden [&_*]:text-ellipsis ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-800 dark:text-slate-100'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
-                                                                            <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
-                                                                                {opt.text}
-                                                                            </ReactMarkdown>
-                                                                        </div>
-                                                                        {showCorrect && (
-                                                                            <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1 shadow-sm ml-auto z-10 !print-color-adjust-exact">
-                                                                                <Check className="w-5 h-5 md:w-6 md:h-6 stroke-[3]" />
+                                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                                                    {opt.text}
+                                                                                </ReactMarkdown>
                                                                             </div>
-                                                                        )}
+                                                                            {showCorrect && (
+                                                                                <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1 shadow-sm ml-auto z-10 !print-color-adjust-exact">
+                                                                                    <Check className="w-5 h-5 md:w-6 md:h-6 stroke-[3]" />
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            );
+                                                                );
                                                             });
                                                         })()}
                                                     </div>
