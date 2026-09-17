@@ -3617,7 +3617,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {/* Question */}
                                     <div
-                                        className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor.startsWith('#') ? '' : qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'}`}
+                                        className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] md:max-h-[260px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor.startsWith('#') ? '' : qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'}`}
                                         style={{
                                             containerType: 'inline-size',
                                             backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
@@ -3626,10 +3626,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 const stmtLines = q.statements ? q.statements.length : 0;
                                                 const stmtLen = q.statements ? q.statements.join(' ').length : 0;
                                                 const tLen = (q.questionText?.length || 0) + stmtLen;
+                                                const multiplier = tLen <= 45 ? 1.6 : 2.8;
                                                 if (hasStmts) {
-                                                    return `min(calc(var(--base-q-size) * 0.85), calc((min(94vw, 1000px) - 120px) * 1.6 / ${Math.max(1, tLen)}))`;
+                                                    return `min(calc(var(--base-q-size) * 0.85), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
                                                 }
-                                                return `min(var(--base-q-size), calc((min(94vw, 1000px) - 120px) * 1.6 / ${Math.max(1, tLen)}))`;
+                                                return `min(var(--base-q-size), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
                                             })(),
                                             '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
                                             borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
@@ -5405,8 +5406,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             }
                         }
                     ` }} />
+
                     {/* Floating Quick Pen Tool (Left Edge) */}
-                    <div className="absolute left-3 md:left-5 top-[15%] md:top-[20%] z-[70] flex flex-col gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300">
+                    <div className="absolute left-3 md:left-5 top-18 md:top-20 z-[70] flex flex-col gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300">
                         {/* Clear Markings Button (Above Pen) */}
                         <button
                             onClick={clearCanvas}
@@ -5460,9 +5462,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 />
                             ))}
                         </div>
-                    </div>
-
-                    {/* Floating Presentation Tools (Right Edge, Top, Transparent) */}
+                    </div>                    {/* Floating Presentation Tools (Right Edge, Top, Transparent) */}
                     <div className="absolute right-4 top-18 md:top-20 z-[70] bg-transparent flex flex-col gap-1 w-9 items-center animate-in slide-in-from-right-10 fade-in duration-300">
 
                         <button onClick={() => { setDrawingTool('laser'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'laser') ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Laser (Shift+L)">
@@ -6008,7 +6008,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         ) : (
                                             <div className="w-full flex flex-col items-center flex-1 !print-color-adjust-exact mt-8">
                                                 <div
-                                                    className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor.startsWith('#') ? '' : qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'} !print-color-adjust-exact`}
+                                                    className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] md:max-h-[260px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor.startsWith('#') ? '' : qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'} !print-color-adjust-exact`}
                                                     style={{
                                                         containerType: 'inline-size',
                                                         backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
@@ -6017,10 +6017,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             const stmtLines = q.statements ? q.statements.length : 0;
                                                             const stmtLen = q.statements ? q.statements.join(' ').length : 0;
                                                             const tLen = (q.questionText?.length || 0) + stmtLen;
+                                                            const multiplier = tLen <= 45 ? 1.6 : 2.8;
                                                             if (hasStmts) {
-                                                                return `min(calc(var(--base-q-size) * 0.85), calc((min(94vw, 1000px) - 120px) * 1.6 / ${Math.max(1, tLen)}))`;
+                                                                return `min(calc(var(--base-q-size) * 0.85), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
                                                             }
-                                                            return `min(var(--base-q-size), calc((min(94vw, 1000px) - 120px) * 1.6 / ${Math.max(1, tLen)}))`;
+                                                            return `min(var(--base-q-size), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
                                                         })(),
                                                         '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
                                                         borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
