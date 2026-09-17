@@ -62,7 +62,7 @@ const CONFETTI_CONFIG = {
 };
 
 import 'katex/dist/katex.min.css';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders, List, Key, Camera, Youtube, Bell, Eye, ThumbsUp } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Pause, Settings, Check, Clock, Pen, Trash2, Focus, Highlighter, MousePointer2, Maximize, Minimize, LayoutGrid, Sun, Moon, Eraser, Square, Circle, ArrowUpRight, Type, Presentation, ZoomIn, Volume2, VolumeX, MonitorPlay, Lightbulb, MessageCircle, Stamp, Droplet, Music, AlignLeft, Keyboard, Printer, Trophy, Globe, BarChart2, Sparkles, ImageDown, FileDown, Video, Sliders, List, Key, Camera, Youtube, Bell, Eye, ThumbsUp, Layers } from 'lucide-react';
 
 const bnOptionsMap: Record<string, string> = {
     a: 'ক',
@@ -752,6 +752,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [step, setStep] = useState(0); // 0: Question, 1: Show Answer, 2: Show Explanation
     const [qFontScale, setQFontScale] = useState(1);
     const [optFontScale, setOptFontScale] = useState(1);
+    const [fontFamily, setFontFamily] = useState<string>('system-ui, sans-serif');
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
     const [isNavigatorOpen, setIsNavigatorOpen] = useState(false);
@@ -1228,6 +1229,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [selectedMusic, setSelectedMusic] = useState(MUSIC_OPTIONS.find(m => m.id === 'tiptoe_still')?.url ?? MUSIC_OPTIONS[0].url);
     const [musicVolume, setMusicVolume] = useState(0.1);
     const [musicAutoDucking, setMusicAutoDucking] = useState(true);
+    const [isMicDuckingEnabled, setIsMicDuckingEnabled] = useState(false);
+    const [isUserSpeaking, setIsUserSpeaking] = useState(false);
+    
     const [musicDuckRatio, setMusicDuckRatio] = useState(0.1);  // volume ratio when TTS speaks
     const [musicIdleRatio, setMusicIdleRatio] = useState(0.59); // volume ratio when not speaking
     const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
@@ -1283,6 +1287,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
         if (typeof window !== 'undefined') return localStorage.getItem('elevenLabsApiKey') || process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY || '';
         return process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY || '';
     });
+    const [elevenLabsModel, setElevenLabsModel] = useState(() => {
+        if (typeof window !== 'undefined') return localStorage.getItem('elevenLabsModel') || 'eleven_multilingual_v3';
+        return 'eleven_multilingual_v3';
+    });
     const cloudAudioRef = useRef<HTMLAudioElement | null>(null);
     const [isCloudTTSLoading, setIsCloudTTSLoading] = useState(false);
 
@@ -1293,8 +1301,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
             localStorage.setItem('azureTtsApiKey', azureTtsApiKey);
             localStorage.setItem('azureRegion', azureRegion);
             localStorage.setItem('elevenLabsApiKey', elevenLabsApiKey);
+            localStorage.setItem('elevenLabsModel', elevenLabsModel);
         }
-    }, [ttsProvider, googleTtsApiKey, azureTtsApiKey, azureRegion, elevenLabsApiKey]);
+    }, [ttsProvider, googleTtsApiKey, azureTtsApiKey, azureRegion, elevenLabsApiKey, elevenLabsModel]);
 
     useEffect(() => {
         let intervalId: any;
@@ -1372,47 +1381,121 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const isAutoPlayRef = useRef(isAutoPlayReadAloud);
     const stepRef = useRef(step);
 
-    // musicVolume slider: set idle or full volume depending on speaking state
-    useEffect(() => {
-        if (!lofiAudioRef.current) return;
-        if (musicAutoDucking && isSpeaking) return; // don't override active duck
-        lofiAudioRef.current.volume = musicAutoDucking
-            ? musicVolume * musicIdleRatio
-            : musicVolume;
-    }, [musicVolume, musicIdleRatio, musicAutoDucking]);
+    // Mic Auto-Ducking: Monitor user's microphone for voice activity
+    const micDuckingStreamRef = useRef<MediaStream | null>(null);
+    const micDuckingAudioCtxRef = useRef<any>(null);
+    const micDuckingAnimFrameRef = useRef<number | null>(null);
+    const userSpeakingTimeoutRef = useRef<any>(null);
 
-    // Music Auto-Ducking: smooth fade ONLY on TTS start/stop transitions
-    const duckingIntervalRef = useRef<any>(null);
-    const prevSpeakingRef = useRef(false);
     useEffect(() => {
-        if (!lofiAudioRef.current || !isLofiEnabled || !musicAutoDucking) {
-            // if ducking disabled, just restore to musicVolume directly
-            if (lofiAudioRef.current && !musicAutoDucking && prevSpeakingRef.current) {
-                lofiAudioRef.current.volume = musicVolume;
+        if (!isMicDuckingEnabled) {
+            // Cleanup and stop when disabled
+            if (micDuckingAnimFrameRef.current) cancelAnimationFrame(micDuckingAnimFrameRef.current);
+            if (userSpeakingTimeoutRef.current) clearTimeout(userSpeakingTimeoutRef.current);
+            if (micDuckingStreamRef.current) {
+                micDuckingStreamRef.current.getTracks().forEach(track => track.stop());
+                micDuckingStreamRef.current = null;
             }
-            prevSpeakingRef.current = isSpeaking;
+            if (micDuckingAudioCtxRef.current) {
+                micDuckingAudioCtxRef.current.close().catch(() => {});
+                micDuckingAudioCtxRef.current = null;
+            }
+            setIsUserSpeaking(false);
             return;
         }
 
-        const wasSpeeaking = prevSpeakingRef.current;
-        prevSpeakingRef.current = isSpeaking;
+        let isMounted = true;
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
 
-        // Only animate on actual transitions (false→true or true→false)
-        if (wasSpeeaking === isSpeaking) return;
+        const startMicMonitor = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                if (!isMounted) {
+                    stream.getTracks().forEach(track => track.stop());
+                    return;
+                }
+                micDuckingStreamRef.current = stream;
 
+                const audioCtx = new AudioContextClass();
+                micDuckingAudioCtxRef.current = audioCtx;
+
+                const source = audioCtx.createMediaStreamSource(stream);
+                const analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                analyser.smoothingTimeConstant = 0.4;
+                source.connect(analyser);
+
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+                const checkAudioLevel = () => {
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < dataArray.length; i++) {
+                        sum += dataArray[i];
+                    }
+                    const average = sum / dataArray.length;
+
+                    // Threshold for voice activity (adjust between 5 and 20 based on mic sensitivity)
+                    if (average > 10) {
+                        setIsUserSpeaking(true);
+                        if (userSpeakingTimeoutRef.current) clearTimeout(userSpeakingTimeoutRef.current);
+                        
+                        // Hold the ducking for 1 second after voice drops below threshold
+                        userSpeakingTimeoutRef.current = setTimeout(() => {
+                            if (isMounted) setIsUserSpeaking(false);
+                        }, 1000);
+                    }
+                    micDuckingAnimFrameRef.current = requestAnimationFrame(checkAudioLevel);
+                };
+                
+                checkAudioLevel();
+            } catch (err) {
+                console.warn("Mic ducking requires microphone permissions.", err);
+                setIsMicDuckingEnabled(false);
+            }
+        };
+
+        startMicMonitor();
+
+        return () => {
+            isMounted = false;
+            if (micDuckingAnimFrameRef.current) cancelAnimationFrame(micDuckingAnimFrameRef.current);
+            if (userSpeakingTimeoutRef.current) clearTimeout(userSpeakingTimeoutRef.current);
+            if (micDuckingStreamRef.current) {
+                micDuckingStreamRef.current.getTracks().forEach(track => track.stop());
+                micDuckingStreamRef.current = null;
+            }
+            if (micDuckingAudioCtxRef.current) {
+                micDuckingAudioCtxRef.current.close().catch(() => {});
+                micDuckingAudioCtxRef.current = null;
+            }
+            setIsUserSpeaking(false);
+        };
+    }, [isMicDuckingEnabled]);
+
+
+    // Background Music Volume Management (Idle vs Ducking)
+    const duckingIntervalRef = useRef<any>(null);
+    useEffect(() => {
+        if (!lofiAudioRef.current || !isLofiEnabled) return;
+
+        const isAnySpeaking = isSpeaking || isUserSpeaking;
+
+        const targetVolume = (musicAutoDucking && isAnySpeaking)
+            ? musicVolume * musicDuckRatio   // duck down when TTS speaks
+            : (musicAutoDucking ? musicVolume * musicIdleRatio : musicVolume); // idle level or full volume
+
+        // Smoothly transition to targetVolume
         if (duckingIntervalRef.current) clearInterval(duckingIntervalRef.current);
 
-        const targetVolume = isSpeaking
-            ? musicVolume * musicDuckRatio   // duck down when TTS speaks
-            : musicVolume * musicIdleRatio;  // idle level when silent
-
-        const STEP = 0.015;
+        const STEP = 0.02;
         const MS = 30;
 
         duckingIntervalRef.current = setInterval(() => {
             if (!lofiAudioRef.current) { clearInterval(duckingIntervalRef.current); return; }
             const cur = lofiAudioRef.current.volume;
             const diff = targetVolume - cur;
+
             if (Math.abs(diff) <= STEP) {
                 lofiAudioRef.current.volume = Math.max(0, Math.min(1, targetVolume));
                 clearInterval(duckingIntervalRef.current);
@@ -1420,7 +1503,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                 lofiAudioRef.current.volume = Math.max(0, Math.min(1, cur + (diff > 0 ? STEP : -STEP)));
             }
         }, MS);
-    }, [isSpeaking, musicAutoDucking, isLofiEnabled]);
+
+        return () => {
+            if (duckingIntervalRef.current) clearInterval(duckingIntervalRef.current);
+        };
+    }, [musicVolume, musicIdleRatio, musicDuckRatio, musicAutoDucking, isSpeaking, isUserSpeaking, isLofiEnabled]);
 
     useEffect(() => {
         isAutoPlayRef.current = isAutoPlayReadAloud;
@@ -2243,7 +2330,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         finalVoiceURI = validCloudVoices[0].id;
                     }
 
-                    const audioDataUrl = await fetchCloudTTS(ttsProvider, text, finalVoiceURI, ttsRate);
+                    const audioDataUrl = await fetchCloudTTS(ttsProvider, text, finalVoiceURI, ttsRate, elevenLabsModel);
 
                     if (currentSlideLocal !== currentSlide) return;
 
@@ -2818,7 +2905,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
     return createPortal(
         <>
-            <div className={`print:hidden fixed inset-0 w-full h-full z-[99999] flex items-center justify-between p-3 mb-3 gap-1 md:gap-1 xl:gap-1 select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
+            <div style={{ fontFamily }} className={`print:hidden fixed inset-0 w-full h-full z-[99999] flex items-center justify-between p-3 mb-3 gap-1 md:gap-1 xl:gap-1 select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-gray-900' : 'bg-[#f8fbff]'}`}>
                 <style>{`
                     ::highlight(tts-word-highlight) {
                         ${ttsWordHighlightStyle === 'bg' ? `background-color: ${ttsWordHighlightColor}88; color: inherit; border-radius: ${ttsWordHighlightRadius}px; text-shadow: 0 0 8px ${ttsWordHighlightColor}66;` : ''}
@@ -3532,6 +3619,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <div
                                         className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor.startsWith('#') ? '' : qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'}`}
                                         style={{
+                                            containerType: 'inline-size',
                                             backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
                                             '--q-size': (() => {
                                                 const hasStmts = q.statements && q.statements.length > 0;
@@ -3539,11 +3627,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 const stmtLen = q.statements ? q.statements.join(' ').length : 0;
                                                 const tLen = (q.questionText?.length || 0) + stmtLen;
                                                 if (hasStmts) {
-                                                    if (stmtLines >= 4 || tLen > 150) return 'calc(var(--base-q-size) * 0.65)';
-                                                    if (stmtLines >= 2 || tLen > 100) return 'calc(var(--base-q-size) * 0.75)';
-                                                    return 'calc(var(--base-q-size) * 0.85)';
+                                                    return `min(calc(var(--base-q-size) * 0.85), calc((min(94vw, 1000px) - 120px) * 1.6 / ${Math.max(1, tLen)}))`;
                                                 }
-                                                return tLen > 300 ? 'calc(var(--base-q-size) * 0.75)' : 'var(--base-q-size)';
+                                                return `min(var(--base-q-size), calc((min(94vw, 1000px) - 120px) * 1.6 / ${Math.max(1, tLen)}))`;
                                             })(),
                                             '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
                                             borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
@@ -3720,6 +3806,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             id={`option-card-${opt.key}`}
                                                             className={containerClasses}
                                                             style={{
+                                                                containerType: 'inline-size',
                                                                 backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined,
                                                                 ...(bgTheme === 'dots' ? {
                                                                     backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
@@ -3791,7 +3878,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             <div className={letterClasses} style={{ fontSize: 'var(--opt-size)' }}>
                                                                 {optLetter}
                                                             </div>
-                                                            <div className={`prose dark:prose-invert max-w-none ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white'} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
+                                                            <div className={`prose dark:prose-invert max-w-none ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white'} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? 'line-through opacity-50' : ''}`} style={{ 
+                                                                '--opt-color': optTextColor !== 'default' ? optTextColor : undefined,
+                                                                '--opt-size': (() => {
+                                                                    const tLen = opt.text?.length || 0;
+                                                                    const isGrid = optionsLayout === 'grid';
+                                                                    const cardWidth = isGrid ? 'min(45vw, 500px)' : 'min(94vw, 1000px)';
+                                                                    return `min(var(--base-opt-size), calc((${cardWidth} - 100px) * 1.7 / ${Math.max(1, tLen)}))`;
+                                                                })()
+                                                            } as React.CSSProperties}>
                                                                 <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                                     {opt.text}
                                                                 </ReactMarkdown>
@@ -4761,7 +4856,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-800/60">
                                                                         <div>
                                                                             <div className="text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                                                                                <span>🎙️</span> Auto-Ducking
+                                                                                <span>🎙️</span> AI Auto-Ducking
                                                                             </div>
                                                                             <div className="text-[10px] text-gray-400 mt-0.5">Music fades when TTS speaks</div>
                                                                         </div>
@@ -4770,6 +4865,23 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${musicAutoDucking ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
                                                                         >
                                                                             <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${musicAutoDucking ? 'translate-x-[18px]' : 'translate-x-1'}`} />
+                                                                        </button>
+                                                                    </div>
+
+                                                                    {/* Mic Auto-Ducking Toggle */}
+                                                                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-800/60">
+                                                                        <div>
+                                                                            <div className="text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                                                                                <span>🎤</span> Mic Auto-Ducking
+                                                                                {isUserSpeaking && <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse ml-1" title="Voice Detected" />}
+                                                                            </div>
+                                                                            <div className="text-[10px] text-gray-400 mt-0.5">Music fades when YOU speak</div>
+                                                                        </div>
+                                                                        <button
+                                                                            onClick={() => setIsMicDuckingEnabled(!isMicDuckingEnabled)}
+                                                                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isMicDuckingEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                                                                        >
+                                                                            <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${isMicDuckingEnabled ? 'translate-x-[18px]' : 'translate-x-1'}`} />
                                                                         </button>
                                                                     </div>
 
@@ -4834,6 +4946,24 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     </div>
 
 
+
+                                                    <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
+                                                        <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between items-center">
+                                                            <span className="flex items-center gap-2"><Type className="w-4 h-4 text-orange-500" /> Font Family</span>
+                                                        </div>
+                                                        <select
+                                                            value={fontFamily}
+                                                            onChange={(e) => setFontFamily(e.target.value)}
+                                                            className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                                                        >
+                                                            <option value="system-ui, sans-serif">System Default</option>
+                                                            <option value="'Kalpurush', sans-serif">Kalpurush (কালপুরুষ)</option>
+                                                            <option value="'SolaimanLipi', sans-serif">SolaimanLipi (সোলাইমানলিপি)</option>
+                                                            <option value="'Hind Siliguri', sans-serif">Hind Siliguri</option>
+                                                            <option value="'Noto Sans Bengali', sans-serif">Noto Sans Bengali</option>
+                                                            <option value="'Inter', sans-serif">Inter</option>
+                                                        </select>
+                                                    </div>
 
                                                     <div className="mb-1.5 pb-1.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0 last:pb-0 last:mb-0">
                                                         <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex justify-between">
@@ -5252,14 +5382,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         .responsive-fonts {
                             --base-q-size: ${24 * qFontScale}px;
                             --q-size: var(--base-q-size);
-                            --opt-size: ${16 * optFontScale}px;
+                            --base-opt-size: ${16 * optFontScale}px;
+                            --opt-size: var(--base-opt-size);
                             --exp-size: ${15 * expFontScale}px;
                         }
                         @media (min-width: 768px) {
                             .responsive-fonts {
                                 --base-q-size: ${32 * qFontScale}px;
                                 --q-size: var(--base-q-size);
-                                --opt-size: ${20 * optFontScale}px;
+                                --base-opt-size: ${20 * optFontScale}px;
+                                --opt-size: var(--base-opt-size);
                                 --exp-size: ${18 * expFontScale}px;
                             }
                         }
@@ -5267,7 +5399,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             .responsive-fonts {
                                 --base-q-size: ${42 * qFontScale}px;
                                 --q-size: var(--base-q-size);
-                                --opt-size: ${30 * optFontScale}px;
+                                --base-opt-size: ${30 * optFontScale}px;
+                                --opt-size: var(--base-opt-size);
                                 --exp-size: ${24 * expFontScale}px;
                             }
                         }
@@ -5877,6 +6010,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <div
                                                     className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor.startsWith('#') ? '' : qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'} !print-color-adjust-exact`}
                                                     style={{
+                                                        containerType: 'inline-size',
                                                         backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
                                                         '--q-size': (() => {
                                                             const hasStmts = q.statements && q.statements.length > 0;
@@ -5884,11 +6018,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             const stmtLen = q.statements ? q.statements.join(' ').length : 0;
                                                             const tLen = (q.questionText?.length || 0) + stmtLen;
                                                             if (hasStmts) {
-                                                                if (stmtLines >= 4 || tLen > 150) return 'calc(var(--base-q-size) * 0.65)';
-                                                                if (stmtLines >= 2 || tLen > 100) return 'calc(var(--base-q-size) * 0.75)';
-                                                                return 'calc(var(--base-q-size) * 0.85)';
+                                                                return `min(calc(var(--base-q-size) * 0.85), calc((min(94vw, 1000px) - 120px) * 1.6 / ${Math.max(1, tLen)}))`;
                                                             }
-                                                            return tLen > 300 ? 'calc(var(--base-q-size) * 0.75)' : 'var(--base-q-size)';
+                                                            return `min(var(--base-q-size), calc((min(94vw, 1000px) - 120px) * 1.6 / ${Math.max(1, tLen)}))`;
                                                         })(),
                                                         '--q-color': qTextColor !== 'default' ? qTextColor : undefined,
                                                         borderTopColor: bgTheme === 'video' ? 'rgba(255,255,255,0.4)' : [
@@ -5977,6 +6109,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                     <div
                                                                         className={containerClasses}
                                                                         style={{
+                                                                            containerType: 'inline-size',
                                                                             backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined,
                                                                             ...(bgTheme === 'dots' ? {
                                                                                 backgroundImage: `radial-gradient(${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'} 1.5px, transparent 1.5px)`,
@@ -5993,7 +6126,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                         <div className={letterClasses}>
                                                                             {optLetter}
                                                                         </div>
-                                                                        <div className={`prose dark:prose-invert max-w-none w-full leading-snug flex-1 font-bold text-[length:calc(var(--q-size)*0.85)] [&_*]:!text-[length:calc(var(--q-size)*0.85)] [&_*]:!leading-snug [&_*]:!m-0 ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-800 dark:text-slate-100'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
+                                                                        <div className={`prose dark:prose-invert max-w-none w-full leading-snug flex-1 font-bold text-[length:min(calc(var(--q-size)*0.85),calc((min(45vw,500px)-100px)*1.7/${Math.max(1, opt.text?.length||1)}))] [&_*]:!text-[length:min(calc(var(--q-size)*0.85),calc((min(45vw,500px)-100px)*1.7/${Math.max(1, opt.text?.length||1)}))] [&_*]:!leading-snug [&_*]:!m-0 ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-800 dark:text-slate-100'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
                                                                             <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
                                                                                 {opt.text}
                                                                             </ReactMarkdown>
@@ -6412,8 +6545,21 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         value={elevenLabsApiKey}
                                         onChange={(e) => setElevenLabsApiKey(e.target.value)}
                                         placeholder="sk_..."
-                                        className="w-full bg-gray-900 text-xs text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-pink-500"
+                                        className="w-full bg-gray-900 text-xs text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-pink-500 mb-2"
                                     />
+                                    <div className="text-xs font-bold text-gray-300 mb-1 flex items-center gap-1">
+                                        <Layers className="w-3 h-3" /> ElevenLabs Model
+                                    </div>
+                                    <select
+                                        value={elevenLabsModel}
+                                        onChange={(e) => setElevenLabsModel(e.target.value)}
+                                        className="w-full bg-gray-900 text-xs text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-pink-500"
+                                    >
+                                        <option value="eleven_multilingual_v3">Multilingual v3 (Latest)</option>
+                                        <option value="eleven_multilingual_v2">Multilingual v2 (Best for Bengali)</option>
+                                        <option value="eleven_turbo_v2_5">Turbo v2.5 (Fastest)</option>
+                                        <option value="eleven_monolingual_v1">Monolingual v1 (English Only)</option>
+                                    </select>
                                 </div>
                             )}
                         </div>

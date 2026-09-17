@@ -22,14 +22,23 @@ export const CLOUD_VOICES = {
     ],
     elevenlabs: [
         // Users can add their custom ElevenLabs Voice IDs here. These are some generic defaults.
-        { id: 'pNInz6obpgDQGcFmaJgB', name: 'ElevenLabs Adam (Deep Voice)', lang: 'en/multi' },
-        { id: 'hpp4J3VqNfWAUOO0d1Us', name: 'ElevenLabs Bella (Soft Voice)', lang: 'en/multi' },
-        { id: 'IKne3meq5aSn9XLyUdCD', name: 'ElevenLabs Charlie (Deep, Confident)', lang: 'en/multi' },
-        { id: 'onwK4e9ZLuTAKqWW03F9', name: 'ElevenLabs Daniel (Steady)', lang: 'en/multi' }
+        { id: '4O1sYUnmtThcBoSBrri7', name: 'Custom Added Voice', lang: 'multi' },
+        { id: 'TWutjvRaJqAX89preB4e', name: 'Evan - Calm, Grounded & Reflective', lang: 'multi' },
+        { id: 'DGzg6RaUqxGRTHSBjfgF', name: 'Custom Voice 3', lang: 'multi' },
+        { id: 'pNInz6obpgDQGcFmaJgB', name: 'Adam (Deep, Professional)', lang: 'multi' },
+        { id: 'hpp4J3VqNfWAUOO0d1Us', name: 'Bella (Soft, Calm)', lang: 'multi' },
+        { id: 'IKne3meq5aSn9XLyUdCD', name: 'Charlie (Casual, Conversational)', lang: 'multi' },
+        { id: 'onwK4e9ZLuTAKqWW03F9', name: 'Daniel (Authoritative, News)', lang: 'multi' },
+        { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Rachel (Clear, Pleasant)', lang: 'multi' },
+        { id: 'ThT5KcBeYPX3keUQqHPh', name: 'Dorothy (Pleasant, British)', lang: 'multi' },
+        { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni (Well-rounded)', lang: 'multi' },
+        { id: 'MF3mGyEYCl7XYWbV9V6O', name: 'Elli (Emotional, Clear)', lang: 'multi' },
+        { id: 'VR6AewLTigWG4xSOukaG', name: 'Rachel (Warm, Expressive)', lang: 'multi' },
+        { id: '2EiwWnXFnvU5JabPnv8n', name: 'Clyde (War veteran)', lang: 'multi' }
     ]
 };
 
-export const fetchCloudTTS = async (provider: string, text: string, voiceId: string, rate: number = 1) => {
+export const fetchCloudTTS = async (provider: string, text: string, voiceId: string, rate: number = 1, modelId: string = '') => {
     const response = await fetch('/api/tts', {
         method: 'POST',
         headers: {
@@ -39,7 +48,8 @@ export const fetchCloudTTS = async (provider: string, text: string, voiceId: str
             provider,
             text,
             voiceId,
-            rate
+            rate,
+            modelId
         })
     });
 
