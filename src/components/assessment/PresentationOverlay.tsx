@@ -3307,31 +3307,56 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Header */}
                     {showHeader && (
                         <div
-                            className="shrink-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-900 dark:via-violet-900 dark:to-purple-900 border-b border-indigo-400/30 dark:border-indigo-700/50 flex flex-col md:flex-row justify-between items-center w-full z-30 relative transition-all duration-500 px-3 md:px-6"
-                            style={{
-                                paddingTop: `${0.75 * headerScale}rem`,
-                                paddingBottom: `${0.75 * headerScale}rem`,
-                                gap: `${0.5 * headerScale}rem`,
-                                boxShadow: '0 4px 20px rgba(109,40,217,0.3), 0 1px 0 rgba(255,255,255,0.12)'
-                            }}
+                            className="shrink-0 bg-gradient-to-r from-[#008b18] via-[#3b82f6] to-[#030c06] dark:from-[#008b18]/90 dark:via-[#3b82f6]/90 dark:to-[#030c06]/90 border-b border-blue-400/30 dark:border-blue-700/50 w-full z-30 relative transition-all duration-500"
+                            style={{ boxShadow: '0 4px 20px rgba(109,40,217,0.3), 0 1px 0 rgba(255,255,255,0.12)' }}
                         >
-                            {/* Logo Area */}
-                            <div className="flex items-center w-full md:w-auto justify-between md:justify-start">
+                            {/* Mobile Header Row */}
+                            <div className="flex md:hidden items-center justify-between px-3 py-2 gap-2">
+                                {/* Left: Logo + Title */}
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                    {showLogo && (
+                                        <img src="/icons/icon-192x192.png" alt="DeshExam" className="w-9 h-9 shrink-0 object-contain drop-shadow-sm rounded-full bg-white p-0.5" />
+                                    )}
+                                    <div className="flex flex-col min-w-0">
+                                        <div className="flex items-center gap-1 font-black text-sm leading-tight">
+                                            <span className="text-[#FF9F57]">DESH</span>
+                                            <span className="text-white">EXAM</span>
+                                        </div>
+                                        <h1 className="text-white/90 font-bold text-xs leading-tight truncate">{displayTitle}</h1>
+                                        {displayTaxonomy && (
+                                            <p className="text-white/60 font-semibold text-[10px] leading-tight truncate">{displayTaxonomy.replace(/•/g, '•').substring(0, 40)}</p>
+                                        )}
+                                    </div>
+                                </div>
+                                {/* Right: X + Question Counter */}
+                                <div className="flex flex-col items-center gap-0.5 shrink-0">
+                                    <button onClick={closePresentation} className="bg-white/20 hover:bg-white/30 rounded-full text-white border border-white/30 flex items-center justify-center w-8 h-8">
+                                        <X className="w-4 h-4" strokeWidth={2.5} />
+                                    </button>
+                                    <span className="text-white/90 font-black tracking-widest text-[9px] whitespace-nowrap">
+                                        Q {String(currentSlide + 1).padStart(2, '0')}/{String(questions.length).padStart(2, '0')}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Desktop Header Row */}
+                            <div
+                                className="hidden md:flex flex-row justify-between items-center px-6"
+                                style={{
+                                    paddingTop: `${0.75 * headerScale}rem`,
+                                    paddingBottom: `${0.75 * headerScale}rem`,
+                                    gap: `${0.5 * headerScale}rem`,
+                                }}
+                            >
+                                {/* Desktop Logo */}
                                 {showLogo && (
-                                    <div className="flex items-center gap-2 md:gap-3">
+                                    <div className="flex items-center gap-3 shrink-0">
                                         <img src="/icons/icon-192x192.png" alt="DeshExam" style={{ height: `${2.25 * headerScale}rem` }} className="w-auto object-contain drop-shadow-sm rounded-full bg-white p-1" />
                                         <div className="flex flex-col justify-center select-none">
                                             <div className="flex items-center gap-1.5 font-black leading-tight tracking-tight drop-shadow-sm" style={{ fontSize: `${1.15 * headerScale}rem` }}>
-                                                {/* Saffron / Kesari */}
-                                                <span className="text-[#FF9F57] font-black tracking-tight drop-shadow-sm">
-                                                    DESH
-                                                </span>
-                                                {/* Light white-green for purple bg */}
-                                                <span className="text-white font-black tracking-tight drop-shadow-sm">
-                                                    EXAM
-                                                </span>
+                                                <span className="text-[#FF9F57] font-black tracking-tight drop-shadow-sm">DESH</span>
+                                                <span className="text-white font-black tracking-tight drop-shadow-sm">EXAM</span>
                                             </div>
-                                            {/* Tagline — white tones for purple bg */}
                                             <div className="flex items-center gap-1 font-extrabold tracking-widest uppercase mt-0.5" style={{ fontSize: `${0.55 * headerScale}rem` }}>
                                                 <span className="text-orange-300">Learn</span>
                                                 <span className="text-white/60 font-bold">•</span>
@@ -3343,67 +3368,46 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </div>
                                 )}
 
-                                {/* Mobile Actions */}
-                                <div className="flex md:hidden items-center gap-2 shrink-0">
+                                {/* Desktop Title */}
+                                <div className={`flex-1 px-6 flex flex-col justify-center ${headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
+                                    <h1 className="font-extrabold text-white dark:text-gray-100 tracking-tight line-clamp-none drop-shadow-sm" style={{ fontSize: `${1.1 * headerScale * headerTitleScale}rem` }}>{displayTitle}</h1>
+                                    {displayTaxonomy && (
+                                        <div className="flex items-center flex-wrap gap-1 font-bold tracking-wider uppercase mt-1" style={{ fontSize: `${0.72 * headerScale * headerTitleScale}rem` }}>
+                                            {displayTaxonomy.split('•').map((part, i) => (
+                                                <span key={i} className="flex items-center gap-1">
+                                                    {i > 0 && <span className="text-white/40 mx-0.5">•</span>}
+                                                    <span className={i === 0 ? 'text-amber-300 drop-shadow-sm' : i === 1 ? 'text-cyan-300 drop-shadow-sm' : i === 2 ? 'text-lime-300 drop-shadow-sm' : 'text-pink-300 drop-shadow-sm'}>{part.trim()}</span>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
 
-                                    <button onClick={closePresentation} className="bg-white/90 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700 rounded-full text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-gray-600 transition-colors flex items-center justify-center shrink-0" style={{ width: `${2.2 * headerScale}rem`, height: `${2.2 * headerScale}rem` }}>
-                                        <X style={{ width: `${1.2 * headerScale}rem`, height: `${1.2 * headerScale}rem` }} strokeWidth={2.5} />
+                                {/* Desktop Actions */}
+                                <div className="flex items-center gap-3 justify-end shrink-0">
+                                    <button onClick={() => setIsScoreVisible(!isScoreVisible)} className="flex items-center gap-1 shrink-0 hover:scale-105 transition-all" title="Session Score">
+                                        <span className="flex items-center gap-1 bg-emerald-500/90 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-l-full font-black text-xs shadow-md border border-emerald-400/50" style={{ fontSize: `${0.8 * headerScale}rem` }}>
+                                            <span className="text-emerald-100">✓</span>
+                                            <span>{sessionScore.correct}</span>
+                                        </span>
+                                        <span className="bg-white/20 text-white/60 px-1 py-1.5 font-bold text-xs" style={{ fontSize: `${0.75 * headerScale}rem` }}>/</span>
+                                        <span className="flex items-center gap-1 bg-rose-500/90 hover:bg-rose-500 text-white px-2.5 py-1.5 rounded-r-full font-black text-xs shadow-md border border-rose-400/50" style={{ fontSize: `${0.8 * headerScale}rem` }}>
+                                            <span>{sessionScore.wrong}</span>
+                                            <span className="text-rose-100">✗</span>
+                                        </span>
+                                    </button>
+                                    <button onClick={closePresentation} className="bg-white/10 hover:bg-white/20 rounded-full text-white shadow-sm border border-white/20 transition-all hover:scale-105 flex items-center justify-center shrink-0" style={{ width: `${2.75 * headerScale}rem`, height: `${2.75 * headerScale}rem` }} title="Close Presentation">
+                                        <X style={{ width: `${1.4 * headerScale}rem`, height: `${1.4 * headerScale}rem` }} strokeWidth={2.5} />
                                     </button>
                                 </div>
                             </div>
-
-                            {/* Title Area */}
-                            <div className={`flex-1 w-full md:px-6 flex flex-col justify-center ${headerTitleAlign === 'left' ? 'items-start text-left' :
-                                headerTitleAlign === 'right' ? 'items-end text-right' :
-                                    'items-center text-center'
-                                }`}>
-                                <h1 className="font-extrabold text-white dark:text-gray-100 tracking-tight line-clamp-1 md:line-clamp-none drop-shadow-sm" style={{ fontSize: `${1.1 * headerScale * headerTitleScale}rem` }}>{displayTitle}</h1>
-                                {displayTaxonomy && (
-                                    <div className="flex items-center flex-wrap gap-1 font-bold tracking-wider uppercase mt-1" style={{ fontSize: `${0.72 * headerScale * headerTitleScale}rem` }}>
-                                        {displayTaxonomy.split('•').map((part, i) => (
-                                            <span key={i} className="flex items-center gap-1">
-                                                {i > 0 && <span className="text-white/40 mx-0.5">•</span>}
-                                                <span className={
-                                                    i === 0 ? 'text-amber-300 drop-shadow-sm' :
-                                                        i === 1 ? 'text-cyan-300 drop-shadow-sm' :
-                                                            i === 2 ? 'text-lime-300 drop-shadow-sm' :
-                                                                'text-pink-300 drop-shadow-sm'
-                                                }>{part.trim()}</span>
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Desktop Actions */}
-                            <div className="hidden md:flex items-center gap-3 justify-end shrink-0">
-                                {/* Score Badge Button */}
-                                <button
-                                    onClick={() => setIsScoreVisible(!isScoreVisible)}
-                                    className="flex items-center gap-1 shrink-0 hover:scale-105 transition-all"
-                                    title="Session Score"
-                                >
-                                    {/* Correct */}
-                                    <span className="flex items-center gap-1 bg-emerald-500/90 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-l-full font-black text-xs shadow-md border border-emerald-400/50" style={{ fontSize: `${0.8 * headerScale}rem` }}>
-                                        <span className="text-emerald-100">✓</span>
-                                        <span>{sessionScore.correct}</span>
-                                    </span>
-                                    {/* Divider */}
-                                    <span className="bg-white/20 text-white/60 px-1 py-1.5 font-bold text-xs" style={{ fontSize: `${0.75 * headerScale}rem` }}>/</span>
-                                    {/* Wrong */}
-                                    <span className="flex items-center gap-1 bg-rose-500/90 hover:bg-rose-500 text-white px-2.5 py-1.5 rounded-r-full font-black text-xs shadow-md border border-rose-400/50" style={{ fontSize: `${0.8 * headerScale}rem` }}>
-                                        <span>{sessionScore.wrong}</span>
-                                        <span className="text-rose-100">✗</span>
-                                    </span>
-                                </button>
-
-
-                                <button onClick={closePresentation} className="bg-white/10 hover:bg-white/20 dark:bg-white/10 dark:hover:bg-white/20 rounded-full text-white shadow-sm border border-white/20 transition-all hover:scale-105 flex items-center justify-center shrink-0" style={{ width: `${2.75 * headerScale}rem`, height: `${2.75 * headerScale}rem` }} title="Close Presentation">
-                                    <X style={{ width: `${1.4 * headerScale}rem`, height: `${1.4 * headerScale}rem` }} strokeWidth={2.5} />
-                                </button>
-                            </div>
                         </div>
                     )}
+
+                    {/* Mobile Full-Width Progress Bar */}
+                    <div className="md:hidden w-full h-1 bg-blue-100/30 dark:bg-slate-800 shrink-0 z-20">
+                        <div className="h-full bg-blue-400 dark:bg-blue-500 transition-all duration-500 ease-out" style={{ width: `${Math.max(3, ((currentSlide + 1) / Math.max(1, questions.length)) * 100)}%` }}></div>
+                    </div>
 
 
                     {/* Hidden Audio Elements */}
@@ -3592,7 +3596,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     )}
 
                     {/* Main Content Area */}
-                    <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-4 md:px-24 py-6 md:py-12 z-10 overflow-y-auto overflow-x-hidden custom-scrollbar gap-8">
+                    <div ref={scrollContainerRef} className="flex-1 w-full relative flex flex-col items-center px-0 md:px-24 py-0 md:py-12 z-10 overflow-y-auto overflow-x-hidden custom-scrollbar md:gap-8 bg-[#EEF4FD] dark:bg-slate-900 md:bg-transparent">
 
                         {/* Zoomable Content Wrapper */}
                         <div
@@ -3614,12 +3618,144 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotateY: 0 }}
                                     exit={{ ...TRANSITION_VARIANTS[transitionType].exit }}
                                     transition={{ duration: animSpeed, ease: 'easeOut' }}
-                                    className="w-full flex flex-col items-center flex-1"
+                                    className="w-full flex flex-col items-center flex-1 md:gap-0 gap-0"
                                 >
+
+                                    {/* Mobile Unified White Card Wrapper */}
+                                    <div className="md:hidden w-full px-4 pt-4 pb-3 flex flex-col gap-3">
+                                        <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-md overflow-hidden">
+                                            {/* Mobile Question Number Pill */}
+                                            <div className="flex justify-center pt-4 pb-2">
+                                                <div className="bg-blue-500 dark:bg-blue-600 text-white px-5 py-1 rounded-full text-sm font-bold shadow-sm">
+                                                    {uiLang === 'bn' ? 'প্রশ্ন' : 'Question'} {uiLang === 'bn' ? toBanglaNumber(currentSlide + 1) : String(currentSlide + 1).padStart(2, '0')}
+                                                </div>
+                                            </div>
+
+                                            {/* Mobile Question Text */}
+                                            <div className="px-5 pb-4">
+                                                <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-center font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)]' : (bgTheme === 'video' ? 'text-white [&_*]:!text-white' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')} ${activeTTSBlock === 'question' ? 'scale-[1.01] origin-left transition-all duration-300' : 'transition-all duration-300'}`} style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}>
+                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>
+                                                        {q.questionText}
+                                                    </ReactMarkdown>
+                                                </div>
+                                                {q.statements && q.statements.length > 0 && (
+                                                    <div className="mt-2 flex flex-col gap-1 w-full pl-3 border-l-4 border-indigo-200 dark:border-indigo-800/50">
+                                                        {q.statements.map((stmt: string, sIdx: number) => (
+                                                            <div key={sIdx} className="prose dark:prose-invert max-w-none w-full text-[calc(var(--q-size)*0.85)] leading-snug text-left font-bold text-slate-700 dark:text-gray-300">
+                                                                <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>{stmt}</ReactMarkdown>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Mobile Options */}
+                                            {!((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && parsedOptions.length > 0 && (
+                                                <div className="flex flex-col gap-0 border-t border-gray-100 dark:border-slate-700">
+                                                    {parsedOptions.map((opt: { key: string, text: string }, oIdx: number) => {
+                                                        const isCorrect = q.correctAnswer && q.correctAnswer.toLowerCase().includes(opt.key);
+                                                        const optLetter = getOptionLabel(opt.key, uiLang);
+                                                        const showCorrect = step >= 1 && isCorrect;
+                                                        const showWrong = step >= 1 && !isCorrect;
+                                                        const isSelected = selectedOption === opt.key;
+                                                        const isEliminated = eliminatedOptions.includes(opt.key);
+
+                                                        const mobileColors = [
+                                                            { bg: 'bg-[#4285F4]', selectedBg: 'bg-blue-50 dark:bg-blue-950', selectedBorder: 'border-[#4285F4]' },
+                                                            { bg: 'bg-[#34A853]', selectedBg: 'bg-green-50 dark:bg-green-950', selectedBorder: 'border-[#34A853]' },
+                                                            { bg: 'bg-[#F9AB00]', selectedBg: 'bg-yellow-50 dark:bg-yellow-950', selectedBorder: 'border-[#F9AB00]' },
+                                                            { bg: 'bg-[#EA4335]', selectedBg: 'bg-red-50 dark:bg-red-950', selectedBorder: 'border-[#EA4335]' },
+                                                        ];
+                                                        const mc = mobileColors[oIdx % mobileColors.length];
+
+                                                        let rowBg = 'bg-white dark:bg-slate-800';
+                                                        let rowBorder = 'border-t border-gray-100 dark:border-slate-700';
+                                                        let textOpacity = '';
+                                                        if (isEliminated && step === 0) { textOpacity = 'opacity-40 grayscale'; }
+                                                        else if (isSelected && step === 0) { rowBg = mc.selectedBg; rowBorder = `border-t border-l-4 ${mc.selectedBorder}`; }
+                                                        else if (showCorrect) { rowBg = 'bg-green-50 dark:bg-green-950'; rowBorder = 'border-t border-l-4 border-[#34A853]'; }
+                                                        else if (showWrong && isSelected) { rowBg = 'bg-red-50 dark:bg-red-950'; rowBorder = 'border-t border-l-4 border-[#EA4335]'; }
+
+                                                        return (
+                                                            <div
+                                                                key={oIdx}
+                                                                className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
+                                                                onClick={() => {
+                                                                    if (step === 0 && !isEliminated) {
+                                                                        setSelectedOption(opt.key);
+                                                                        setStep(1);
+                                                                        if (q.correctAnswer) {
+                                                                            const isCor = q.correctAnswer.toLowerCase().trim().includes(opt.key);
+                                                                            updateSessionScore(currentSlide, isCor);
+                                                                            if (isCor) {
+                                                                                const newConsecutive = consecutiveCorrect + 1;
+                                                                                setConsecutiveCorrect(newConsecutive);
+                                                                                setIsConfettiActive(true);
+                                                                                triggerCelebration(newConsecutive);
+                                                                                setTimeout(() => setIsConfettiActive(false), 2000);
+                                                                                if (popAudioRef.current) { popAudioRef.current.currentTime = 0; popAudioRef.current.play().catch(() => {}); }
+                                                                            } else {
+                                                                                setConsecutiveCorrect(0);
+                                                                                if (wrongAudioRef.current) { wrongAudioRef.current.currentTime = 0; wrongAudioRef.current.play().catch(() => {}); }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-base ${mc.bg} ${(showCorrect) ? 'bg-[#34A853]' : (showWrong && isSelected) ? 'bg-[#EA4335]' : ''}`}>
+                                                                    {optLetter}
+                                                                </div>
+                                                                <div className="flex-1 text-slate-800 dark:text-white font-semibold text-base leading-snug">
+                                                                    <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>{opt.text}</ReactMarkdown>
+                                                                </div>
+                                                                {isSelected && step === 0 && <Check className="w-5 h-5 text-blue-500 shrink-0" strokeWidth={3} />}
+                                                                {step >= 1 && showCorrect && <Check className="w-5 h-5 text-[#34A853] shrink-0" strokeWidth={3} />}
+                                                                {step >= 1 && showWrong && isSelected && <X className="w-5 h-5 text-[#EA4335] shrink-0" strokeWidth={3} />}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+
+                                            {/* Mobile Explanation */}
+                                            {((step >= 2 && q.explanation && isExpEnabled) || isManualExpOpen) && q.explanation && (
+                                                <div className="border-t border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/50 px-5 py-4">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <div className="bg-blue-500 text-white px-3 py-0.5 rounded-full text-xs font-bold">Explanation</div>
+                                                    </div>
+                                                    <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 text-sm font-medium">
+                                                        <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>{q.explanation}</ReactMarkdown>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Mobile Navigation Row */}
+                                        <div className="flex items-center justify-between gap-3 px-1 pb-2">
+                                            <button
+                                                onClick={prevStep}
+                                                disabled={currentSlide === 0}
+                                                className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-gray-200 dark:border-slate-700 text-slate-700 dark:text-white font-bold text-sm disabled:opacity-40 active:scale-95 transition-all"
+                                            >
+                                                <ChevronLeft className="w-4 h-4" /> {uiLang === 'bn' ? 'আগে' : 'Prev'}
+                                            </button>
+                                            <span className="text-slate-500 dark:text-slate-400 font-bold text-xs">{currentSlide + 1}/{questions.length}</span>
+                                            <button
+                                                onClick={nextStep}
+                                                disabled={currentSlide >= questions.length - 1}
+                                                className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-2xl bg-blue-600 text-white shadow-sm font-bold text-sm disabled:opacity-40 active:scale-95 transition-all"
+                                            >
+                                                {uiLang === 'bn' ? 'পরে' : 'Next'} <ChevronRight className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Desktop Layout — hidden on mobile */}
+                                    <div className="hidden md:contents">
 
                                     {/* Question */}
                                     <div
-                                        className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] md:max-h-[260px] mx-auto mt-1 md:mt-1 transition-all duration-300 relative z-10 rounded-t-2xl rounded-b-[0.5rem] border shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-6 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `${qBgColor.startsWith('#') ? '' : qBgColor} border-gray-200/50 dark:border-gray-700/50` : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-gray-100/80 dark:border-slate-700/40'}`}
+                                        className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] md:max-h-[260px] mx-auto mt-6 md:mt-1 transition-all duration-300 relative z-10 rounded-[2rem] md:rounded-t-2xl md:rounded-b-[0.5rem] border shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-5 md:p-8 md:px-10 ${qBgColor !== 'transparent' ? `md:${qBgColor.startsWith('#') ? '' : qBgColor} bg-white dark:bg-slate-800 md:border-gray-200/50 dark:border-gray-700/50` : 'bg-white dark:bg-slate-800 md:bg-white/90 md:dark:bg-slate-900/90 md:backdrop-blur-md border-gray-200 dark:border-slate-700 md:border-gray-100/80 md:dark:border-slate-700/40'}`}
                                         style={{
                                             containerType: 'inline-size',
                                             backgroundColor: qBgColor.startsWith('#') ? qBgColor : undefined,
@@ -3651,9 +3787,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             })
                                         } as unknown as React.CSSProperties}
                                     >
-                                        {/* Question Number Badge */}
-                                        <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 flex items-center justify-center z-20">
-                                            <div className={`w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-3xl md:text-5xl ${bgTheme === 'video' ? 'bg-black/50 border-white/30 text-white' : `${[
+                                        {/* Desktop Question Number Badge */}
+                                        <div className="hidden md:flex absolute -top-10 left-1/2 -translate-x-1/2 items-center justify-center z-20">
+                                            <div className={`w-20 h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-5xl ${bgTheme === 'video' ? 'bg-black/50 border-white/30 text-white' : `${[
                                                 'from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500',
                                                 'from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500',
                                                 'from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500',
@@ -3662,6 +3798,13 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 'from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500'
                                             ][currentSlide % 6]} bg-gradient-to-tr border-white dark:border-slate-800 text-white`}`}>
                                                 {uiLang === 'bn' ? toBanglaNumber(currentSlide + 1) : currentSlide + 1}
+                                            </div>
+                                        </div>
+
+                                        {/* Mobile Question Number Pill */}
+                                        <div className="md:hidden absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+                                            <div className="bg-blue-500 dark:bg-blue-600 text-white px-4 py-0.5 rounded-full text-[13px] font-bold shadow-md whitespace-nowrap">
+                                                {uiLang === 'bn' ? 'প্রশ্ন' : 'Question'} {uiLang === 'bn' ? toBanglaNumber(currentSlide + 1).padStart(2, '০') : String(currentSlide + 1).padStart(2, '0')}
                                             </div>
                                         </div>
 
@@ -3755,15 +3898,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 const theme = colorThemes[oIdx % colorThemes.length];
 
                                                 const bgClass = optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor);
-                                                let containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${bgClass} ${theme.border}`;
-                                                let letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
+                                                let containerClasses = `flex items-center justify-between gap-2 sm:gap-3 md:gap-4 py-1.5 sm:py-2 md:py-2 px-3 sm:px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-sm md:shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${bgClass} border-gray-200 dark:border-gray-700 md:${theme.border}`;
+                                                let letterClasses = `shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 text-base md:text-lg flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
 
                                                 if (step === 0) {
                                                     if (eliminatedOptions.includes(opt.key)) {
-                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800 relative z-10 cursor-not-allowed select-none`;
+                                                        containerClasses = `flex items-center justify-between gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800 relative z-10 cursor-not-allowed select-none`;
                                                         letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-gray-300 text-gray-500`;
                                                     } else if (isSelected) {
-                                                        containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#1e293b] border-[#4285F4] scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30 relative z-10 select-none active:scale-[0.99]`;
+                                                        containerClasses = `flex items-center justify-between gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#1e293b] border-[#4285F4] scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30 relative z-10 select-none active:scale-[0.99]`;
                                                         letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#4285F4] text-white`;
                                                     } else {
                                                         containerClasses += ` hover:scale-[1.02] hover:shadow-md cursor-pointer hover:border-gray-300 active:scale-[0.99]`;
@@ -3992,14 +4135,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                         </div>
                                     )}
 
+                                    </div>{/* END: Desktop Layout hidden on mobile */}
+
                                 </motion.div>
                             </AnimatePresence>
                         </div>
                     </div>
 
 
-                    {/* Footer */}
-                    <div className="shrink-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-900 dark:via-violet-900 dark:to-purple-900 border-t border-indigo-400/30 dark:border-indigo-700/50 py-2 px-2 md:pl-12 md:pr-8 flex justify-between items-center w-full z-30 relative transition-colors duration-500 overflow-visible" style={{ boxShadow: '0 -4px 20px rgba(109,40,217,0.3), 0 -1px 0 rgba(255,255,255,0.12)' }}>
+                    {/* Desktop Footer */}
+                    <div className="hidden md:flex shrink-0 bg-gradient-to-r from-[#008b18] via-[#3b82f6] to-[#030c06] dark:from-[#008b18]/90 dark:via-[#3b82f6]/90 dark:to-[#030c06]/90 border-t border-blue-400/30 dark:border-blue-700/50 py-2 px-2 md:pl-12 md:pr-8 justify-between items-center w-full z-30 relative transition-colors duration-500 overflow-visible" style={{ boxShadow: '0 -4px 20px rgba(0,0,0,0.3), 0 -1px 0 rgba(255,255,255,0.12)' }}>
                         <div className="hidden md:flex items-center text-indigo-200/80 dark:text-indigo-300/70 font-semibold text-sm md:text-lg whitespace-nowrap mr-2 md:mr-4">
                             © DeshExam.app
                         </div>
@@ -5387,6 +5532,60 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 )}
                             </div>
 
+                        </div>
+                    </div>
+
+                    {/* Mobile Bottom Tab Bar */}
+                    <div className="md:hidden shrink-0 w-full bg-[#2d3a5e] dark:bg-[#1a2240] border-t border-white/10 flex items-center justify-around px-2 py-1.5 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] z-30">
+                        {/* 1. Theme */}
+                        <button className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1.5 text-white/80 active:text-white" onClick={() => setIsDarkMode(!isDarkMode)}>
+                            {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+                            <span className="text-[10px] font-semibold">Theme</span>
+                        </button>
+                        {/* 2. Language */}
+                        <button className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1.5 text-white/80 active:text-white" onClick={() => setUiLang(l => l === 'bn' ? 'en' : 'bn')}>
+                            <Globe className="w-6 h-6" />
+                            <span className="text-[10px] font-semibold">Language</span>
+                        </button>
+                        {/* 3. Fullscreen */}
+                        <button className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1.5 text-white/80 active:text-white" onClick={toggleFullscreen}>
+                            {isFullscreen ? <Minimize className="w-6 h-6" /> : <Maximize className="w-6 h-6" />}
+                            <span className="text-[10px] font-semibold">Fullscreen</span>
+                        </button>
+                        {/* 4. Settings */}
+                        <button className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1.5 text-white/80 active:text-white" onClick={() => setIsSettingsOpen(!isSettingsOpen)}>
+                            <Settings className="w-6 h-6" />
+                            <span className="text-[10px] font-semibold">Settings</span>
+                        </button>
+                        {/* 5. More — opens a small popup with extra tools */}
+                        <div className="relative flex-1">
+                            <button
+                                className="flex flex-col items-center justify-center gap-0.5 w-full py-1.5 text-white/80 active:text-white"
+                                onClick={() => setIsShortcutsOpen(!isShortcutsOpen)}
+                            >
+                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                <span className="text-[10px] font-semibold">More</span>
+                            </button>
+                            {isShortcutsOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-[60]" onClick={() => setIsShortcutsOpen(false)}></div>
+                                    <div className="absolute bottom-full right-0 mb-2 bg-[#2d3a5e] dark:bg-[#1a2240] border border-white/20 rounded-2xl shadow-2xl p-3 z-[70] flex flex-col gap-1 min-w-[150px]">
+                                        <button className="flex items-center gap-3 px-3 py-2.5 text-white/90 hover:bg-white/10 rounded-xl text-sm font-semibold" onClick={() => { setIsPenActive(!isPenActive); setIsShortcutsOpen(false); }}>
+                                            <Pen className="w-5 h-5" /> Pen Tool
+                                        </button>
+                                        <button className="flex items-center gap-3 px-3 py-2.5 text-white/90 hover:bg-white/10 rounded-xl text-sm font-semibold" onClick={() => {
+                                            if (isAutoPlayReadAloud || isSpeaking) { setIsAutoPlayReadAloud(false); window.speechSynthesis.cancel(); setIsSpeaking(false); }
+                                            else { setIsAutoPlayReadAloud(true); if (step !== 0) handleReadAloud(true); }
+                                            setIsShortcutsOpen(false);
+                                        }}>
+                                            {isAutoPlayReadAloud || isSpeaking ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />} Audio
+                                        </button>
+                                        <button className="flex items-center gap-3 px-3 py-2.5 text-white/90 hover:bg-white/10 rounded-xl text-sm font-semibold" onClick={() => { setShowAudioSettings(!showAudioSettings); setIsShortcutsOpen(false); }}>
+                                            <Sliders className="w-5 h-5" /> Advance
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
 
