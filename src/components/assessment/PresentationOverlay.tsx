@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
@@ -5601,8 +5601,17 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         }
                     ` }} />
 
-                    {/* Floating Quick Pen Tool (Bottom) */}
-                    <motion.div drag dragMomentum={false} className="absolute left-1/2 -translate-x-1/2 bottom-[75px] md:bottom-[90px] z-[70] flex flex-row gap-1 md:gap-2 items-center animate-in slide-in-from-bottom-10 fade-in duration-300 cursor-move bg-[#2d3a5e]/90 dark:bg-[#1a2240]/90 backdrop-blur-md px-2 md:px-3 py-1.5 md:py-2 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.3)] border border-white/10">
+                    {/* Floating Quick Pen Tool (Left) */}
+                    <motion.div drag dragMomentum={false} className="absolute left-3 md:left-5 bottom-[75px] md:bottom-[90px] z-[70] flex flex-row gap-1 md:gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300 cursor-move bg-black/30 dark:bg-black/60 backdrop-blur-sm px-2 md:px-3 py-1.5 md:py-2 rounded-full border border-black/10 dark:border-white/10 shadow-sm">
+                        {/* Clear Markings Button */}
+                        <button
+                            onClick={clearCanvas}
+                            className="p-1.5 md:p-2 text-white/70 hover:text-red-400 transition-colors bg-transparent rounded-full hover:bg-white/10"
+                            title="Clear All Markings"
+                        >
+                            <Eraser className="w-4 h-4 md:w-5 md:h-5" />
+                        </button>
+
                         {/* Main Pen Toggle Button */}
                         <button
                             onClick={() => {
@@ -5620,15 +5629,6 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             title="Quick Pen Toggle"
                         >
                             <Pen className="w-4 h-4 md:w-5 md:h-5" />
-                        </button>
-
-                        {/* Clear Markings Button */}
-                        <button
-                            onClick={clearCanvas}
-                            className="p-1.5 md:p-2 text-white/70 hover:text-red-400 transition-colors bg-transparent rounded-full hover:bg-white/10"
-                            title="Clear All Markings"
-                        >
-                            <Eraser className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
 
                         {/* Preset Colors (Visible when Pen is active, expands horizontally) */}
