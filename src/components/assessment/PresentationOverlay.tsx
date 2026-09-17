@@ -3702,9 +3702,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {/* Options Area with Side Navigation */}
                                     <div className="relative w-full max-w-[1200px] flex justify-center mt-6 md:mt-8 mb-4 mx-auto">
-                                        {/* Prev Arrow & Exp Toggle */}
-                                        <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:flex flex-col gap-4 items-center">
-                                            {q.explanation && (
+                                        {/* Exp Toggle */}
+                                        {q.explanation && (
+                                            <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-0 z-[45] group hidden md:flex flex-col gap-4 items-center">
                                                 <button
                                                     onClick={() => setIsManualExpOpen(!isManualExpOpen)}
                                                     className={`p-3 rounded-full shadow-lg backdrop-blur-sm border transition-all hover:scale-110 active:scale-95 ${isManualExpOpen ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600' : 'bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600'}`}
@@ -3712,16 +3712,19 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 >
                                                     <Lightbulb className="w-8 h-8 md:w-6 md:h-6" strokeWidth={2.5} />
                                                 </button>
-                                            )}
-                                            {currentSlide > 0 && (
+                                            </div>
+                                        )}
+                                        {/* Prev Arrow */}
+                                        {currentSlide > 0 && (
+                                            <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
                                                 <button
                                                     onClick={prevStep}
                                                     className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
                                                 >
                                                     <ChevronLeft className="w-8 h-8" strokeWidth={2.5} />
                                                 </button>
-                                            )}
-                                        </div>
+                                            </div>
+                                        )}
 
                                         <motion.div
                                             className={optionsLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl" : "flex flex-col gap-y-3 w-[90%] sm:w-fit min-w-[300px] md:min-w-[450px] lg:min-w-[500px] max-w-4xl mx-auto"}
@@ -5419,11 +5422,11 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     ` }} />
 
                     {/* Floating Quick Pen Tool (Left Edge) */}
-                    <div className="absolute left-3 md:left-5 top-18 md:top-20 z-[70] flex flex-col gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300">
-                        {/* Clear Markings Button (Above Pen) */}
+                    <motion.div drag dragMomentum={false} className="absolute left-3 md:left-5 top-18 md:top-20 z-[70] flex flex-row gap-2 items-center animate-in slide-in-from-left-10 fade-in duration-300 cursor-move bg-white/50 dark:bg-gray-800/50 backdrop-blur-md p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-700">
+                        {/* Clear Markings Button (Left) */}
                         <button
                             onClick={clearCanvas}
-                            className="p-2 mb-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors bg-transparent rounded-full hover:bg-red-500/10"
+                            className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors bg-transparent rounded-full hover:bg-red-500/10"
                             title="Clear All Markings"
                         >
                             <Eraser className="w-5 h-5 md:w-6 md:h-6" />
@@ -5448,8 +5451,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             <Pen className="w-5 h-5 md:w-6 md:h-6" />
                         </button>
 
-                        {/* Preset Colors (Visible when Pen is active, expands downwards) */}
-                        <div className={`flex flex-col gap-2 p-1.5 bg-transparent transition-all duration-300 origin-top ${(isPenActive && drawingTool === 'pen') ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 -translate-y-4 pointer-events-none'
+                        {/* Preset Colors (Visible when Pen is active, expands horizontally) */}
+                        <div className={`flex flex-row gap-2 p-1 bg-transparent transition-all duration-300 origin-left ${(isPenActive && drawingTool === 'pen') ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-90 -translate-x-4 pointer-events-none'
                             }`}>
                             {[
                                 { color: '#ef4444', name: 'Red' },
@@ -5473,72 +5476,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 />
                             ))}
                         </div>
-                    </div>                    {/* Floating Presentation Tools (Right Edge, Top, Transparent) */}
-                    <div className="absolute right-4 top-18 md:top-20 z-[70] bg-transparent flex flex-col gap-1 w-9 items-center animate-in slide-in-from-right-10 fade-in duration-300">
-
-                        <button onClick={() => { setDrawingTool('laser'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'laser') ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Laser (Shift+L)">
-                            <MousePointer2 className="w-4 h-4" />
-                        </button>
-
-                        <button onClick={() => { setDrawingTool('highlighter'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'highlighter') ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Marker (Shift+M)">
-                            <Highlighter className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => { setDrawingTool('eraser'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'eraser') ? 'bg-slate-500/40 text-white border border-slate-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Eraser (Shift+E)">
-                            <Eraser className="w-4 h-4" />
-                        </button>
-
-                        <hr className="w-full border-slate-700/50 my-0.5" />
-
-                        <button onClick={() => { setDrawingTool('rectangle'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'rectangle') ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Rectangle (Shift+B)">
-                            <Square className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => { setDrawingTool('circle'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'circle') ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Circle (Shift+C)">
-                            <Circle className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => { setDrawingTool('arrow'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'arrow') ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Arrow (Shift+V)">
-                            <ArrowUpRight className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => { setDrawingTool('text'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'text') ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Text (Shift+T)">
-                            <Type className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => { setDrawingTool('magnifier'); setIsPenActive(true); }} className={`p-0.5 rounded-lg transition-all ${(isPenActive && drawingTool === 'magnifier') ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} title="Zoom (Shift+Z)">
-                            <ZoomIn className="w-4 h-4" />
-                        </button>
-
-                        <hr className="w-full border-slate-700/50 my-0.5" />
-
-                        <button onClick={clearCanvas} className="p-0.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all" title="Clear Canvas (Shift+Del)">
-                            <Trash2 className="w-4 h-4" />
-                        </button>
-
-                        <hr className="w-full border-slate-700/50 my-0.5" />
-
-                        {/* Color Picker Group */}
-                        <div className={`relative group mt-0.5 mb-0.5 transition-opacity ${(!isPenActive || drawingTool === 'laser' || drawingTool === 'magnifier') ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
-                            {/* The main color button */}
-                            <div className="w-5 h-5 mx-auto relative rounded-full overflow-hidden border border-slate-600 hover:border-slate-400 transition-all cursor-pointer shadow-sm" title="Choose Color">
-                                <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: penColor }}></div>
-                                <input
-                                    type="color"
-                                    value={penColor}
-                                    onChange={e => { setPenColor(e.target.value); setIsPenActive(true); }}
-                                    className="absolute inset-[-10px] w-[50px] h-[50px] cursor-pointer opacity-0"
-                                />
-                            </div>
-                            {/* Flyout for quick colors */}
-                            <div className="absolute right-full top-1/2 -translate-y-1/2 mr-3 hidden group-hover:flex bg-slate-900/95 backdrop-blur-xl p-1.5 rounded-2xl border border-slate-700/50 shadow-xl gap-1.5 animate-in slide-in-from-right-2 fade-in duration-200">
-                                {['#ef4444', '#3b82f6', '#22c55e', '#facc15', '#ffffff'].map(c => (
-                                    <button
-                                        key={c}
-                                        onClick={() => { setPenColor(c); setIsPenActive(true); }}
-                                        className={`w-5 h-5 rounded-full border-2 ${penColor === c ? 'border-white scale-110 shadow-lg' : 'border-transparent hover:scale-110'} transition-all`}
-                                        style={{ backgroundColor: c }}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
+                    </motion.div>
                 </div>
 
                 {/* Right Sidebar Column */}
