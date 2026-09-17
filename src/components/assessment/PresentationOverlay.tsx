@@ -766,7 +766,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     const [wmOpacity, setWmOpacity] = useState(0.10);
     const [wmSize, setWmSize] = useState(13);
     const [wmSpacing, setWmSpacing] = useState(80);
-    const [wmVisible, setWmVisible] = useState(true);
+    const [wmVisible, setWmVisible] = useState(false);
 
     // ── Feature 7: Multi-language UI ──────────────────────────────────────────
     const [uiLang, setUiLang] = useState<UiLang>(() => {
