@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
@@ -5279,8 +5279,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                     {isSettingsOpen && (
                                         <>
-                                            <div className="fixed inset-0 z-[60]" onClick={() => setIsSettingsOpen(false)}></div>
-                                            <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 md:fixed md:bottom-[70px] md:left-auto md:right-4 md:translate-x-0 md:mb-0 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-3 md:p-4 w-[92vw] sm:w-[350px] z-[70] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[75vh] md:max-h-[65vh]">
+                                            <div className="fixed inset-0 z-[100000]" onClick={() => setIsSettingsOpen(false)}></div>
+                                            <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 md:fixed md:bottom-[70px] md:left-auto md:right-4 md:translate-x-0 md:mb-0 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-3 md:p-4 w-[92vw] sm:w-[350px] z-[100001] animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[75vh] md:max-h-[65vh]">
                                                 <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-100 dark:border-gray-800/60 shrink-0">
                                                     <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg flex items-center gap-2">
                                                         <Settings className="w-5 h-5 text-indigo-500" /> Settings
