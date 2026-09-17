@@ -3311,35 +3311,39 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     {/* Header */}
                     {showHeader && (
                         <div
-                            className="shrink-0 bg-gradient-to-r from-[#008b18] via-[#3b82f6] to-[#030c06] dark:from-[#008b18]/90 dark:via-[#3b82f6]/90 dark:to-[#030c06]/90 border-b border-blue-400/30 dark:border-blue-700/50 w-full z-30 relative transition-all duration-500"
+                            className="shrink-0 md:bg-gradient-to-r md:from-[#008b18] md:via-[#3b82f6] md:to-[#030c06] md:dark:from-[#008b18]/90 md:dark:via-[#3b82f6]/90 md:dark:to-[#030c06]/90 bg-[#155ab2] dark:bg-[#0f4082] border-b border-blue-400/30 dark:border-blue-700/50 w-full z-30 relative transition-all duration-500"
                             style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.1)' }}
                         >
                             {/* Mobile Header Row */}
-                            <div className="flex md:hidden items-center justify-between px-0 py-0 gap-2">
+                            <div className="flex md:hidden relative items-center justify-between px-3 py-3 gap-2">
                                 {/* Left: Logo + Title */}
-                                <div className="flex items-center gap-2 min-w-0 flex-1 px-2">
+                                <div className="flex items-center gap-3 min-w-0 flex-1 px-1">
                                     {showLogo && (
-                                        <img src="/icons/icon-192x192.png" alt="DeshExam" className="w-9 h-9 shrink-0 object-contain drop-shadow-sm rounded-full bg-white p-0.5" />
+                                        <img src="/icons/icon-192x192.png" alt="DeshExam" className="w-10 h-10 shrink-0 object-contain drop-shadow-sm rounded-[10px] bg-white p-[3px]" />
                                     )}
                                     <div className="flex flex-col min-w-0">
-                                        <div className="flex items-center gap-1 font-black text-sm leading-tight">
-                                            <span className="text-[#FF9F57]">DESH</span>
-                                            <span className="text-white">EXAM</span>
-                                        </div>
-                                        <h1 className="text-white/90 font-bold text-xs leading-tight truncate">{displayTitle}</h1>
+                                        <h1 className="text-white/95 font-bold text-[15px] leading-tight truncate drop-shadow-sm">{displayTitle}</h1>
                                         {displayTaxonomy && (
-                                            <p className="text-white/60 font-semibold text-[10px] leading-tight truncate">{displayTaxonomy.replace(/•/g, '•').substring(0, 40)}</p>
+                                            <p className="text-white/80 font-medium text-[11px] leading-tight mt-0.5 truncate">{displayTaxonomy.replace(/•/g, '•').substring(0, 40)}</p>
                                         )}
                                     </div>
                                 </div>
-                                {/* Right: X + Question Counter */}
-                                <div className="flex flex-col items-center gap-0.5 shrink-0">
-                                    <button onClick={closePresentation} className="bg-white/20 hover:bg-white/30 rounded-full text-white border border-white/30 flex items-center justify-center w-8 h-8">
+                                {/* Right: X */}
+                                <div className="flex items-center shrink-0 pr-1 pb-1">
+                                    <button onClick={closePresentation} className="bg-white/10 hover:bg-white/20 rounded-full text-white border border-white/20 flex items-center justify-center w-8 h-8 transition-colors shadow-sm">
                                         <X className="w-4 h-4" strokeWidth={2.5} />
                                     </button>
-                                    <span className="text-white/90 font-black tracking-widest text-[9px] whitespace-nowrap">
-                                        Q {String(currentSlide + 1).padStart(2, '0')}/{String(questions.length).padStart(2, '0')}
+                                </div>
+
+                                {/* Drop-down Tab for Question Number */}
+                                <div className="absolute -bottom-6 right-0 h-6 bg-[#155ab2] dark:bg-[#0f4082] pl-4 pr-3 flex items-center justify-center rounded-bl-[1.1rem] shadow-[0_4px_6px_rgba(0,0,0,0.2)] border-b border-l border-white/10 z-20">
+                                    <span className="text-white/95 font-bold tracking-widest text-[9px] whitespace-nowrap">
+                                        QUESTION {String(currentSlide + 1).padStart(2, '0')} OF {String(questions.length).padStart(2, '0')}
                                     </span>
+                                    {/* Inner Curve (Concave) */}
+                                    <svg className="absolute top-0 -left-[14px] w-[14px] h-[14px] text-[#155ab2] dark:text-[#0f4082]" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M16 16V0H0c8.8 0 16 7.2 16 16z" />
+                                    </svg>
                                 </div>
                             </div>
 
@@ -3641,12 +3645,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 } : {})
                                             }}
                                         >
-                                            {/* Mobile Question Number Pill */}
-                                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
-                                                <div className="bg-blue-500 dark:bg-blue-600 text-white px-5 py-0.5 rounded-full text-[13px] font-bold shadow-sm whitespace-nowrap">
-                                                    {uiLang === 'bn' ? 'প্রশ্ন' : 'Question'} {uiLang === 'bn' ? toBanglaNumber(currentSlide + 1).padStart(2, '০') : String(currentSlide + 1).padStart(2, '0')}
-                                                </div>
-                                            </div>
+
 
                                             {/* Mobile Question Text */}
                                             <div className="px-5 pb-4 pt-6">
