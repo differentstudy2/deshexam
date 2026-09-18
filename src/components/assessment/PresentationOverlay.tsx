@@ -3336,12 +3336,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                 </div>
 
                                 {/* Drop-down Tab for Question Number */}
-                                <div className="absolute -bottom-6 right-0 h-6 bg-[#155ab2] dark:bg-[#0f4082] pl-4 pr-3 flex items-center justify-center rounded-bl-[1.1rem] shadow-[0_4px_6px_rgba(0,0,0,0.2)] border-b border-l border-white/10 z-20">
-                                    <span className="text-white/95 font-bold tracking-widest text-[9px] whitespace-nowrap">
-                                        QUESTION {String(currentSlide + 1).padStart(2, '0')} OF {String(questions.length).padStart(2, '0')}
+                                <div className="absolute -bottom-6 right-0 h-6 bg-gradient-to-r from-fuchsia-600 to-pink-600 pl-4 pr-3 flex items-center justify-center rounded-bl-[1.1rem] shadow-[0_4px_10px_rgba(0,0,0,0.3)] border-b border-l border-pink-400/30 z-20">
+                                    <span className="text-white font-extrabold tracking-widest text-[10px] whitespace-nowrap drop-shadow-md">
+                                        {uiLang === 'bn'
+                                            ? `প্রশ্ন ${toBanglaNumber(currentSlide + 1).padStart(2, '০')} / ${toBanglaNumber(questions.length).padStart(2, '০')}`
+                                            : `QUESTION ${String(currentSlide + 1).padStart(2, '0')} OF ${String(questions.length).padStart(2, '0')}`
+                                        }
                                     </span>
                                     {/* Inner Curve (Concave) */}
-                                    <svg className="absolute top-0 -left-[14px] w-[14px] h-[14px] text-[#155ab2] dark:text-[#0f4082]" fill="currentColor" viewBox="0 0 16 16">
+                                    <svg className="absolute top-0 -left-[14px] w-[14px] h-[14px] text-fuchsia-600" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M16 16V0H0c8.8 0 16 7.2 16 16z" />
                                     </svg>
                                 </div>
@@ -3632,7 +3635,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     {/* Mobile Unified White Card Wrapper */}
                                     <div className="md:hidden w-full px-4 pt-4 pb-3 flex flex-col gap-3">
                                         {/* Question Card */}
-                                        <div 
+                                        <div
                                             className={`relative rounded-t-[1rem] rounded-b-[0.3rem] shadow-md overflow-visible border-t-4 border-t-blue-500 mt-3 transition-colors duration-300 ${bgTheme === 'video' ? 'bg-black/40 border border-white/10 backdrop-blur-md' : isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-gray-100'}`}
                                             style={{
                                                 backgroundColor: qBgColor !== 'transparent' ? (qBgColor === 'default' ? undefined : qBgColor) : undefined,
@@ -3648,9 +3651,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                             {/* Mobile Question Number Pill (Top Center) */}
                                             <div className="absolute -top-[1.15rem] left-1/2 -translate-x-1/2 z-20 flex items-center bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-md border-2 border-white dark:border-slate-800 px-4 py-1.5 whitespace-nowrap">
                                                 <span className="font-extrabold text-[13px] font-mono leading-none pt-[1px] text-white uppercase tracking-wider drop-shadow-sm">
-                                                    {uiLang === 'bn' 
+                                                    {uiLang === 'bn'
                                                         ? `প্রশ্ন ${toBanglaNumber(currentSlide + 1).padStart(2, '০')}`
-                                                        : `Question ${String(currentSlide + 1).padStart(2, '0')}`
+                                                        : `Q ${String(currentSlide + 1).padStart(2, '0')}`
                                                     }
                                                 </span>
                                             </div>                                            {/* Mobile Question Text */}
@@ -3768,7 +3771,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                             <div className={`prose dark:prose-invert max-w-none flex-1 font-bold text-[17px] leading-snug [&_*]:!text-[17px] [&_*]:!leading-snug [&_*]:!m-0 ${optTextColor !== 'default' ? 'text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]' : 'text-slate-800 dark:text-white [&_*]:!text-slate-800 dark:[&_*]:!text-white'}`} style={{ '--opt-color': optTextColor !== 'default' ? optTextColor : undefined } as React.CSSProperties}>
                                                                 <ReactMarkdown remarkPlugins={remarkPluginsList} rehypePlugins={rehypePluginsList}>{opt.text}</ReactMarkdown>
                                                             </div>
-                                                            
+
                                                             {isSelected && step === 0 && (
                                                                 <motion.div
                                                                     initial={{ scale: 0, opacity: 0 }}
@@ -4633,6 +4636,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                             else { setIsAutoPlayReadAloud(true); if (step !== 0) handleReadAloud(true); }
                         }}>
                             {isAutoPlayReadAloud || isSpeaking ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
+                        </button>
+                        {/* Whiteboard Mode */}
+                        <button className={`p-2 active:scale-95 transition-transform ${isWhiteboardMode ? 'text-blue-300' : 'text-white/80 active:text-white'}`} onClick={() => setIsWhiteboardMode(!isWhiteboardMode)}>
+                            <Presentation className="w-5 h-5" />
+                        </button>
+                        {/* Background Music */}
+                        <button className={`p-2 active:scale-95 transition-transform ${isLofiEnabled ? 'text-blue-300' : 'text-white/80 active:text-white'}`} onClick={() => setIsLofiEnabled(!isLofiEnabled)}>
+                            <Music className="w-5 h-5" />
+                        </button>
+                        {/* Save as Image */}
+                        <button className={`p-2 active:scale-95 transition-transform ${isSavingImage ? 'text-blue-300 animate-pulse' : 'text-white/80 active:text-white'}`} onClick={handleSaveAsImage} disabled={isSavingImage}>
+                            {isSavingImage ? <span className="w-5 h-5 flex items-center justify-center"><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" /></svg></span> : <ImageDown className="w-5 h-5" />}
                         </button>
                         {/* 4. Advance Settings */}
                         <button className={`p-2 active:scale-95 transition-transform ${showAudioSettings ? 'text-blue-300' : 'text-white/80 active:text-white'}`} onClick={() => setShowAudioSettings(!showAudioSettings)}>
