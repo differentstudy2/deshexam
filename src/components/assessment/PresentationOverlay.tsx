@@ -3324,7 +3324,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <div className="flex flex-col min-w-0">
                                         <h1 className="text-white/95 font-bold text-[15px] leading-tight truncate drop-shadow-sm">{displayTitle}</h1>
                                         {displayTaxonomy && (
-                                            <p className="text-white/80 font-medium text-[11px] leading-tight mt-0.5 truncate">{displayTaxonomy.replace(/•/g, '•').substring(0, 40)}</p>
+                                            <p className="text-amber-300 font-bold text-[11px] leading-tight mt-0.5 truncate drop-shadow-sm">{displayTaxonomy}</p>
                                         )}
                                     </div>
                                 </div>
@@ -5097,7 +5097,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <div className={`flex-1 w-full px-6 flex flex-col justify-center ${isPrintAsList || headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
                                                     <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight text-lg">{displayTitle}</h1>
                                                     {displayTaxonomy && (
-                                                        <div className="text-indigo-700 dark:text-gray-400 font-bold tracking-wider uppercase mt-1 text-xs">
+                                                        <div className="text-amber-500 dark:text-amber-400 font-extrabold tracking-wider uppercase mt-1 text-xs">
                                                             {displayTaxonomy}
                                                         </div>
                                                     )}
@@ -5134,7 +5134,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <div className={`flex-1 w-full px-2 flex flex-col justify-center items-center text-center`}>
                                                     <h1 className={`font-extrabold tracking-tight text-base md:text-lg lg:text-xl line-clamp-1 ${bgTheme === 'video' ? 'text-white drop-shadow-md' : isDarkMode ? 'text-white' : 'text-white'}`}>{displayTitle}</h1>
                                                     {displayTaxonomy && (
-                                                        <div className={`font-bold tracking-wider uppercase mt-1 text-[10px] md:text-xs ${bgTheme === 'video' ? 'text-white/90 drop-shadow-md' : isDarkMode ? 'text-gray-300' : 'text-purple-100/90'}`}>
+                                                        <div className={`font-extrabold tracking-wider uppercase mt-1 text-[10px] md:text-xs text-amber-300 drop-shadow-sm`}>
                                                             {displayTaxonomy}
                                                         </div>
                                                     )}
