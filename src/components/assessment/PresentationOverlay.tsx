@@ -722,6 +722,31 @@ const LeftStreamWidgets = ({ currentQuestion, isSpeaking }: { currentQuestion?: 
         </div>
     );
 };
+const ColorfulTaxonomy = ({ text, isDark = false }: { text: string, isDark?: boolean }) => {
+    if (!text) return null;
+    const parts = text.split(/([•|])/);
+    let colorIndex = 0;
+    const lightColors = ['text-amber-300', 'text-cyan-300', 'text-lime-300', 'text-fuchsia-300', 'text-orange-300', 'text-emerald-300'];
+    const darkColors = ['text-indigo-700', 'text-pink-600', 'text-teal-700', 'text-rose-600', 'text-blue-700', 'text-purple-700'];
+    const colors = isDark ? darkColors : lightColors;
+    
+    return (
+        <>
+            {parts.map((part, i) => {
+                if (part === '•' || part === '|' || part.includes('?')) {
+                    return <span key={i} className={isDark ? 'text-gray-400 mx-1' : 'text-white/40 mx-1'}>{part.includes('?') ? '•' : part}</span>;
+                }
+                const trimmed = part.trim();
+                if (!trimmed) return <span key={i}> </span>;
+                
+                const color = colors[colorIndex % colors.length];
+                colorIndex++;
+                
+                return <span key={i} className={`${color} drop-shadow-sm`}>{trimmed}</span>;
+            })}
+        </>
+    );
+};
 
 export default function PresentationOverlay({ questions, classLine, chapterName, topicName, autoStart, onClose, isPremiumUser, testLanguage }: PresentationOverlayProps) {
     const { user, userProfile } = useAuth();
@@ -3324,7 +3349,9 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <div className="flex flex-col min-w-0">
                                         <h1 className="text-white/95 font-bold text-[15px] leading-tight truncate drop-shadow-sm">{displayTitle}</h1>
                                         {displayTaxonomy && (
-                                            <p className="text-amber-300 font-bold text-[11px] leading-tight mt-0.5 truncate drop-shadow-sm">{displayTaxonomy}</p>
+                                            <p className="font-bold text-[11px] leading-tight mt-0.5 truncate drop-shadow-sm">
+                                                <ColorfulTaxonomy text={displayTaxonomy} />
+                                            </p>
                                         )}
                                     </div>
                                 </div>
@@ -3384,12 +3411,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     <h1 className="font-extrabold text-white dark:text-gray-100 tracking-tight line-clamp-none drop-shadow-sm" style={{ fontSize: `${1.1 * headerScale * headerTitleScale}rem` }}>{displayTitle}</h1>
                                     {displayTaxonomy && (
                                         <div className="flex items-center flex-wrap gap-1 font-bold tracking-wider uppercase mt-1" style={{ fontSize: `${0.72 * headerScale * headerTitleScale}rem` }}>
-                                            {displayTaxonomy.split('•').map((part, i) => (
-                                                <span key={i} className="flex items-center gap-1">
-                                                    {i > 0 && <span className="text-white/40 mx-0.5">•</span>}
-                                                    <span className={i === 0 ? 'text-amber-300 drop-shadow-sm' : i === 1 ? 'text-cyan-300 drop-shadow-sm' : i === 2 ? 'text-lime-300 drop-shadow-sm' : 'text-pink-300 drop-shadow-sm'}>{part.trim()}</span>
-                                                </span>
-                                            ))}
+                                            <ColorfulTaxonomy text={displayTaxonomy} />
                                         </div>
                                     )}
                                 </div>
@@ -3416,8 +3438,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     )}
 
                     {/* Mobile Full-Width Progress Bar */}
-                    <div className="md:hidden w-full h-1 bg-blue-100/30 dark:bg-slate-800 shrink-0 z-20">
-                        <div className="h-full bg-blue-400 dark:bg-blue-500 transition-all duration-500 ease-out" style={{ width: `${Math.max(3, ((currentSlide + 1) / Math.max(1, questions.length)) * 100)}%` }}></div>
+                    <div className="md:hidden w-full h-1 bg-black/10 dark:bg-slate-800 shrink-0 z-20">
+                        <div className="h-full bg-gradient-to-r from-pink-500 to-amber-400 dark:from-pink-500 dark:to-amber-400 transition-all duration-500 ease-out" style={{ width: `${Math.max(3, ((currentSlide + 1) / Math.max(1, questions.length)) * 100)}%` }}></div>
                     </div>
 
 
@@ -3694,8 +3716,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     ];
                                                     const mc = mobileColors[oIdx % mobileColors.length];
 
-                                                    let rowBg = bgTheme === 'video' ? 'bg-black/40 backdrop-blur-md' : 'bg-white dark:bg-slate-800';
-                                                    let rowBorder = bgTheme === 'video' ? 'border border-white/10' : 'border border-gray-100 dark:border-slate-700';
+                                                    let rowBg = bgTheme === 'video' ? 'bg-black/40 backdrop-blur-md' : 'bg-[rgba(15,23,42,0.09)] dark:bg-slate-800';
+                                                    let rowBorder = bgTheme === 'video' ? 'border border-white/10' : 'border border-slate-200/70 dark:border-slate-700';
                                                     let textOpacity = '';
                                                     if (isEliminated && step === 0) { textOpacity = 'opacity-40 grayscale'; }
                                                     else if (isSelected && step === 0) { rowBg = mc.selectedBg; rowBorder = `border border-l-4 ${mc.selectedBorder}`; }
@@ -3706,7 +3728,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                         <div
                                                             id={`mobile-option-card-${opt.key}`}
                                                             key={oIdx}
-                                                            className={`relative flex items-center gap-3 px-4 py-2 rounded-2xl shadow-sm cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
+                                                            className={`relative flex items-center gap-3 px-4 py-2 rounded-2xl shadow-md cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
                                                             style={{
                                                                 backgroundColor: (optBgColor !== 'default' && optBgColor.startsWith('#')) ? optBgColor : undefined,
                                                                 ...(bgTheme === 'dots' ? {
@@ -3973,18 +3995,18 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
 
                                                     // Colors closely matching the image
                                                     const colorThemes = [
-                                                        { border: 'border-[#4285F4]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
-                                                        { border: 'border-[#34A853]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
-                                                        { border: 'border-[#F9AB00]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
-                                                        { border: 'border-[#EA4335]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
-                                                        { border: 'border-[#9C27B0]/50', bg: 'bg-white dark:bg-gray-800', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
+                                                        { border: 'border-[#4285F4]/30', bg: 'bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80', letterBg: 'bg-[#4285F4]', letterText: 'text-white' }, // Blue
+                                                        { border: 'border-[#34A853]/30', bg: 'bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80', letterBg: 'bg-[#34A853]', letterText: 'text-white' }, // Green
+                                                        { border: 'border-[#F9AB00]/30', bg: 'bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80', letterBg: 'bg-[#F9AB00]', letterText: 'text-white' }, // Yellow/Orange
+                                                        { border: 'border-[#EA4335]/30', bg: 'bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80', letterBg: 'bg-[#EA4335]', letterText: 'text-white' }, // Red
+                                                        { border: 'border-[#9C27B0]/30', bg: 'bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80', letterBg: 'bg-[#9C27B0]', letterText: 'text-white' }, // Purple
                                                     ];
 
                                                     const theme = colorThemes[oIdx % colorThemes.length];
 
                                                     const bgClass = optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor);
-                                                    let containerClasses = `flex items-center justify-between gap-2 sm:gap-3 md:gap-4 py-1.5 sm:py-2 md:py-2 px-3 sm:px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-sm md:shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative z-10 select-none ${bgClass} border-gray-200 dark:border-gray-700 md:${theme.border}`;
-                                                    let letterClasses = `shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 text-base md:text-lg flex items-center justify-center rounded-full font-black transition-colors duration-300 ${theme.letterBg} ${theme.letterText}`;
+                                                    let containerClasses = `flex items-center justify-between gap-2 sm:gap-3 md:gap-4 py-1.5 sm:py-2 md:py-2 px-3 sm:px-4 md:px-5 rounded-xl border-[1.5px] transition-all duration-200 shadow-md relative z-10 select-none ${bgClass} border-slate-200/70 dark:border-slate-700 md:${theme.border}`;
+                                                    let letterClasses = `shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 text-base md:text-lg flex items-center justify-center rounded-full font-black transition-colors duration-300 shadow-sm ${theme.letterBg} ${theme.letterText}`;
 
                                                     if (step === 0) {
                                                         if (eliminatedOptions.includes(opt.key)) {
@@ -5097,8 +5119,8 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 <div className={`flex-1 w-full px-6 flex flex-col justify-center ${isPrintAsList || headerTitleAlign === 'left' ? 'items-start text-left' : headerTitleAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}>
                                                     <h1 className="font-extrabold text-indigo-950 dark:text-gray-100 tracking-tight text-lg">{displayTitle}</h1>
                                                     {displayTaxonomy && (
-                                                        <div className="text-amber-500 dark:text-amber-400 font-extrabold tracking-wider uppercase mt-1 text-xs">
-                                                            {displayTaxonomy}
+                                                        <div className="font-extrabold tracking-wider uppercase mt-1 text-xs">
+                                                            <ColorfulTaxonomy text={displayTaxonomy} isDark={true} />
                                                         </div>
                                                     )}
                                                 </div>
@@ -5135,7 +5157,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     <h1 className={`font-extrabold tracking-tight text-base md:text-lg lg:text-xl line-clamp-1 ${bgTheme === 'video' ? 'text-white drop-shadow-md' : isDarkMode ? 'text-white' : 'text-white'}`}>{displayTitle}</h1>
                                                     {displayTaxonomy && (
                                                         <div className={`font-extrabold tracking-wider uppercase mt-1 text-[10px] md:text-xs text-amber-300 drop-shadow-sm`}>
-                                                            {displayTaxonomy}
+                                                            <ColorfulTaxonomy text={displayTaxonomy} />
                                                         </div>
                                                     )}
                                                 </div>
