@@ -77,6 +77,45 @@ const bnNumbersMap: Record<number, string> = {
     5: '৫', 6: '৬', 7: '৭', 8: '৮', 9: '৯'
 };
 
+const FloatingScore = ({ id, startX, startY, onComplete }: { id: number, startX: number, startY: number, onComplete: (id: number) => void }) => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    // Target position for the score tabs: Left tab on mobile (x: 40, y: 30), Right side on desktop (x: innerWidth - 60, y: 30)
+    const destX = isMobile ? 40 : (typeof window !== 'undefined' ? window.innerWidth - 60 : 0);
+    const destY = isMobile ? 30 : 30;
+    
+    const [style, setStyle] = useState({
+        left: startX,
+        top: startY,
+        opacity: 1,
+        transform: 'scale(1.5)',
+        transition: 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)'
+    });
+
+    useEffect(() => {
+        const t1 = setTimeout(() => {
+            setStyle({
+                left: destX,
+                top: destY,
+                opacity: 0,
+                transform: 'scale(0.5)',
+                transition: 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)'
+            });
+        }, 50);
+        
+        const t2 = setTimeout(() => onComplete(id), 850);
+        return () => { clearTimeout(t1); clearTimeout(t2); };
+    }, [destX, destY, id, onComplete]);
+
+    return (
+        <div
+            className="fixed z-[9999] pointer-events-none font-black text-2xl text-emerald-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] flex items-center justify-center -translate-x-1/2 -translate-y-1/2"
+            style={style}
+        >
+            +1
+        </div>
+    );
+};
+
 const toBanglaNumber = (n: number): string =>
     String(n).split('').map(d => bnNumbersMap[parseInt(d)] ?? d).join('');
 
@@ -838,6 +877,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
     // ── Feature 8: Session Score + Firebase Leaderboard ──────────────────────
     const [sessionScore, setSessionScore] = useState({ correct: 0, wrong: 0, skipped: 0 });
     const [isScoreVisible, setIsScoreVisible] = useState(false);
+    const [floatingScores, setFloatingScores] = useState<{ id: number; x: number; y: number }[]>([]);
     const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
     const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
     const [leaderboardLoading, setLeaderboardLoading] = useState(false);
@@ -3769,7 +3809,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                     backgroundSize: '12px 12px'
                                                                 } : {})
                                                             }}
-                                                            onClick={() => {
+                                                            onClick={(e) => {
                                                                 if (step === 0 && !isEliminated) {
                                                                     setSelectedOption(opt.key);
                                                                     setStep(1);
@@ -3809,7 +3849,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                         }
                                                                         // Track session score
                                                                         const isCor = q.correctAnswer.toLowerCase().trim().includes(opt.key);
-                                                                        updateSessionScore(currentSlide, isCor);
+                                                                        if (isCor) {
+                                                                            const id = Date.now();
+                                                                            setFloatingScores(prev => [...prev, { id, x: e.clientX, y: e.clientY }]);
+                                                                            setTimeout(() => {
+                                                                                updateSessionScore(currentSlide, true);
+                                                                            }, 800);
+                                                                        } else {
+                                                                            updateSessionScore(currentSlide, false);
+                                                                        }
                                                                     }
                                                                 }
                                                             }}
@@ -4122,7 +4170,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                         );
                                                                     }
                                                                 }}
-                                                                onClick={() => {
+                                                                onClick={(e) => {
                                                                     if (step === 0) {
                                                                         if (eliminatedOptions.includes(opt.key)) return;
                                                                         setSelectedOption(opt.key);
@@ -4164,8 +4212,16 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                                         }
                                                                         // Feature 8: Track session score
                                                                         if (q.correctAnswer) {
-                                                                            const isCorrect = q.correctAnswer.toLowerCase().trim().includes(opt.key);
-                                                                            updateSessionScore(currentSlide, isCorrect);
+                                                                            const isCor = q.correctAnswer.toLowerCase().trim().includes(opt.key);
+                                                                            if (isCor) {
+                                                                                const id = Date.now();
+                                                                                setFloatingScores(prev => [...prev, { id, x: e.clientX, y: e.clientY }]);
+                                                                                setTimeout(() => {
+                                                                                    updateSessionScore(currentSlide, true);
+                                                                                }, 800);
+                                                                            } else {
+                                                                                updateSessionScore(currentSlide, false);
+                                                                            }
                                                                         }
                                                                     }
                                                                 }}
@@ -6897,6 +6953,10 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                     </div>
                 </div>
             )}
+            {/* Floating Scores */}
+            {floatingScores.map(fs => (
+                <FloatingScore key={fs.id} id={fs.id} startX={fs.x} startY={fs.y} onComplete={(id) => setFloatingScores(prev => prev.filter(f => f.id !== id))} />
+            ))}
         </>,
         document.body
     );
