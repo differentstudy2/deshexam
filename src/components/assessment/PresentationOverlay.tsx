@@ -3645,16 +3645,14 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                 } : {})
                                             }}
                                         >
-                                            {/* Mobile Score Pill (Top Center) */}
-                                            <div className="absolute -top-[1.15rem] left-1/2 -translate-x-1/2 z-20 flex items-center bg-white dark:bg-slate-800 rounded-full shadow-md border border-slate-200 dark:border-slate-700 px-1 py-1 gap-1">
-                                                <div className="flex items-center gap-1.5 bg-green-50 text-green-600 dark:bg-green-500/20 dark:text-green-400 rounded-full pl-2 pr-2.5 py-0.5">
-                                                    <Check className="w-4 h-4" strokeWidth={3} />
-                                                    <span className="font-bold text-[13px] font-mono leading-none pt-[1px]">{sessionScore.correct}</span>
-                                                </div>
-                                                <div className="flex items-center gap-1.5 bg-red-50 text-red-600 dark:bg-red-500/20 dark:text-red-400 rounded-full pl-2 pr-2.5 py-0.5">
-                                                    <X className="w-4 h-4" strokeWidth={3} />
-                                                    <span className="font-bold text-[13px] font-mono leading-none pt-[1px]">{sessionScore.wrong}</span>
-                                                </div>
+                                            {/* Mobile Question Number Pill (Top Center) */}
+                                            <div className="absolute -top-[1.15rem] left-1/2 -translate-x-1/2 z-20 flex items-center bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-md border-2 border-white dark:border-slate-800 px-4 py-1.5 whitespace-nowrap">
+                                                <span className="font-extrabold text-[13px] font-mono leading-none pt-[1px] text-white uppercase tracking-wider drop-shadow-sm">
+                                                    {uiLang === 'bn' 
+                                                        ? `প্রশ্ন ${toBanglaNumber(currentSlide + 1).padStart(2, '০')}`
+                                                        : `Question ${String(currentSlide + 1).padStart(2, '0')}`
+                                                    }
+                                                </span>
                                             </div>                                            {/* Mobile Question Text */}
                                             <div className="px-5 pb-4 pt-6">
                                                 <div data-read-cursor-target="question" className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== 'default' ? 'text-[var(--q-color)] [&_*]:!text-[var(--q-color)]' : (bgTheme === 'video' ? 'text-white [&_*]:!text-white' : 'text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white')} ${activeTTSBlock === 'question' ? 'scale-[1.01] origin-left transition-all duration-300' : 'transition-all duration-300'}`} style={{ '--q-color': qTextColor !== 'default' ? qTextColor : undefined } as React.CSSProperties}>
