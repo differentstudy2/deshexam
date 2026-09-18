@@ -729,7 +729,7 @@ const ColorfulTaxonomy = ({ text, isDark = false }: { text: string, isDark?: boo
     const lightColors = ['text-amber-300', 'text-cyan-300', 'text-lime-300', 'text-fuchsia-300', 'text-orange-300', 'text-emerald-300'];
     const darkColors = ['text-indigo-700', 'text-pink-600', 'text-teal-700', 'text-rose-600', 'text-blue-700', 'text-purple-700'];
     const colors = isDark ? darkColors : lightColors;
-    
+
     return (
         <>
             {parts.map((part, i) => {
@@ -738,10 +738,10 @@ const ColorfulTaxonomy = ({ text, isDark = false }: { text: string, isDark?: boo
                 }
                 const trimmed = part.trim();
                 if (!trimmed) return <span key={i}> </span>;
-                
+
                 const color = colors[colorIndex % colors.length];
                 colorIndex++;
-                
+
                 return <span key={i} className={`${color} drop-shadow-sm`}>{trimmed}</span>;
             })}
         </>
@@ -3362,8 +3362,25 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                     </button>
                                 </div>
 
-                                {/* Drop-down Tab for Question Number */}
-                                <div className="absolute -bottom-6 right-0 h-6 bg-gradient-to-r from-fuchsia-600 to-pink-600 pl-4 pr-3 flex items-center justify-center rounded-bl-[1.1rem] shadow-[0_4px_10px_rgba(0,0,0,0.3)] border-b border-l border-pink-400/30 z-20">
+                                {/* Drop-down Tab for Scores (Left) */}
+                                <div className="absolute -bottom-6 left-0 h-6 w-[115px] bg-gradient-to-r from-emerald-600 to-teal-600 pr-4 pl-3 flex items-center justify-center rounded-br-[1.1rem] shadow-[0_4px_10px_rgba(0,0,0,0.3)] border-b border-r border-teal-400/30 z-20 gap-2">
+                                    <span className="text-white font-extrabold text-[10px] whitespace-nowrap drop-shadow-md flex items-center gap-1">
+                                        <span className="text-emerald-200">✓</span>
+                                        {uiLang === 'bn' ? toBanglaNumber(sessionScore.correct) : sessionScore.correct}
+                                    </span>
+                                    <span className="text-white/40 text-[10px] pb-0.5">|</span>
+                                    <span className="text-white font-extrabold text-[10px] whitespace-nowrap drop-shadow-md flex items-center gap-1">
+                                        <span className="text-rose-200">✗</span>
+                                        {uiLang === 'bn' ? toBanglaNumber(sessionScore.wrong) : sessionScore.wrong}
+                                    </span>
+                                    {/* Inner Curve (Concave) */}
+                                    <svg className="absolute top-0 -right-[14px] w-[14px] h-[14px] text-teal-600" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M0 16V0h16C7.2 0 0 7.2 0 16z" />
+                                    </svg>
+                                </div>
+
+                                {/* Drop-down Tab for Question Number (Right) */}
+                                <div className="absolute -bottom-6 right-0 h-6 w-[115px] bg-gradient-to-r from-fuchsia-600 to-pink-600 pl-4 pr-3 flex items-center justify-center rounded-bl-[1.1rem] shadow-[0_4px_10px_rgba(0,0,0,0.3)] border-b border-l border-pink-400/30 z-20">
                                     <span className="text-white font-extrabold tracking-widest text-[10px] whitespace-nowrap drop-shadow-md">
                                         {uiLang === 'bn'
                                             ? `প্রশ্ন ${toBanglaNumber(currentSlide + 1).padStart(2, '০')} / ${toBanglaNumber(questions.length).padStart(2, '০')}`
@@ -3437,9 +3454,22 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                         </div>
                     )}
 
-                    {/* Mobile Full-Width Progress Bar */}
-                    <div className="md:hidden w-full h-1 bg-black/10 dark:bg-slate-800 shrink-0 z-20">
-                        <div className="h-full bg-gradient-to-r from-pink-500 to-amber-400 dark:from-pink-500 dark:to-amber-400 transition-all duration-500 ease-out" style={{ width: `${Math.max(3, ((currentSlide + 1) / Math.max(1, questions.length)) * 100)}%` }}></div>
+                    {/* Mobile Centered Progress Bar */}
+                    <div className="md:hidden w-1/2 mx-auto h-1.5 mt-2.5 mb-1 bg-black/10 dark:bg-slate-800 rounded-full shrink-0 z-20 overflow-hidden shadow-inner">
+                        <div className="h-full bg-gradient-to-r from-pink-500 to-amber-400 dark:from-pink-500 dark:to-amber-400 transition-all duration-500 ease-out rounded-full" style={{ width: `${Math.max(3, ((currentSlide + 1) / Math.max(1, questions.length)) * 100)}%` }}></div>
+                    </div>
+
+                    {/* Mobile Explanation Toggle */}
+                    <div className="md:hidden w-full h-0 relative z-30 shrink-0">
+                        <div className="absolute top-2 left-0.5">
+                            <button
+                                onClick={() => setIsExpEnabled(!isExpEnabled)}
+                                className={`flex items-center justify-center w-6 h-6 rounded-full border transition-all ${isExpEnabled ? 'bg-amber-100 border-amber-300 dark:bg-amber-900/30 dark:border-amber-700/50 shadow-[0_0_8px_rgba(251,191,36,0.3)]' : 'bg-white/80 dark:bg-gray-800/80 border-gray-200 dark:border-gray-700 shadow-sm backdrop-blur-sm'}`}
+                                title="Toggle Explanation"
+                            >
+                                <Lightbulb className={`w-4 h-4 ${isExpEnabled ? 'text-amber-500 fill-amber-500/20' : 'text-gray-400'}`} />
+                            </button>
+                        </div>
                     </div>
 
 
@@ -3709,15 +3739,15 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     const isEliminated = eliminatedOptions.includes(opt.key);
 
                                                     const mobileColors = [
-                                                        { bg: 'bg-[#4285F4]', selectedBg: 'bg-blue-50 dark:bg-blue-950', selectedBorder: 'border-[#4285F4]' },
-                                                        { bg: 'bg-[#34A853]', selectedBg: 'bg-green-50 dark:bg-green-950', selectedBorder: 'border-[#34A853]' },
-                                                        { bg: 'bg-[#F9AB00]', selectedBg: 'bg-yellow-50 dark:bg-yellow-950', selectedBorder: 'border-[#F9AB00]' },
-                                                        { bg: 'bg-[#EA4335]', selectedBg: 'bg-red-50 dark:bg-red-950', selectedBorder: 'border-[#EA4335]' },
+                                                        { bg: 'bg-[#4285F4]', selectedBg: 'bg-blue-50 dark:bg-blue-950', selectedBorder: 'border-[#4285F4]', border: 'border-[#4285F4]/40' },
+                                                        { bg: 'bg-[#34A853]', selectedBg: 'bg-green-50 dark:bg-green-950', selectedBorder: 'border-[#34A853]', border: 'border-[#34A853]/40' },
+                                                        { bg: 'bg-[#F9AB00]', selectedBg: 'bg-yellow-50 dark:bg-yellow-950', selectedBorder: 'border-[#F9AB00]', border: 'border-[#F9AB00]/40' },
+                                                        { bg: 'bg-[#EA4335]', selectedBg: 'bg-red-50 dark:bg-red-950', selectedBorder: 'border-[#EA4335]', border: 'border-[#EA4335]/40' },
                                                     ];
                                                     const mc = mobileColors[oIdx % mobileColors.length];
 
                                                     let rowBg = bgTheme === 'video' ? 'bg-black/40 backdrop-blur-md' : 'bg-[rgba(15,23,42,0.09)] dark:bg-slate-800';
-                                                    let rowBorder = bgTheme === 'video' ? 'border border-white/10' : 'border border-slate-200/70 dark:border-slate-700';
+                                                    let rowBorder = bgTheme === 'video' ? 'border border-white/10' : `border ${mc.border} dark:border-slate-700`;
                                                     let textOpacity = '';
                                                     if (isEliminated && step === 0) { textOpacity = 'opacity-40 grayscale'; }
                                                     else if (isSelected && step === 0) { rowBg = mc.selectedBg; rowBorder = `border border-l-4 ${mc.selectedBorder}`; }
@@ -4005,7 +4035,7 @@ export default function PresentationOverlay({ questions, classLine, chapterName,
                                                     const theme = colorThemes[oIdx % colorThemes.length];
 
                                                     const bgClass = optBgColor === 'default' ? theme.bg : (optBgColor.startsWith('#') ? '' : optBgColor);
-                                                    let containerClasses = `flex items-center justify-between gap-2 sm:gap-3 md:gap-4 py-1.5 sm:py-2 md:py-2 px-3 sm:px-4 md:px-5 rounded-xl border-[1.5px] transition-all duration-200 shadow-md relative z-10 select-none ${bgClass} border-slate-200/70 dark:border-slate-700 md:${theme.border}`;
+                                                    let containerClasses = `flex items-center justify-between gap-2 sm:gap-3 md:gap-4 py-1.5 sm:py-2 md:py-2 px-3 sm:px-4 md:px-5 rounded-xl border-[1.5px] transition-all duration-200 shadow-md relative z-10 select-none ${bgClass} ${theme.border}`;
                                                     let letterClasses = `shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 text-base md:text-lg flex items-center justify-center rounded-full font-black transition-colors duration-300 shadow-sm ${theme.letterBg} ${theme.letterText}`;
 
                                                     if (step === 0) {
