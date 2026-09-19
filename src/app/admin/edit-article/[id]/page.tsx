@@ -1,8 +1,7 @@
 
-
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -29,6 +28,7 @@ import { getContentById, updateContent } from '@/lib/firebase/firestore';
 import { Loader2, Save } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { Textarea } from '@/components/ui/textarea';
+import { ImageUploader } from '@/components/feature/image-uploader';
 
 
 const formSchema = z.object({
@@ -36,11 +36,13 @@ const formSchema = z.object({
   description: z.string().min(1, "Description is required."),
   body: z.string().min(1, "Content body cannot be empty."),
   subject: z.string().optional(),
+  featureImage: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function EditArticlePage({ params }: { params: { id: string } }) {
+export default function EditArticlePage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const { toast } = useToast();
   const router = useRouter();
   const { id: contentId } = params;
@@ -53,6 +55,7 @@ export default function EditArticlePage({ params }: { params: { id: string } }) 
       description: '',
       body: '',
       subject: '',
+      featureImage: '',
     },
   });
 
@@ -99,6 +102,7 @@ export default function EditArticlePage({ params }: { params: { id: string } }) 
         description: data.description,
         body: data.body,
         subject: data.subject || 'General',
+        featureImage: data.featureImage,
       };
 
       await updateContent(contentId, contentToSave);
@@ -116,7 +120,7 @@ export default function EditArticlePage({ params }: { params: { id: string } }) 
       });
     }
   }
-  
+
   if (loading) {
     return (
         <div className="flex h-full items-center justify-center">
@@ -191,6 +195,24 @@ export default function EditArticlePage({ params }: { params: { id: string } }) 
                   </FormItem>
                 )}
               />
+              
+               <FormField
+                  control={form.control}
+                  name="featureImage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Feature Image</FormLabel>
+                      <FormControl>
+                        <ImageUploader
+                            fieldName={field.name}
+                            onUrlChange={(url) => form.setValue('featureImage', url, { shouldValidate: true })}
+                            value={field.value}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}

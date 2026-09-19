@@ -33,10 +33,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, ArrowLeft, Upload } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { useState, useRef } from 'react';
+import { useState, useRef, Suspense } from 'react';
 import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 
 const aiGeneratorFormSchema = z.object({
@@ -46,7 +46,7 @@ const aiGeneratorFormSchema = z.object({
     sourceFile: z.string().optional(),
     numQuestions: z.coerce.number().int().min(1).max(20),
     difficulty: z.enum(['Easy', 'Medium', 'Hard']),
-    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Any']),
+    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Descriptive', 'Any']),
 }).refine(data => {
     if (data.sourceType === 'topic') return !!data.sourceTopic && data.sourceTopic.length >= 3;
     if (data.sourceType === 'text') return !!data.sourceText && data.sourceText.length >= 3;
@@ -59,9 +59,12 @@ const aiGeneratorFormSchema = z.object({
 type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
 
-export default function AIQuestionGeneratorPage() {
+function AIQuestionGeneratorPageComponent() {
     const { toast } = useToast();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectUrl = searchParams.get('redirect') || '/admin/add-content';
+
     const [isGenerating, setIsGenerating] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -99,7 +102,7 @@ export default function AIQuestionGeneratorPage() {
                 numQuestions: aiData.numQuestions,
                 difficulty: aiData.difficulty,
                 questionType: aiData.questionType,
-                sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
+                sourceType: aiData.sourceType,
                 source: source,
             };
 
@@ -112,7 +115,7 @@ export default function AIQuestionGeneratorPage() {
                 description: `Redirecting you back to the form...`,
             });
 
-            router.push('/admin/add-content');
+            router.push(redirectUrl);
     
         } catch (error) {
           toast({
@@ -128,19 +131,23 @@ export default function AIQuestionGeneratorPage() {
       const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            if (file.type === 'text/plain') {
+            if (file.type.startsWith('image/') || file.type === 'application/pdf' || file.type === 'text/plain') {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const text = e.target?.result as string;
-                    aiForm.setValue('sourceFile', text, { shouldValidate: true });
+                    const result = e.target?.result as string;
+                    aiForm.setValue('sourceFile', result, { shouldValidate: true });
                     aiForm.setValue('sourceType', 'file');
                 };
-                reader.readAsText(file);
+                if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
             } else {
                 toast({
                     variant: 'destructive',
                     title: 'Invalid File Type',
-                    description: 'Please upload a .txt file.',
+                    description: 'Please upload an image, PDF, or .txt file.',
                 });
             }
         }
@@ -150,7 +157,7 @@ export default function AIQuestionGeneratorPage() {
         <div>
             <div className="mb-6">
                 <Button asChild variant="outline">
-                    <Link href="/admin/add-content">
+                    <Link href={redirectUrl}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Content Editor
                     </Link>
@@ -214,11 +221,11 @@ export default function AIQuestionGeneratorPage() {
                                                     <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
                                                     <div className="flex text-sm text-muted-foreground">
                                                         <p className="pl-1">
-                                                            {aiForm.watch('sourceFile') ? 'File selected' : 'Upload a .txt file'}
+                                                            {aiForm.watch('sourceFile') ? 'File selected' : 'Upload an Image, PDF or .txt file'}
                                                         </p>
                                                     </div>
                                                     <p className="text-xs text-muted-foreground">
-                                                    {aiForm.watch('sourceFile') ? aiForm.watch('sourceFile')?.substring(0, 50) + '...' : 'Text file up to 10MB'}
+                                                    {aiForm.watch('sourceFile') ? (aiForm.watch('sourceFile') || '').substring(0, 50) + '...' : 'Text, image or PDF file up to 10MB'}
                                                     </p>
                                                 </div>
                                             </div>
@@ -228,7 +235,7 @@ export default function AIQuestionGeneratorPage() {
                                             ref={fileInputRef}
                                             onChange={handleFileChange}
                                             className="hidden"
-                                            accept=".txt"
+                                            accept=".txt,image/*,application/pdf"
                                         />
                                         <FormMessage />
                                     </FormItem>
@@ -283,6 +290,7 @@ export default function AIQuestionGeneratorPage() {
                                                 <SelectItem value="Short Answer">Short Answer</SelectItem>
                                                 <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
                                                 <SelectItem value="Matching">Matching</SelectItem>
+                                                <SelectItem value="Descriptive">Descriptive</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -300,4 +308,12 @@ export default function AIQuestionGeneratorPage() {
             </Card>
         </div>
     );
+}
+
+export default function AIQuestionGeneratorPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <AIQuestionGeneratorPageComponent />
+        </Suspense>
+    )
 }
