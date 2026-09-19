@@ -2596,6 +2596,12 @@ export default function PresentationOverlay({
     | "midnight"
     | "aurora"
     | "sunset"
+    | "cyberpunk"
+    | "ocean"
+    | "forest"
+    | "fire"
+    | "nebula"
+    | "hologram"
   >("grid");
   const [selectedVideo, setSelectedVideo] = useState(VIDEO_OPTIONS[0].url);
   const [videoOpacity, setVideoOpacity] = useState(40);
@@ -2760,6 +2766,63 @@ export default function PresentationOverlay({
     }
   }
 
+  const handleThemeChange = (theme: typeof bgTheme) => {
+    setBgTheme(theme);
+    switch (theme) {
+      case "cyberpunk":
+        setQBgColor("bg-gradient-to-br from-fuchsia-900 via-purple-900 to-violet-950");
+        setOptBgColor("bg-gradient-to-br from-fuchsia-900 via-purple-900 to-violet-950");
+        setQTextColor("text-white");
+        setOptTextColor("text-white");
+        break;
+      case "ocean":
+        setQBgColor("bg-gradient-to-br from-cyan-900 via-blue-900 to-slate-950");
+        setOptBgColor("bg-gradient-to-br from-cyan-900 via-blue-900 to-slate-950");
+        setQTextColor("text-white");
+        setOptTextColor("text-white");
+        break;
+      case "forest":
+        setQBgColor("bg-gradient-to-br from-emerald-900 via-green-900 to-slate-950");
+        setOptBgColor("bg-gradient-to-br from-emerald-900 via-green-900 to-slate-950");
+        setQTextColor("text-white");
+        setOptTextColor("text-white");
+        break;
+      case "fire":
+        setQBgColor("bg-gradient-to-br from-orange-900 via-red-900 to-stone-950");
+        setOptBgColor("bg-gradient-to-br from-orange-900 via-red-900 to-stone-950");
+        setQTextColor("text-white");
+        setOptTextColor("text-white");
+        break;
+      case "nebula":
+        setQBgColor("bg-gradient-to-br from-indigo-900 via-violet-900 to-fuchsia-950");
+        setOptBgColor("bg-gradient-to-br from-indigo-900 via-violet-900 to-fuchsia-950");
+        setQTextColor("text-white");
+        setOptTextColor("text-white");
+        break;
+      case "hologram":
+        setQBgColor("bg-gradient-to-br from-teal-900 via-cyan-900 to-blue-950");
+        setOptBgColor("bg-gradient-to-br from-teal-900 via-cyan-900 to-blue-950");
+        setQTextColor("text-white");
+        setOptTextColor("text-white");
+        break;
+      case "midnight":
+      case "aurora":
+      case "sunset":
+      case "video":
+        setQBgColor("bg-black/50 dark:bg-black/80");
+        setOptBgColor("bg-black/50 dark:bg-black/80");
+        setQTextColor("text-white");
+        setOptTextColor("text-white");
+        break;
+      default:
+        setQBgColor("bg-white dark:bg-gray-800");
+        setOptBgColor("default");
+        setQTextColor("default");
+        setOptTextColor("default");
+        break;
+    }
+  };
+
   const getBgThemeClasses = () => {
     switch (bgTheme) {
       case "mesh":
@@ -2776,6 +2839,18 @@ export default function PresentationOverlay({
         return "bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#022c22] text-white";
       case "sunset":
         return "bg-gradient-to-br from-[#4c1d95] via-[#9f1239] to-[#fb923c] text-white";
+      case "cyberpunk":
+        return "bg-gradient-to-br from-[#1a0b2e] via-[#120521] to-[#0a0014] text-white";
+      case "ocean":
+        return "bg-gradient-to-br from-[#061e36] via-[#021021] to-[#00050c] text-white";
+      case "forest":
+        return "bg-gradient-to-br from-[#082b1d] via-[#031c11] to-[#010c07] text-white";
+      case "fire":
+        return "bg-gradient-to-br from-[#381008] via-[#210602] to-[#0f0200] text-white";
+      case "nebula":
+        return "bg-gradient-to-br from-[#2a0e4a] via-[#15042b] to-[#0a001a] text-white";
+      case "hologram":
+        return "bg-gradient-to-br from-[#0a2e30] via-[#041a1c] to-[#010d0e] text-white";
       default:
         return "bg-slate-50 dark:bg-slate-950";
     }
@@ -2794,6 +2869,12 @@ export default function PresentationOverlay({
       case "video":
       case "aurora":
       case "sunset":
+      case "cyberpunk":
+      case "ocean":
+      case "forest":
+      case "fire":
+      case "nebula":
+      case "hologram":
         return "";
       default:
         return "bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.2),rgba(255,255,255,0))]";
@@ -5688,13 +5769,11 @@ export default function PresentationOverlay({
                   <div className="md:hidden w-full px-4 pt-4 pb-3 flex flex-col gap-3">
                     {/* Question Card */}
                     <div
-                      className={`relative rounded-t-[1rem] rounded-b-[0.3rem] shadow-md overflow-visible border-t-4 border-t-blue-500 mt-3 transition-colors duration-300 ${bgTheme === "video" ? "bg-black/40 border border-white/10 backdrop-blur-md" : isDarkMode ? "bg-slate-800 border border-slate-700" : "bg-white border border-gray-100"}`}
+                      className={`relative rounded-t-[1rem] rounded-b-[0.3rem] shadow-md overflow-visible border-t-4 border-t-blue-500 mt-3 transition-colors duration-300 ${qBgColor !== "transparent" && !qBgColor.startsWith("#") ? qBgColor : bgTheme === "video" ? "bg-black/40 border border-white/10 backdrop-blur-md" : isDarkMode ? "bg-slate-800 border border-slate-700" : "bg-white border border-gray-100"}`}
                       style={{
                         backgroundColor:
-                          qBgColor !== "transparent"
-                            ? qBgColor === "default"
-                              ? undefined
-                              : qBgColor
+                          qBgColor !== "transparent" && qBgColor.startsWith("#")
+                            ? qBgColor
                             : undefined,
                         ...(bgTheme === "dots"
                           ? {
@@ -5811,9 +5890,11 @@ export default function PresentationOverlay({
                                 mobileColors[oIdx % mobileColors.length];
 
                               let rowBg =
-                                bgTheme === "video"
-                                  ? "bg-black/40 backdrop-blur-md"
-                                  : "bg-[rgba(15,23,42,0.09)] dark:bg-slate-800";
+                                optBgColor !== "default" && !optBgColor.startsWith("#")
+                                  ? optBgColor
+                                  : bgTheme === "video"
+                                    ? "bg-black/40 backdrop-blur-md"
+                                    : "bg-[rgba(15,23,42,0.09)] dark:bg-slate-800";
                               let rowBorder =
                                 bgTheme === "video"
                                   ? "border border-white/10"
@@ -6099,7 +6180,7 @@ export default function PresentationOverlay({
                   <div className="hidden md:contents">
                     {/* Question */}
                     <div
-                      className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] md:max-h-[260px] mx-auto mt-6 md:mt-1 transition-all duration-300 relative z-10 rounded-[2rem] md:rounded-t-2xl md:rounded-b-[0.5rem] border shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-5 md:p-8 md:px-10 ${qBgColor !== "transparent" ? `md:${qBgColor.startsWith("#") ? "" : qBgColor} bg-white dark:bg-slate-800 md:border-gray-200/50 dark:border-gray-700/50` : "bg-white dark:bg-slate-800 md:bg-white/90 md:dark:bg-slate-900/90 md:backdrop-blur-md border-gray-200 dark:border-slate-700 md:border-gray-100/80 md:dark:border-slate-700/40"}`}
+                      className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] md:max-h-[260px] mx-auto mt-6 md:mt-1 transition-all duration-300 relative z-10 rounded-[2rem] md:rounded-t-2xl md:rounded-b-[0.5rem] border shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-5 md:p-8 md:px-10 ${qBgColor !== "transparent" ? `${qBgColor.startsWith("#") ? "bg-white dark:bg-slate-800" : qBgColor} md:border-gray-200/50 dark:border-gray-700/50` : "bg-white/90 dark:bg-slate-900/90 md:backdrop-blur-md border-gray-200 dark:border-slate-700 md:border-gray-100/80 md:dark:border-slate-700/40"}`}
                       style={
                         {
                           containerType: "inline-size",
@@ -9326,55 +9407,27 @@ export default function PresentationOverlay({
                     Background Theme
                   </span>
                 </div>
-                <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap gap-1">
-                  <button
-                    onClick={() => setBgTheme("default")}
-                    className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === "default" ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
+                <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                  <select
+                    value={bgTheme}
+                    onChange={(e) => handleThemeChange(e.target.value as any)}
+                    className="w-full text-sm font-bold bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-none rounded-lg px-3 py-2 outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500 shadow-sm"
                   >
-                    Default
-                  </button>
-                  <button
-                    onClick={() => setBgTheme("mesh")}
-                    className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === "mesh" ? "bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
-                  >
-                    Mesh
-                  </button>
-                  <button
-                    onClick={() => setBgTheme("grid")}
-                    className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === "grid" ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
-                  >
-                    Grid
-                  </button>
-                  <button
-                    onClick={() => setBgTheme("dots")}
-                    className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === "dots" ? "bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
-                  >
-                    Dots
-                  </button>
-                  <button
-                    onClick={() => setBgTheme("video")}
-                    className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === "video" ? "bg-white dark:bg-gray-700 text-rose-600 dark:text-rose-400 shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
-                  >
-                    Video
-                  </button>
-                  <button
-                    onClick={() => setBgTheme("midnight")}
-                    className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === "midnight" ? "bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
-                  >
-                    Midnight
-                  </button>
-                  <button
-                    onClick={() => setBgTheme("aurora")}
-                    className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === "aurora" ? "bg-white dark:bg-gray-700 text-teal-600 dark:text-teal-400 shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
-                  >
-                    Aurora
-                  </button>
-                  <button
-                    onClick={() => setBgTheme("sunset")}
-                    className={`flex-1 min-w-[22%] py-1.5 px-2 text-xs font-bold rounded-lg transition-colors ${bgTheme === "sunset" ? "bg-white dark:bg-gray-700 text-pink-600 dark:text-pink-400 shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
-                  >
-                    Sunset
-                  </button>
+                    <option value="default">Default</option>
+                    <option value="mesh">Mesh</option>
+                    <option value="grid">Grid</option>
+                    <option value="dots">Dots</option>
+                    <option value="video">Video</option>
+                    <option value="midnight">Midnight</option>
+                    <option value="aurora">Aurora</option>
+                    <option value="sunset">Sunset</option>
+                    <option value="cyberpunk">Cyberpunk</option>
+                    <option value="ocean">Deep Ocean</option>
+                    <option value="forest">Dark Forest</option>
+                    <option value="fire">Firescape</option>
+                    <option value="nebula">Cosmic Nebula</option>
+                    <option value="hologram">Holographic</option>
+                  </select>
                 </div>
                 {bgTheme === "video" && (
                   <div className="mt-2 space-y-2">
@@ -9438,7 +9491,7 @@ export default function PresentationOverlay({
                     <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">
                       Bg Color:
                     </span>
-                    <div className="flex gap-1.5 flex-1 justify-end">
+                    <div className="flex gap-1.5 flex-1 justify-end flex-wrap">
                       <button
                         onClick={() => setQBgColor("transparent")}
                         className={`w-5 h-5 rounded-full border-2 ${qBgColor === "transparent" ? "border-blue-500" : "border-transparent"} relative`}
@@ -9483,6 +9536,21 @@ export default function PresentationOverlay({
                         }
                         className={`w-5 h-5 rounded-full border border-gray-700 dark:border-gray-600 bg-gray-900 shadow-sm ring-2 ${qBgColor === "bg-black/50 dark:bg-black/80" ? "ring-blue-500" : "ring-transparent"}`}
                         title="Black/Dark"
+                      ></button>
+                      <button
+                        onClick={() => setQBgColor("bg-gradient-to-br from-fuchsia-900 via-purple-900 to-violet-950")}
+                        className={`w-5 h-5 rounded-full border border-fuchsia-500/50 bg-gradient-to-br from-fuchsia-900 via-purple-900 to-violet-950 shadow-sm ring-2 ${qBgColor === "bg-gradient-to-br from-fuchsia-900 via-purple-900 to-violet-950" ? "ring-blue-500" : "ring-transparent"}`}
+                        title="Cyberpunk"
+                      ></button>
+                      <button
+                        onClick={() => setQBgColor("bg-gradient-to-br from-cyan-900 via-blue-900 to-slate-950")}
+                        className={`w-5 h-5 rounded-full border border-cyan-500/50 bg-gradient-to-br from-cyan-900 via-blue-900 to-slate-950 shadow-sm ring-2 ${qBgColor === "bg-gradient-to-br from-cyan-900 via-blue-900 to-slate-950" ? "ring-blue-500" : "ring-transparent"}`}
+                        title="Deep Ocean"
+                      ></button>
+                      <button
+                        onClick={() => setQBgColor("bg-gradient-to-br from-emerald-900 via-green-900 to-slate-950")}
+                        className={`w-5 h-5 rounded-full border border-emerald-500/50 bg-gradient-to-br from-emerald-900 via-green-900 to-slate-950 shadow-sm ring-2 ${qBgColor === "bg-gradient-to-br from-emerald-900 via-green-900 to-slate-950" ? "ring-blue-500" : "ring-transparent"}`}
+                        title="Forest Dark"
                       ></button>
                       <input
                         type="color"
@@ -9538,6 +9606,8 @@ export default function PresentationOverlay({
                           qTextColor.startsWith("#") ? qTextColor : "#000000"
                         }
                         onChange={(e) => setQTextColor(e.target.value)}
+                        className="w-5 h-5 ml-1 cursor-pointer border-0 rounded overflow-hidden bg-transparent"
+                        title="Custom Color"
                       />
                     </div>
                   </div>
@@ -9557,7 +9627,7 @@ export default function PresentationOverlay({
                     <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 min-w-[50px] uppercase">
                       Bg Color:
                     </span>
-                    <div className="flex gap-1.5 flex-1 justify-end items-center">
+                    <div className="flex gap-1.5 flex-1 justify-end items-center flex-wrap">
                       <button
                         onClick={() => setOptBgColor("default")}
                         className={`w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm text-[9px] font-bold flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 ring-2 ${optBgColor === "default" ? "ring-blue-500" : "ring-transparent"}`}
@@ -9592,6 +9662,21 @@ export default function PresentationOverlay({
                         }
                         className={`w-5 h-5 rounded-full border border-gray-700 dark:border-gray-600 bg-gray-900 shadow-sm ring-2 ${optBgColor === "bg-black/50 dark:bg-black/80" ? "ring-blue-500" : "ring-transparent"}`}
                         title="Black/Dark"
+                      ></button>
+                      <button
+                        onClick={() => setOptBgColor("bg-gradient-to-br from-fuchsia-900 via-purple-900 to-violet-950")}
+                        className={`w-5 h-5 rounded-full border border-fuchsia-500/50 bg-gradient-to-br from-fuchsia-900 via-purple-900 to-violet-950 shadow-sm ring-2 ${optBgColor === "bg-gradient-to-br from-fuchsia-900 via-purple-900 to-violet-950" ? "ring-blue-500" : "ring-transparent"}`}
+                        title="Cyberpunk"
+                      ></button>
+                      <button
+                        onClick={() => setOptBgColor("bg-gradient-to-br from-cyan-900 via-blue-900 to-slate-950")}
+                        className={`w-5 h-5 rounded-full border border-cyan-500/50 bg-gradient-to-br from-cyan-900 via-blue-900 to-slate-950 shadow-sm ring-2 ${optBgColor === "bg-gradient-to-br from-cyan-900 via-blue-900 to-slate-950" ? "ring-blue-500" : "ring-transparent"}`}
+                        title="Deep Ocean"
+                      ></button>
+                      <button
+                        onClick={() => setOptBgColor("bg-gradient-to-br from-emerald-900 via-green-900 to-slate-950")}
+                        className={`w-5 h-5 rounded-full border border-emerald-500/50 bg-gradient-to-br from-emerald-900 via-green-900 to-slate-950 shadow-sm ring-2 ${optBgColor === "bg-gradient-to-br from-emerald-900 via-green-900 to-slate-950" ? "ring-blue-500" : "ring-transparent"}`}
+                        title="Forest Dark"
                       ></button>
                       <input
                         type="color"
