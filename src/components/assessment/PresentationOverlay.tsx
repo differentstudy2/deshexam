@@ -470,618 +470,618 @@ const CELEBRATION_PARTICLES: {
   shape: "rect" | "square" | "circle" | "ribbon";
   rot: number;
 }[] = [
-  // Top row
-  {
-    left: "3%",
-    top: "4%",
-    delay: 0.03,
-    color: "#f43f5e",
-    w: 12,
-    h: 7,
-    shape: "rect",
-    rot: -30,
-  },
-  {
-    left: "10%",
-    top: "2%",
-    delay: 0.07,
-    color: "#facc15",
-    w: 9,
-    h: 9,
-    shape: "square",
-    rot: 20,
-  },
-  {
-    left: "18%",
-    top: "6%",
-    delay: 0.05,
-    color: "#34d399",
-    w: 14,
-    h: 6,
-    shape: "rect",
-    rot: 45,
-  },
-  {
-    left: "27%",
-    top: "3%",
-    delay: 0.1,
-    color: "#38bdf8",
-    w: 8,
-    h: 8,
-    shape: "circle",
-    rot: 0,
-  },
-  {
-    left: "35%",
-    top: "7%",
-    delay: 0.06,
-    color: "#e879f9",
-    w: 16,
-    h: 5,
-    shape: "ribbon",
-    rot: -15,
-  },
-  {
-    left: "44%",
-    top: "2%",
-    delay: 0.12,
-    color: "#fb923c",
-    w: 10,
-    h: 10,
-    shape: "square",
-    rot: 35,
-  },
-  {
-    left: "53%",
-    top: "5%",
-    delay: 0.08,
-    color: "#818cf8",
-    w: 13,
-    h: 6,
-    shape: "rect",
-    rot: -50,
-  },
-  {
-    left: "62%",
-    top: "3%",
-    delay: 0.11,
-    color: "#4ade80",
-    w: 8,
-    h: 8,
-    shape: "circle",
-    rot: 0,
-  },
-  {
-    left: "71%",
-    top: "6%",
-    delay: 0.04,
-    color: "#f472b6",
-    w: 11,
-    h: 5,
-    shape: "rect",
-    rot: 25,
-  },
-  {
-    left: "80%",
-    top: "2%",
-    delay: 0.09,
-    color: "#fbbf24",
-    w: 9,
-    h: 9,
-    shape: "square",
-    rot: -40,
-  },
-  {
-    left: "89%",
-    top: "5%",
-    delay: 0.06,
-    color: "#2dd4bf",
-    w: 15,
-    h: 5,
-    shape: "ribbon",
-    rot: 10,
-  },
-  {
-    left: "95%",
-    top: "3%",
-    delay: 0.13,
-    color: "#f43f5e",
-    w: 8,
-    h: 8,
-    shape: "circle",
-    rot: 0,
-  },
+    // Top row
+    {
+      left: "3%",
+      top: "4%",
+      delay: 0.03,
+      color: "#f43f5e",
+      w: 12,
+      h: 7,
+      shape: "rect",
+      rot: -30,
+    },
+    {
+      left: "10%",
+      top: "2%",
+      delay: 0.07,
+      color: "#facc15",
+      w: 9,
+      h: 9,
+      shape: "square",
+      rot: 20,
+    },
+    {
+      left: "18%",
+      top: "6%",
+      delay: 0.05,
+      color: "#34d399",
+      w: 14,
+      h: 6,
+      shape: "rect",
+      rot: 45,
+    },
+    {
+      left: "27%",
+      top: "3%",
+      delay: 0.1,
+      color: "#38bdf8",
+      w: 8,
+      h: 8,
+      shape: "circle",
+      rot: 0,
+    },
+    {
+      left: "35%",
+      top: "7%",
+      delay: 0.06,
+      color: "#e879f9",
+      w: 16,
+      h: 5,
+      shape: "ribbon",
+      rot: -15,
+    },
+    {
+      left: "44%",
+      top: "2%",
+      delay: 0.12,
+      color: "#fb923c",
+      w: 10,
+      h: 10,
+      shape: "square",
+      rot: 35,
+    },
+    {
+      left: "53%",
+      top: "5%",
+      delay: 0.08,
+      color: "#818cf8",
+      w: 13,
+      h: 6,
+      shape: "rect",
+      rot: -50,
+    },
+    {
+      left: "62%",
+      top: "3%",
+      delay: 0.11,
+      color: "#4ade80",
+      w: 8,
+      h: 8,
+      shape: "circle",
+      rot: 0,
+    },
+    {
+      left: "71%",
+      top: "6%",
+      delay: 0.04,
+      color: "#f472b6",
+      w: 11,
+      h: 5,
+      shape: "rect",
+      rot: 25,
+    },
+    {
+      left: "80%",
+      top: "2%",
+      delay: 0.09,
+      color: "#fbbf24",
+      w: 9,
+      h: 9,
+      shape: "square",
+      rot: -40,
+    },
+    {
+      left: "89%",
+      top: "5%",
+      delay: 0.06,
+      color: "#2dd4bf",
+      w: 15,
+      h: 5,
+      shape: "ribbon",
+      rot: 10,
+    },
+    {
+      left: "95%",
+      top: "3%",
+      delay: 0.13,
+      color: "#f43f5e",
+      w: 8,
+      h: 8,
+      shape: "circle",
+      rot: 0,
+    },
 
-  // Upper-mid row
-  {
-    left: "1%",
-    top: "18%",
-    delay: 0.14,
-    color: "#38bdf8",
-    w: 12,
-    h: 6,
-    shape: "rect",
-    rot: 55,
-  },
-  {
-    left: "8%",
-    top: "22%",
-    delay: 0.18,
-    color: "#e879f9",
-    w: 9,
-    h: 9,
-    shape: "square",
-    rot: -25,
-  },
-  {
-    left: "16%",
-    top: "16%",
-    delay: 0.11,
-    color: "#facc15",
-    w: 7,
-    h: 7,
-    shape: "circle",
-    rot: 0,
-  },
-  {
-    left: "24%",
-    top: "24%",
-    delay: 0.2,
-    color: "#f43f5e",
-    w: 18,
-    h: 5,
-    shape: "ribbon",
-    rot: -35,
-  },
-  {
-    left: "33%",
-    top: "19%",
-    delay: 0.16,
-    color: "#34d399",
-    w: 11,
-    h: 7,
-    shape: "rect",
-    rot: 40,
-  },
-  {
-    left: "42%",
-    top: "23%",
-    delay: 0.13,
-    color: "#818cf8",
-    w: 8,
-    h: 8,
-    shape: "square",
-    rot: 15,
-  },
-  {
-    left: "51%",
-    top: "17%",
-    delay: 0.19,
-    color: "#fb923c",
-    w: 9,
-    h: 9,
-    shape: "circle",
-    rot: 0,
-  },
-  {
-    left: "60%",
-    top: "25%",
-    delay: 0.15,
-    color: "#2dd4bf",
-    w: 14,
-    h: 5,
-    shape: "ribbon",
-    rot: 60,
-  },
-  {
-    left: "69%",
-    top: "20%",
-    delay: 0.22,
-    color: "#f472b6",
-    w: 12,
-    h: 7,
-    shape: "rect",
-    rot: -20,
-  },
-  {
-    left: "78%",
-    top: "17%",
-    delay: 0.1,
-    color: "#4ade80",
-    w: 8,
-    h: 8,
-    shape: "square",
-    rot: 30,
-  },
-  {
-    left: "87%",
-    top: "22%",
-    delay: 0.17,
-    color: "#fbbf24",
-    w: 7,
-    h: 7,
-    shape: "circle",
-    rot: 0,
-  },
-  {
-    left: "94%",
-    top: "19%",
-    delay: 0.21,
-    color: "#f43f5e",
-    w: 16,
-    h: 5,
-    shape: "ribbon",
-    rot: -45,
-  },
+    // Upper-mid row
+    {
+      left: "1%",
+      top: "18%",
+      delay: 0.14,
+      color: "#38bdf8",
+      w: 12,
+      h: 6,
+      shape: "rect",
+      rot: 55,
+    },
+    {
+      left: "8%",
+      top: "22%",
+      delay: 0.18,
+      color: "#e879f9",
+      w: 9,
+      h: 9,
+      shape: "square",
+      rot: -25,
+    },
+    {
+      left: "16%",
+      top: "16%",
+      delay: 0.11,
+      color: "#facc15",
+      w: 7,
+      h: 7,
+      shape: "circle",
+      rot: 0,
+    },
+    {
+      left: "24%",
+      top: "24%",
+      delay: 0.2,
+      color: "#f43f5e",
+      w: 18,
+      h: 5,
+      shape: "ribbon",
+      rot: -35,
+    },
+    {
+      left: "33%",
+      top: "19%",
+      delay: 0.16,
+      color: "#34d399",
+      w: 11,
+      h: 7,
+      shape: "rect",
+      rot: 40,
+    },
+    {
+      left: "42%",
+      top: "23%",
+      delay: 0.13,
+      color: "#818cf8",
+      w: 8,
+      h: 8,
+      shape: "square",
+      rot: 15,
+    },
+    {
+      left: "51%",
+      top: "17%",
+      delay: 0.19,
+      color: "#fb923c",
+      w: 9,
+      h: 9,
+      shape: "circle",
+      rot: 0,
+    },
+    {
+      left: "60%",
+      top: "25%",
+      delay: 0.15,
+      color: "#2dd4bf",
+      w: 14,
+      h: 5,
+      shape: "ribbon",
+      rot: 60,
+    },
+    {
+      left: "69%",
+      top: "20%",
+      delay: 0.22,
+      color: "#f472b6",
+      w: 12,
+      h: 7,
+      shape: "rect",
+      rot: -20,
+    },
+    {
+      left: "78%",
+      top: "17%",
+      delay: 0.1,
+      color: "#4ade80",
+      w: 8,
+      h: 8,
+      shape: "square",
+      rot: 30,
+    },
+    {
+      left: "87%",
+      top: "22%",
+      delay: 0.17,
+      color: "#fbbf24",
+      w: 7,
+      h: 7,
+      shape: "circle",
+      rot: 0,
+    },
+    {
+      left: "94%",
+      top: "19%",
+      delay: 0.21,
+      color: "#f43f5e",
+      w: 16,
+      h: 5,
+      shape: "ribbon",
+      rot: -45,
+    },
 
-  // Left side
-  {
-    left: "2%",
-    top: "36%",
-    delay: 0.16,
-    color: "#818cf8",
-    w: 11,
-    h: 6,
-    shape: "rect",
-    rot: 70,
-  },
-  {
-    left: "5%",
-    top: "50%",
-    delay: 0.24,
-    color: "#facc15",
-    w: 8,
-    h: 8,
-    shape: "square",
-    rot: -55,
-  },
-  {
-    left: "1%",
-    top: "63%",
-    delay: 0.3,
-    color: "#34d399",
-    w: 7,
-    h: 7,
-    shape: "circle",
-    rot: 0,
-  },
-  {
-    left: "6%",
-    top: "76%",
-    delay: 0.36,
-    color: "#38bdf8",
-    w: 15,
-    h: 5,
-    shape: "ribbon",
-    rot: 30,
-  },
+    // Left side
+    {
+      left: "2%",
+      top: "36%",
+      delay: 0.16,
+      color: "#818cf8",
+      w: 11,
+      h: 6,
+      shape: "rect",
+      rot: 70,
+    },
+    {
+      left: "5%",
+      top: "50%",
+      delay: 0.24,
+      color: "#facc15",
+      w: 8,
+      h: 8,
+      shape: "square",
+      rot: -55,
+    },
+    {
+      left: "1%",
+      top: "63%",
+      delay: 0.3,
+      color: "#34d399",
+      w: 7,
+      h: 7,
+      shape: "circle",
+      rot: 0,
+    },
+    {
+      left: "6%",
+      top: "76%",
+      delay: 0.36,
+      color: "#38bdf8",
+      w: 15,
+      h: 5,
+      shape: "ribbon",
+      rot: 30,
+    },
 
-  // Right side
-  {
-    left: "93%",
-    top: "36%",
-    delay: 0.14,
-    color: "#e879f9",
-    w: 12,
-    h: 6,
-    shape: "rect",
-    rot: -60,
-  },
-  {
-    left: "96%",
-    top: "50%",
-    delay: 0.22,
-    color: "#fb923c",
-    w: 8,
-    h: 8,
-    shape: "square",
-    rot: 40,
-  },
-  {
-    left: "92%",
-    top: "63%",
-    delay: 0.28,
-    color: "#f472b6",
-    w: 7,
-    h: 7,
-    shape: "circle",
-    rot: 0,
-  },
-  {
-    left: "95%",
-    top: "76%",
-    delay: 0.34,
-    color: "#fbbf24",
-    w: 16,
-    h: 4,
-    shape: "ribbon",
-    rot: -20,
-  },
+    // Right side
+    {
+      left: "93%",
+      top: "36%",
+      delay: 0.14,
+      color: "#e879f9",
+      w: 12,
+      h: 6,
+      shape: "rect",
+      rot: -60,
+    },
+    {
+      left: "96%",
+      top: "50%",
+      delay: 0.22,
+      color: "#fb923c",
+      w: 8,
+      h: 8,
+      shape: "square",
+      rot: 40,
+    },
+    {
+      left: "92%",
+      top: "63%",
+      delay: 0.28,
+      color: "#f472b6",
+      w: 7,
+      h: 7,
+      shape: "circle",
+      rot: 0,
+    },
+    {
+      left: "95%",
+      top: "76%",
+      delay: 0.34,
+      color: "#fbbf24",
+      w: 16,
+      h: 4,
+      shape: "ribbon",
+      rot: -20,
+    },
 
-  // Center scatter
-  {
-    left: "22%",
-    top: "40%",
-    delay: 0.25,
-    color: "#f43f5e",
-    w: 10,
-    h: 10,
-    shape: "square",
-    rot: 25,
-  },
-  {
-    left: "32%",
-    top: "55%",
-    delay: 0.18,
-    color: "#4ade80",
-    w: 9,
-    h: 5,
-    shape: "rect",
-    rot: -40,
-  },
-  {
-    left: "45%",
-    top: "43%",
-    delay: 0.22,
-    color: "#38bdf8",
-    w: 7,
-    h: 7,
-    shape: "circle",
-    rot: 0,
-  },
-  {
-    left: "56%",
-    top: "57%",
-    delay: 0.2,
-    color: "#facc15",
-    w: 13,
-    h: 5,
-    shape: "ribbon",
-    rot: 50,
-  },
-  {
-    left: "67%",
-    top: "42%",
-    delay: 0.26,
-    color: "#818cf8",
-    w: 10,
-    h: 6,
-    shape: "rect",
-    rot: -30,
-  },
-  {
-    left: "75%",
-    top: "56%",
-    delay: 0.15,
-    color: "#e879f9",
-    w: 8,
-    h: 8,
-    shape: "square",
-    rot: 65,
-  },
+    // Center scatter
+    {
+      left: "22%",
+      top: "40%",
+      delay: 0.25,
+      color: "#f43f5e",
+      w: 10,
+      h: 10,
+      shape: "square",
+      rot: 25,
+    },
+    {
+      left: "32%",
+      top: "55%",
+      delay: 0.18,
+      color: "#4ade80",
+      w: 9,
+      h: 5,
+      shape: "rect",
+      rot: -40,
+    },
+    {
+      left: "45%",
+      top: "43%",
+      delay: 0.22,
+      color: "#38bdf8",
+      w: 7,
+      h: 7,
+      shape: "circle",
+      rot: 0,
+    },
+    {
+      left: "56%",
+      top: "57%",
+      delay: 0.2,
+      color: "#facc15",
+      w: 13,
+      h: 5,
+      shape: "ribbon",
+      rot: 50,
+    },
+    {
+      left: "67%",
+      top: "42%",
+      delay: 0.26,
+      color: "#818cf8",
+      w: 10,
+      h: 6,
+      shape: "rect",
+      rot: -30,
+    },
+    {
+      left: "75%",
+      top: "56%",
+      delay: 0.15,
+      color: "#e879f9",
+      w: 8,
+      h: 8,
+      shape: "square",
+      rot: 65,
+    },
 
-  // Lower-mid row
-  {
-    left: "4%",
-    top: "66%",
-    delay: 0.28,
-    color: "#f472b6",
-    w: 12,
-    h: 6,
-    shape: "rect",
-    rot: -15,
-  },
-  {
-    left: "13%",
-    top: "70%",
-    delay: 0.32,
-    color: "#2dd4bf",
-    w: 9,
-    h: 9,
-    shape: "square",
-    rot: 45,
-  },
-  {
-    left: "22%",
-    top: "64%",
-    delay: 0.26,
-    color: "#fbbf24",
-    w: 8,
-    h: 8,
-    shape: "circle",
-    rot: 0,
-  },
-  {
-    left: "31%",
-    top: "72%",
-    delay: 0.34,
-    color: "#f43f5e",
-    w: 17,
-    h: 4,
-    shape: "ribbon",
-    rot: -55,
-  },
-  {
-    left: "41%",
-    top: "67%",
-    delay: 0.3,
-    color: "#34d399",
-    w: 11,
-    h: 7,
-    shape: "rect",
-    rot: 35,
-  },
-  {
-    left: "51%",
-    top: "73%",
-    delay: 0.36,
-    color: "#818cf8",
-    w: 8,
-    h: 8,
-    shape: "square",
-    rot: -20,
-  },
-  {
-    left: "61%",
-    top: "66%",
-    delay: 0.24,
-    color: "#fb923c",
-    w: 7,
-    h: 7,
-    shape: "circle",
-    rot: 0,
-  },
-  {
-    left: "71%",
-    top: "71%",
-    delay: 0.32,
-    color: "#38bdf8",
-    w: 14,
-    h: 5,
-    shape: "ribbon",
-    rot: 25,
-  },
-  {
-    left: "81%",
-    top: "65%",
-    delay: 0.28,
-    color: "#e879f9",
-    w: 10,
-    h: 6,
-    shape: "rect",
-    rot: -70,
-  },
-  {
-    left: "90%",
-    top: "70%",
-    delay: 0.38,
-    color: "#4ade80",
-    w: 9,
-    h: 9,
-    shape: "square",
-    rot: 50,
-  },
+    // Lower-mid row
+    {
+      left: "4%",
+      top: "66%",
+      delay: 0.28,
+      color: "#f472b6",
+      w: 12,
+      h: 6,
+      shape: "rect",
+      rot: -15,
+    },
+    {
+      left: "13%",
+      top: "70%",
+      delay: 0.32,
+      color: "#2dd4bf",
+      w: 9,
+      h: 9,
+      shape: "square",
+      rot: 45,
+    },
+    {
+      left: "22%",
+      top: "64%",
+      delay: 0.26,
+      color: "#fbbf24",
+      w: 8,
+      h: 8,
+      shape: "circle",
+      rot: 0,
+    },
+    {
+      left: "31%",
+      top: "72%",
+      delay: 0.34,
+      color: "#f43f5e",
+      w: 17,
+      h: 4,
+      shape: "ribbon",
+      rot: -55,
+    },
+    {
+      left: "41%",
+      top: "67%",
+      delay: 0.3,
+      color: "#34d399",
+      w: 11,
+      h: 7,
+      shape: "rect",
+      rot: 35,
+    },
+    {
+      left: "51%",
+      top: "73%",
+      delay: 0.36,
+      color: "#818cf8",
+      w: 8,
+      h: 8,
+      shape: "square",
+      rot: -20,
+    },
+    {
+      left: "61%",
+      top: "66%",
+      delay: 0.24,
+      color: "#fb923c",
+      w: 7,
+      h: 7,
+      shape: "circle",
+      rot: 0,
+    },
+    {
+      left: "71%",
+      top: "71%",
+      delay: 0.32,
+      color: "#38bdf8",
+      w: 14,
+      h: 5,
+      shape: "ribbon",
+      rot: 25,
+    },
+    {
+      left: "81%",
+      top: "65%",
+      delay: 0.28,
+      color: "#e879f9",
+      w: 10,
+      h: 6,
+      shape: "rect",
+      rot: -70,
+    },
+    {
+      left: "90%",
+      top: "70%",
+      delay: 0.38,
+      color: "#4ade80",
+      w: 9,
+      h: 9,
+      shape: "square",
+      rot: 50,
+    },
 
-  // Bottom row
-  {
-    left: "2%",
-    top: "83%",
-    delay: 0.34,
-    color: "#facc15",
-    w: 11,
-    h: 6,
-    shape: "rect",
-    rot: 20,
-  },
-  {
-    left: "11%",
-    top: "87%",
-    delay: 0.28,
-    color: "#f43f5e",
-    w: 8,
-    h: 8,
-    shape: "circle",
-    rot: 0,
-  },
-  {
-    left: "20%",
-    top: "82%",
-    delay: 0.38,
-    color: "#2dd4bf",
-    w: 15,
-    h: 5,
-    shape: "ribbon",
-    rot: -40,
-  },
-  {
-    left: "30%",
-    top: "89%",
-    delay: 0.32,
-    color: "#818cf8",
-    w: 9,
-    h: 9,
-    shape: "square",
-    rot: 60,
-  },
-  {
-    left: "40%",
-    top: "84%",
-    delay: 0.4,
-    color: "#fb923c",
-    w: 12,
-    h: 6,
-    shape: "rect",
-    rot: -25,
-  },
-  {
-    left: "50%",
-    top: "88%",
-    delay: 0.36,
-    color: "#4ade80",
-    w: 7,
-    h: 7,
-    shape: "circle",
-    rot: 0,
-  },
-  {
-    left: "60%",
-    top: "83%",
-    delay: 0.3,
-    color: "#f472b6",
-    w: 16,
-    h: 4,
-    shape: "ribbon",
-    rot: 35,
-  },
-  {
-    left: "70%",
-    top: "89%",
-    delay: 0.42,
-    color: "#fbbf24",
-    w: 10,
-    h: 10,
-    shape: "square",
-    rot: -50,
-  },
-  {
-    left: "80%",
-    top: "84%",
-    delay: 0.34,
-    color: "#38bdf8",
-    w: 12,
-    h: 5,
-    shape: "rect",
-    rot: 45,
-  },
-  {
-    left: "90%",
-    top: "87%",
-    delay: 0.38,
-    color: "#e879f9",
-    w: 8,
-    h: 8,
-    shape: "circle",
-    rot: 0,
-  },
-];
+    // Bottom row
+    {
+      left: "2%",
+      top: "83%",
+      delay: 0.34,
+      color: "#facc15",
+      w: 11,
+      h: 6,
+      shape: "rect",
+      rot: 20,
+    },
+    {
+      left: "11%",
+      top: "87%",
+      delay: 0.28,
+      color: "#f43f5e",
+      w: 8,
+      h: 8,
+      shape: "circle",
+      rot: 0,
+    },
+    {
+      left: "20%",
+      top: "82%",
+      delay: 0.38,
+      color: "#2dd4bf",
+      w: 15,
+      h: 5,
+      shape: "ribbon",
+      rot: -40,
+    },
+    {
+      left: "30%",
+      top: "89%",
+      delay: 0.32,
+      color: "#818cf8",
+      w: 9,
+      h: 9,
+      shape: "square",
+      rot: 60,
+    },
+    {
+      left: "40%",
+      top: "84%",
+      delay: 0.4,
+      color: "#fb923c",
+      w: 12,
+      h: 6,
+      shape: "rect",
+      rot: -25,
+    },
+    {
+      left: "50%",
+      top: "88%",
+      delay: 0.36,
+      color: "#4ade80",
+      w: 7,
+      h: 7,
+      shape: "circle",
+      rot: 0,
+    },
+    {
+      left: "60%",
+      top: "83%",
+      delay: 0.3,
+      color: "#f472b6",
+      w: 16,
+      h: 4,
+      shape: "ribbon",
+      rot: 35,
+    },
+    {
+      left: "70%",
+      top: "89%",
+      delay: 0.42,
+      color: "#fbbf24",
+      w: 10,
+      h: 10,
+      shape: "square",
+      rot: -50,
+    },
+    {
+      left: "80%",
+      top: "84%",
+      delay: 0.34,
+      color: "#38bdf8",
+      w: 12,
+      h: 5,
+      shape: "rect",
+      rot: 45,
+    },
+    {
+      left: "90%",
+      top: "87%",
+      delay: 0.38,
+      color: "#e879f9",
+      w: 8,
+      h: 8,
+      shape: "circle",
+      rot: 0,
+    },
+  ];
 
 type TransitionType = "slide" | "zoom" | "flip" | "fade" | "bounce";
 type LayoutTemplate = "default" | "fullscreen_q" | "split" | "minimal" | "card";
 
 const TRANSITION_VARIANTS: Record<TransitionType, { initial: any; exit: any }> =
-  {
-    slide: { initial: { x: 60, opacity: 0 }, exit: { x: -60, opacity: 0 } },
-    zoom: {
-      initial: { scale: 0.85, opacity: 0 },
-      exit: { scale: 1.1, opacity: 0 },
-    },
-    flip: {
-      initial: { rotateY: 90, opacity: 0 },
-      exit: { rotateY: -90, opacity: 0 },
-    },
-    fade: { initial: { opacity: 0 }, exit: { opacity: 0 } },
-    bounce: { initial: { y: -50, opacity: 0 }, exit: { y: 50, opacity: 0 } },
-  };
+{
+  slide: { initial: { x: 60, opacity: 0 }, exit: { x: -60, opacity: 0 } },
+  zoom: {
+    initial: { scale: 0.85, opacity: 0 },
+    exit: { scale: 1.1, opacity: 0 },
+  },
+  flip: {
+    initial: { rotateY: 90, opacity: 0 },
+    exit: { rotateY: -90, opacity: 0 },
+  },
+  fade: { initial: { opacity: 0 }, exit: { opacity: 0 } },
+  bounce: { initial: { y: -50, opacity: 0 }, exit: { y: 50, opacity: 0 } },
+};
 
 const remarkPluginsList = [remarkGfm, remarkMath];
 const rehypePluginsList = [rehypeKatex, rehypeRaw];
@@ -2224,7 +2224,7 @@ export default function PresentationOverlay({
   const [useCompressor, setUseCompressor] = useState(true);
   const [lowCutFreq, setLowCutFreq] = useState(150); // 0 to 300 Hz
   const [trebleBoost, setTrebleBoost] = useState(5); // 0 to 10
-  const [noiseGateThreshold, setNoiseGateThreshold] = useState(0.02); // 0 to 0.1
+  const [noiseGateThreshold, setNoiseGateThreshold] = useState(0); // 0 to 0.1
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<BlobPart[]>([]);
@@ -2257,13 +2257,15 @@ export default function PresentationOverlay({
         height = 720;
         bitsPerSecond = 5000000; // 5 Mbps
       } else if (recordingQuality === "ultra") {
+        frameRate = 60; 
         width = 2560;
         height = 1440;
         bitsPerSecond = 30000000; // 30 Mbps
       } else if (recordingQuality === "4k") {
+        frameRate = 60; 
         width = 3840;
         height = 2160;
-        bitsPerSecond = 60000000; // 60 Mbps for 4K (Note: actual captured resolution depends on user's monitor native resolution)
+        bitsPerSecond = 60000000; // 60 Mbps for 4K 
       }
 
       // 1. Get Screen & Tab/System Audio
@@ -2294,119 +2296,124 @@ export default function PresentationOverlay({
         console.warn("Microphone not available or permission denied.", err);
       }
 
-      // 3. Mix Audio Tracks using AudioContext
+      // 3. Audio Mixing Logic
       let finalStream = displayStream;
+      let finalAudioTracks: MediaStreamTrack[] = [];
 
       const hasDisplayAudio = displayStream.getAudioTracks().length > 0;
       const hasMicAudio = micStream && micStream.getAudioTracks().length > 0;
 
-      if (hasDisplayAudio || hasMicAudio) {
-        const AudioContextClass =
-          window.AudioContext || (window as any).webkitAudioContext;
-        if (AudioContextClass) {
-          const audioCtx = new AudioContextClass();
-          const dest = audioCtx.createMediaStreamDestination();
-
-          if (hasDisplayAudio) {
-            const displaySource = audioCtx.createMediaStreamSource(
-              new MediaStream([displayStream.getAudioTracks()[0]]),
-            );
+      if (hasDisplayAudio && hasMicAudio && micStream) {
+        try {
+          const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+          if (AudioContextClass) {
+            const audioCtx = new AudioContextClass();
+            if (audioCtx.state === "suspended") {
+              await audioCtx.resume();
+            }
+            const dest = audioCtx.createMediaStreamDestination();
+            
+            const displaySource = audioCtx.createMediaStreamSource(new MediaStream([displayStream.getAudioTracks()[0]]));
             displaySource.connect(dest);
-          }
-
-          if (hasMicAudio && micStream) {
+            
             const micSource = audioCtx.createMediaStreamSource(micStream);
-            let currentNode: AudioNode = micSource;
-
-            // 1. Noise Gate
-            if (noiseGateThreshold > 0) {
-              const scriptNode = audioCtx.createScriptProcessor(4096, 1, 1);
-              const gateGain = audioCtx.createGain();
-              let isOpen = true; // State to track if gate is open
-
-              scriptNode.onaudioprocess = (e) => {
-                const inputData = e.inputBuffer.getChannelData(0);
-                let sum = 0;
-                for (let i = 0; i < inputData.length; i++) {
-                  sum += inputData[i] * inputData[i];
-                }
-                const rms = Math.sqrt(sum / inputData.length);
-
-                // Hysteresis logic to prevent chopping/chattering
-                if (!isOpen && rms > noiseGateThreshold) {
-                  isOpen = true;
-                  gateGain.gain.setTargetAtTime(1, audioCtx.currentTime, 0.02);
-                } else if (isOpen && rms < noiseGateThreshold * 0.4) {
-                  // Voice must drop to 40% of the threshold to close the gate
-                  isOpen = false;
-                  gateGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.4);
-                }
-              };
-
-              micSource.connect(scriptNode);
-              scriptNode.connect(audioCtx.destination);
-              currentNode.connect(gateGain);
-              currentNode = gateGain;
-            }
-
-            // 2. Low-Cut Filter
-            if (lowCutFreq > 0) {
-              const lowCut = audioCtx.createBiquadFilter();
-              lowCut.type = "highpass";
-              lowCut.frequency.value = lowCutFreq;
-              currentNode.connect(lowCut);
-              currentNode = lowCut;
-            }
-
-            // 3. Treble Boost
-            if (trebleBoost > 0) {
-              const treble = audioCtx.createBiquadFilter();
-              treble.type = "highshelf";
-              treble.frequency.value = 3000;
-              treble.gain.value = trebleBoost;
-              currentNode.connect(treble);
-              currentNode = treble;
-            }
-
-            // 4. Compressor
-            if (useCompressor) {
-              const compressor = audioCtx.createDynamicsCompressor();
-              compressor.threshold.value = -24;
-              compressor.knee.value = 30;
-              compressor.ratio.value = 4;
-              compressor.attack.value = 0.003;
-              compressor.release.value = 0.25;
-              currentNode.connect(compressor);
-              currentNode = compressor;
-            }
-
-            currentNode.connect(dest);
+            micSource.connect(dest);
+            
+            finalAudioTracks = dest.stream.getAudioTracks();
+          } else {
+            finalAudioTracks = micStream.getAudioTracks();
           }
+        } catch (e) {
+          console.warn("Audio mixing failed, falling back to mic audio", e);
+          finalAudioTracks = micStream.getAudioTracks();
+        }
+      } else if (hasMicAudio && micStream) {
+        finalAudioTracks = micStream.getAudioTracks();
+      } else if (hasDisplayAudio) {
+        finalAudioTracks = displayStream.getAudioTracks();
+      }
 
-          const mixedTracks = dest.stream.getAudioTracks();
+      finalStream = new MediaStream([
+        displayStream.getVideoTracks()[0],
+        ...finalAudioTracks,
+      ]);
 
-          finalStream = new MediaStream([
-            displayStream.getVideoTracks()[0],
-            ...(mixedTracks.length > 0 ? mixedTracks : []),
-          ]);
-        } else {
-          console.warn(
-            "AudioContext not supported in this browser, falling back to basic display stream",
-          );
+      // --- Force Upscale to 4K / 1440p using Canvas ---
+      let videoTrackToUse = finalStream.getVideoTracks()[0];
+      let upscalerInterval: any = null;
+      let upscalerVideo: HTMLVideoElement | null = null;
+      let canvasStream: MediaStream | null = null;
+
+      if (recordingQuality === "4k" || recordingQuality === "ultra") {
+        try {
+          const targetWidth = recordingQuality === "4k" ? 3840 : 2560;
+          
+          upscalerVideo = document.createElement("video");
+          upscalerVideo.srcObject = new MediaStream([videoTrackToUse]);
+          upscalerVideo.muted = true;
+          // Must play the video to draw to canvas
+          await upscalerVideo.play().catch(e => console.warn("Upscaler video play failed:", e));
+          
+          // Dynamically calculate height to perfectly preserve the aspect ratio!
+          const settings = videoTrackToUse.getSettings();
+          const sourceWidth = settings.width || 1920;
+          const sourceHeight = settings.height || 1080;
+          let targetHeight = Math.round(targetWidth * (sourceHeight / sourceWidth));
+          // Ensure even dimensions for encoder compatibility
+          if (targetHeight % 2 !== 0) targetHeight += 1;
+          
+          const canvas = document.createElement("canvas");
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          const ctx = canvas.getContext("2d", { alpha: false, desynchronized: true }); 
+          
+          if (ctx) {
+            // Disable smoothing for 4K - it's an integer scale usually and vastly improves performance!
+            ctx.imageSmoothingEnabled = false;
+
+            let lastTime = 0;
+
+            const drawFrame = (time: number) => {
+              // Dynamically drop FPS to 30 if Auto Read is on to prevent stuttering
+              const currentFps = isAutoPlayRef.current ? 30 : (frameRate || 60);
+              const currentInterval = 1000 / currentFps;
+
+              if (upscalerVideo && upscalerVideo.readyState >= 2) {
+                if (time - lastTime >= currentInterval) {
+                  ctx.drawImage(upscalerVideo, 0, 0, targetWidth, targetHeight);
+                  lastTime = time;
+                }
+              }
+              upscalerInterval = requestAnimationFrame(drawFrame);
+            };
+            upscalerInterval = requestAnimationFrame(drawFrame);
+            
+            canvasStream = canvas.captureStream(frameRate || 60);
+            videoTrackToUse = canvasStream.getVideoTracks()[0];
+
+            // Rebuild final stream with the upscaled video track
+            const audioTracks = finalStream.getAudioTracks();
+            finalStream = new MediaStream([
+              videoTrackToUse,
+              ...audioTracks
+            ]);
+          }
+        } catch(e) {
+          console.warn("Failed to setup 4K canvas upscaler, falling back to native resolution", e);
         }
       }
 
-      // Check supported mime types
-      let mimeType = "video/webm;codecs=vp9,opus";
+      let mimeType = 'video/webm;codecs=vp9,opus';
+      let extension = 'webm';
       if (!MediaRecorder.isTypeSupported(mimeType)) {
-        mimeType = "video/webm;codecs=vp8,opus";
-        if (!MediaRecorder.isTypeSupported(mimeType)) {
-          mimeType = "video/webm";
-        }
+          mimeType = 'video/webm;codecs=vp8,opus';
+          if (!MediaRecorder.isTypeSupported(mimeType)) {
+              mimeType = 'video/webm';
+          }
       }
 
       const mediaRecorder = new MediaRecorder(finalStream, {
-        mimeType,
+        mimeType: mimeType || undefined,
         videoBitsPerSecond: bitsPerSecond,
       });
       mediaRecorderRef.current = mediaRecorder;
@@ -2428,17 +2435,28 @@ export default function PresentationOverlay({
         const baseName = (chapterName || topicName || classLine || "Test")
           .replace(/\s+/g, "_")
           .replace(/[<>:"/\\|?*]+/g, "");
-        a.download = `DeshExam_${baseName}_${recordingQuality.toUpperCase()}.webm`;
+        a.download = `DeshExam_${baseName}_${recordingQuality.toUpperCase()}.${extension}`;
         a.click();
         window.URL.revokeObjectURL(url);
         setIsRecording(false);
         setIsRecordingPaused(false);
 
+        // Cleanup Upscaler
+        if (upscalerInterval) cancelAnimationFrame(upscalerInterval);
+        if (upscalerVideo) {
+          upscalerVideo.pause();
+          upscalerVideo.srcObject = null;
+        }
+        if (canvasStream) {
+          canvasStream.getTracks().forEach((track) => track.stop());
+        }
+
         // Stop all tracks to remove the recording icon from browser tab
         displayStream.getTracks().forEach((track) => track.stop());
         if (micStream) micStream.getTracks().forEach((track) => track.stop());
-        if (finalStream !== displayStream)
+        if (finalStream && finalStream !== displayStream) {
           finalStream.getTracks().forEach((track) => track.stop());
+        }
       };
 
       // Detect if user clicks "Stop sharing" on the browser's native UI
@@ -2577,7 +2595,7 @@ export default function PresentationOverlay({
   >("left");
   const [selectedMusic, setSelectedMusic] = useState(
     MUSIC_OPTIONS.find((m) => m.id === "tiptoe_still")?.url ??
-      MUSIC_OPTIONS[0].url,
+    MUSIC_OPTIONS[0].url,
   );
   const [musicVolume, setMusicVolume] = useState(0.1);
   const [musicAutoDucking, setMusicAutoDucking] = useState(true);
@@ -2587,6 +2605,15 @@ export default function PresentationOverlay({
   const [musicDuckRatio, setMusicDuckRatio] = useState(0.1); // volume ratio when TTS speaks
   const [musicIdleRatio, setMusicIdleRatio] = useState(0.59); // volume ratio when not speaking
   const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
+
+  const [isYoutubeMode, setIsYoutubeMode] = useState(false);
+  const [youtubeTimerDuration, setYoutubeTimerDuration] = useState(5);
+  const [currentYoutubeTimer, setCurrentYoutubeTimer] = useState<number | null>(null);
+  const youtubeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [presentationStage, setPresentationStage] = useState<"intro" | "slides" | "outro">("intro");
+  const [showIntroSlide, setShowIntroSlide] = useState(true);
+  const [showOutroSlide, setShowOutroSlide] = useState(true);
   const [bgTheme, setBgTheme] = useState<
     | "default"
     | "mesh"
@@ -2602,10 +2629,12 @@ export default function PresentationOverlay({
     | "fire"
     | "nebula"
     | "hologram"
+    | "solid"
   >("grid");
   const [selectedVideo, setSelectedVideo] = useState(VIDEO_OPTIONS[0].url);
   const [videoOpacity, setVideoOpacity] = useState(40);
   const [bgOpacity, setBgOpacity] = useState(100);
+  const [customBgColor, setCustomBgColor] = useState("#00FF00"); // Default green screen
   const [qBgColor, setQBgColor] = useState("bg-white dark:bg-gray-800");
   const [qTextColor, setQTextColor] = useState("default");
   const [optBgColor, setOptBgColor] = useState("default");
@@ -2641,7 +2670,7 @@ export default function PresentationOverlay({
   const [ttsWordHighlightColor, setTtsWordHighlightColor] = useState("#facc15"); // yellow
   const [ttsWordHighlightStyle, setTtsWordHighlightStyle] = useState<
     "bg" | "underline" | "glow"
-  >("bg");
+  >("underline");
   const [ttsWordHighlightRadius, setTtsWordHighlightRadius] = useState(4); // px
 
   const [ttsProvider, setTtsProvider] = useState<any>(() => {
@@ -2768,63 +2797,16 @@ export default function PresentationOverlay({
 
   const handleThemeChange = (theme: typeof bgTheme) => {
     setBgTheme(theme);
-    switch (theme) {
-      case "cyberpunk":
-        setQBgColor("bg-gradient-to-br from-fuchsia-900 via-purple-900 to-violet-950");
-        setOptBgColor("bg-gradient-to-br from-fuchsia-900 via-purple-900 to-violet-950");
-        setQTextColor("text-white");
-        setOptTextColor("text-white");
-        break;
-      case "ocean":
-        setQBgColor("bg-gradient-to-br from-cyan-900 via-blue-900 to-slate-950");
-        setOptBgColor("bg-gradient-to-br from-cyan-900 via-blue-900 to-slate-950");
-        setQTextColor("text-white");
-        setOptTextColor("text-white");
-        break;
-      case "forest":
-        setQBgColor("bg-gradient-to-br from-emerald-900 via-green-900 to-slate-950");
-        setOptBgColor("bg-gradient-to-br from-emerald-900 via-green-900 to-slate-950");
-        setQTextColor("text-white");
-        setOptTextColor("text-white");
-        break;
-      case "fire":
-        setQBgColor("bg-gradient-to-br from-orange-900 via-red-900 to-stone-950");
-        setOptBgColor("bg-gradient-to-br from-orange-900 via-red-900 to-stone-950");
-        setQTextColor("text-white");
-        setOptTextColor("text-white");
-        break;
-      case "nebula":
-        setQBgColor("bg-gradient-to-br from-indigo-900 via-violet-900 to-fuchsia-950");
-        setOptBgColor("bg-gradient-to-br from-indigo-900 via-violet-900 to-fuchsia-950");
-        setQTextColor("text-white");
-        setOptTextColor("text-white");
-        break;
-      case "hologram":
-        setQBgColor("bg-gradient-to-br from-teal-900 via-cyan-900 to-blue-950");
-        setOptBgColor("bg-gradient-to-br from-teal-900 via-cyan-900 to-blue-950");
-        setQTextColor("text-white");
-        setOptTextColor("text-white");
-        break;
-      case "midnight":
-      case "aurora":
-      case "sunset":
-      case "video":
-        setQBgColor("bg-black/50 dark:bg-black/80");
-        setOptBgColor("bg-black/50 dark:bg-black/80");
-        setQTextColor("text-white");
-        setOptTextColor("text-white");
-        break;
-      default:
-        setQBgColor("bg-white dark:bg-gray-800");
-        setOptBgColor("default");
-        setQTextColor("default");
-        setOptTextColor("default");
-        break;
-    }
+    setQBgColor("bg-white dark:bg-gray-800");
+    setOptBgColor("bg-white dark:bg-gray-800");
+    setQTextColor("default");
+    setOptTextColor("default");
   };
 
   const getBgThemeClasses = () => {
     switch (bgTheme) {
+      case "solid":
+        return "";
       case "mesh":
         return "bg-indigo-50 dark:bg-indigo-950";
       case "grid":
@@ -2904,7 +2886,7 @@ export default function PresentationOverlay({
         micDuckingStreamRef.current = null;
       }
       if (micDuckingAudioCtxRef.current) {
-        micDuckingAudioCtxRef.current.close().catch(() => {});
+        micDuckingAudioCtxRef.current.close().catch(() => { });
         micDuckingAudioCtxRef.current = null;
       }
       setIsUserSpeaking(false);
@@ -2983,7 +2965,7 @@ export default function PresentationOverlay({
         micDuckingStreamRef.current = null;
       }
       if (micDuckingAudioCtxRef.current) {
-        micDuckingAudioCtxRef.current.close().catch(() => {});
+        micDuckingAudioCtxRef.current.close().catch(() => { });
         micDuckingAudioCtxRef.current = null;
       }
       setIsUserSpeaking(false);
@@ -3062,7 +3044,7 @@ export default function PresentationOverlay({
         else if (user.email)
           setUserDisplayName((user.email as string).split("@")[0]);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [user]);
 
   // ── Feature 4: Zoom reset on slide change ─────────────────────────────────
@@ -3577,7 +3559,7 @@ export default function PresentationOverlay({
         ) {
           (e.target as HTMLElement).setPointerCapture(e.pointerId);
         }
-      } catch (err) {}
+      } catch (err) { }
       return;
     }
 
@@ -3596,7 +3578,7 @@ export default function PresentationOverlay({
     isDrawing.current = true;
     try {
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    } catch (err) {}
+    } catch (err) { }
     currentStroke.current = [{ x, y }];
     redrawActiveStroke();
   };
@@ -3790,7 +3772,7 @@ export default function PresentationOverlay({
         ) {
           (e.target as HTMLElement).releasePointerCapture(e.pointerId);
         }
-      } catch (err) {}
+      } catch (err) { }
       return;
     }
 
@@ -3805,7 +3787,7 @@ export default function PresentationOverlay({
       ) {
         (e.target as HTMLElement).releasePointerCapture(e.pointerId);
       }
-    } catch (err) {}
+    } catch (err) { }
 
     const mainCanvas = canvasRef.current;
     const activeCanvas = activeCanvasRef.current;
@@ -4076,8 +4058,8 @@ export default function PresentationOverlay({
           setIsCloudTTSLoading(false);
           alert(
             "Cloud TTS failed: " +
-              (e as Error).message +
-              ". Switching to Browser Native.",
+            (e as Error).message +
+            ". Switching to Browser Native.",
           );
           setTtsProvider("browser");
           setIsSpeaking(false);
@@ -4157,38 +4139,50 @@ export default function PresentationOverlay({
           (k) => q.options && q.options[k as keyof typeof q.options],
         );
         const validKey = allOptKeys.find((k) => correctKey.includes(k));
-        if (validKey) {
-          const isBangla = uiLang === "bn";
-          const correctOptText = cleanMarkdown(
-            q.options![validKey as keyof typeof q.options] || "",
-          );
-          const correctText = isBangla
-            ? `সঠিক উত্তর: ${bnOptionsMap[validKey]}, ${correctOptText}`
-            : `Correct Answer is: ${validKey.toUpperCase()}, ${correctOptText}`;
 
-          speakText(correctText, true, () => {
-            triggerHumanClick(validKey, () => {
-              setIsSpeaking(false);
-              setTimeout(() => {
-                if (isAutoPlayRef.current) {
-                  setCurrentSlide((prev) => {
-                    if (
-                      prev === currentSlideLocal &&
-                      prev < questions.length - 1
-                    ) {
-                      setStep(0);
-                      setSelectedOption(null);
-                      setTimerSeconds(0);
-                      return prev + 1;
-                    }
-                    return prev;
-                  });
-                }
-              }, 1500);
+        const triggerReveal = () => {
+          if (validKey) {
+            const isBangla = uiLang === "bn";
+            const correctOptText = cleanMarkdown(
+              q.options![validKey as keyof typeof q.options] || "",
+            );
+            const correctText = isBangla
+              ? `সঠিক উত্তর: ${bnOptionsMap[validKey]}, ${correctOptText}`
+              : `Correct Answer is: ${validKey.toUpperCase()}, ${correctOptText}`;
+
+            speakText(correctText, true, () => {
+              triggerHumanClick(validKey, () => {
+                setIsSpeaking(false);
+                setTimeout(() => {
+                  if (isAutoPlayRef.current) {
+                    nextStepRef.current?.();
+                  }
+                }, 1500);
+              });
             });
-          });
+          } else {
+            setIsSpeaking(false);
+          }
+        };
+
+        if (isYoutubeMode) {
+          setCurrentYoutubeTimer(youtubeTimerDuration);
+          let timeLeft = youtubeTimerDuration;
+
+          if (youtubeTimerRef.current) clearInterval(youtubeTimerRef.current);
+
+          youtubeTimerRef.current = setInterval(() => {
+            timeLeft -= 1;
+            setCurrentYoutubeTimer(timeLeft);
+
+            if (timeLeft <= 0) {
+              if (youtubeTimerRef.current) clearInterval(youtubeTimerRef.current);
+              setCurrentYoutubeTimer(null);
+              triggerReveal();
+            }
+          }, 1000);
         } else {
-          setIsSpeaking(false);
+          triggerReveal();
         }
       } else {
         setIsSpeaking(false);
@@ -4203,12 +4197,13 @@ export default function PresentationOverlay({
 
   const openPresentation = useCallback(() => {
     setIsOpen(true);
+    setPresentationStage(showIntroSlide ? "intro" : "slides");
     setCurrentSlide(0);
     setStep(mode === "read" ? 2 : 0);
     setSelectedOption(null);
     setTimerSeconds(0);
     document.body.style.overflow = "hidden";
-  }, [mode]);
+  }, [mode, showIntroSlide]);
 
   useEffect(() => {
     if (autoStart) {
@@ -4228,12 +4223,26 @@ export default function PresentationOverlay({
   }, [onClose]);
 
   const nextStep = useCallback(() => {
+    if (presentationStage === "intro") {
+      setPresentationStage("slides");
+      setCurrentSlide(0);
+      setStep(mode === "read" ? 2 : 0);
+      setSelectedOption(null);
+      setTimerSeconds(0);
+      return;
+    }
+    if (presentationStage === "outro") {
+      return;
+    }
+
     if (mode === "read") {
       if (currentSlide < questions.length - 1) {
         setCurrentSlide(currentSlide + 1);
         setStep(2);
         setSelectedOption(null);
         setTimerSeconds(0);
+      } else if (showOutroSlide) {
+        setPresentationStage("outro");
       }
     } else {
       const currentQ = questions[currentSlide];
@@ -4251,9 +4260,11 @@ export default function PresentationOverlay({
         setStep(0);
         setSelectedOption(null);
         setTimerSeconds(0);
+      } else if (showOutroSlide) {
+        setPresentationStage("outro");
       }
     }
-  }, [step, currentSlide, questions, mode, isExpEnabled, isOptionExpEnabled]);
+  }, [step, currentSlide, questions, mode, isExpEnabled, isOptionExpEnabled, presentationStage, showOutroSlide]);
 
   const nextStepRef = useRef(nextStep);
   useEffect(() => {
@@ -4270,12 +4281,24 @@ export default function PresentationOverlay({
   }, [isAutoChangeQuestion, step, autoChangeDelay]);
 
   const prevStep = useCallback(() => {
+    if (presentationStage === "outro") {
+      setPresentationStage("slides");
+      setCurrentSlide(questions.length - 1);
+      setStep(mode === "read" ? 2 : (isExpEnabled || isOptionExpEnabled ? 2 : 1));
+      return;
+    }
+    if (presentationStage === "intro") {
+      return;
+    }
+
     if (mode === "read") {
       if (currentSlide > 0) {
         setCurrentSlide(currentSlide - 1);
         setStep(2);
         setSelectedOption(null);
         setTimerSeconds(0);
+      } else if (showIntroSlide) {
+        setPresentationStage("intro");
       }
     } else {
       if (step > 0) {
@@ -4285,9 +4308,11 @@ export default function PresentationOverlay({
         setStep(2);
         setSelectedOption(null);
         setTimerSeconds(0);
+      } else if (showIntroSlide) {
+        setPresentationStage("intro");
       }
     }
-  }, [step, currentSlide, mode]);
+  }, [step, currentSlide, mode, presentationStage, questions, showIntroSlide, isExpEnabled, isOptionExpEnabled]);
 
   useEffect(() => {
     if (mode === "read") {
@@ -4296,6 +4321,13 @@ export default function PresentationOverlay({
       setStep(0);
     }
   }, [mode]);
+
+  useEffect(() => {
+    if (youtubeTimerRef.current) {
+      clearInterval(youtubeTimerRef.current);
+      setCurrentYoutubeTimer(null);
+    }
+  }, [currentSlide]);
 
   useEffect(() => {
     if (!isOpen || !isTimerEnabled || step >= 1) return;
@@ -4705,7 +4737,7 @@ export default function PresentationOverlay({
         <style>{`
                     ::highlight(tts-word-highlight) {
                         ${ttsWordHighlightStyle === "bg" ? `background-color: ${ttsWordHighlightColor}88; color: inherit; border-radius: ${ttsWordHighlightRadius}px; text-shadow: 0 0 8px ${ttsWordHighlightColor}66;` : ""}
-                        ${ttsWordHighlightStyle === "underline" ? `color: inherit; text-decoration: underline; text-decoration-color: ${ttsWordHighlightColor}; text-decoration-thickness: 3px; text-underline-offset: 2px;` : ""}
+                        ${ttsWordHighlightStyle === "underline" ? `color: inherit; text-decoration-line: underline; text-decoration-color: ${ttsWordHighlightColor}; text-decoration-thickness: 3px;` : ""}
                         ${ttsWordHighlightStyle === "glow" ? `color: ${ttsWordHighlightColor}; text-shadow: 0 0 12px ${ttsWordHighlightColor}, 0 0 24px ${ttsWordHighlightColor}88; border-radius: ${ttsWordHighlightRadius}px;` : ""}
                     }
                     .dark ::highlight(tts-word-highlight) {
@@ -4745,45 +4777,45 @@ export default function PresentationOverlay({
               // Theme-tailored colors
               const colors = isDarkMode
                 ? {
-                    bezelBg:
-                      "bg-gradient-to-br from-slate-800 via-slate-900 to-black",
-                    bezelBorder: "border-slate-700/80",
-                    bezelShadow:
-                      "shadow-[0_16px_36px_rgba(0,0,0,0.7),inset_0_1px_2px_rgba(255,255,255,0.15)]",
-                    ringGlow: "ring-4 ring-cyan-500/20",
-                    crownBg:
-                      "bg-gradient-to-b from-slate-600 via-slate-700 to-slate-800 border-slate-600",
-                    dialGrad1: "#0f172a",
-                    dialGrad2: "#020617",
-                    outerRing: "#334155",
-                    majorTick: "#f8fafc",
-                    minorTick: "#64748b",
-                    minuteHand: "#f1f5f9",
-                    secondHand: "#ff3b30",
-                    centerCap: "#ff3b30",
-                    digitalBg:
-                      "bg-black/90 border-cyan-500/40 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.25)]",
-                  }
+                  bezelBg:
+                    "bg-gradient-to-br from-slate-800 via-slate-900 to-black",
+                  bezelBorder: "border-slate-700/80",
+                  bezelShadow:
+                    "shadow-[0_16px_36px_rgba(0,0,0,0.7),inset_0_1px_2px_rgba(255,255,255,0.15)]",
+                  ringGlow: "ring-4 ring-cyan-500/20",
+                  crownBg:
+                    "bg-gradient-to-b from-slate-600 via-slate-700 to-slate-800 border-slate-600",
+                  dialGrad1: "#0f172a",
+                  dialGrad2: "#020617",
+                  outerRing: "#334155",
+                  majorTick: "#f8fafc",
+                  minorTick: "#64748b",
+                  minuteHand: "#f1f5f9",
+                  secondHand: "#ff3b30",
+                  centerCap: "#ff3b30",
+                  digitalBg:
+                    "bg-black/90 border-cyan-500/40 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.25)]",
+                }
                 : {
-                    bezelBg:
-                      "bg-gradient-to-br from-slate-100 via-white to-slate-200",
-                    bezelBorder: "border-slate-300",
-                    bezelShadow:
-                      "shadow-[0_12px_28px_rgba(0,0,0,0.12),inset_0_2px_4px_rgba(255,255,255,0.9)]",
-                    ringGlow: "ring-4 ring-blue-500/15",
-                    crownBg:
-                      "bg-gradient-to-b from-slate-200 via-slate-400 to-slate-300 border-slate-400",
-                    dialGrad1: "#ffffff",
-                    dialGrad2: "#e2e8f0",
-                    outerRing: "#cbd5e1",
-                    majorTick: "#0f172a",
-                    minorTick: "#94a3b8",
-                    minuteHand: "#1e293b",
-                    secondHand: "#dc2626",
-                    centerCap: "#dc2626",
-                    digitalBg:
-                      "bg-slate-900 border-slate-700 text-cyan-300 shadow-md",
-                  };
+                  bezelBg:
+                    "bg-gradient-to-br from-slate-100 via-white to-slate-200",
+                  bezelBorder: "border-slate-300",
+                  bezelShadow:
+                    "shadow-[0_12px_28px_rgba(0,0,0,0.12),inset_0_2px_4px_rgba(255,255,255,0.9)]",
+                  ringGlow: "ring-4 ring-blue-500/15",
+                  crownBg:
+                    "bg-gradient-to-b from-slate-200 via-slate-400 to-slate-300 border-slate-400",
+                  dialGrad1: "#ffffff",
+                  dialGrad2: "#e2e8f0",
+                  outerRing: "#cbd5e1",
+                  majorTick: "#0f172a",
+                  minorTick: "#94a3b8",
+                  minuteHand: "#1e293b",
+                  secondHand: "#dc2626",
+                  centerCap: "#dc2626",
+                  digitalBg:
+                    "bg-slate-900 border-slate-700 text-cyan-300 shadow-md",
+                };
 
               return (
                 <div className="w-full mt-auto flex flex-col items-center justify-center shrink-0 mb-4 select-none">
@@ -5014,6 +5046,7 @@ export default function PresentationOverlay({
         {/* Main Presentation Area */}
         <div
           ref={slideRef}
+          style={{ backgroundColor: bgTheme === "solid" ? customBgColor : undefined }}
           className={`responsive-fonts flex-1 min-w-0 relative w-full h-full ${getBgThemeClasses()} flex flex-col shadow-2xl overflow-hidden shrink-0 z-10 rounded-xl md:rounded-2xl border border-gray-200/80 dark:border-gray-800 transition-colors duration-500 ${isPenActive && drawingTool === "laser" ? "cursor-none [&_*]:cursor-none" : ""}`}
           onPointerMove={(e) => {
             if (isPenActive && drawingTool === "laser") {
@@ -5060,8 +5093,8 @@ export default function PresentationOverlay({
             style={
               isPenActive && drawingTool === "pen"
                 ? {
-                    cursor: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'><path d='M0 0l6 2 13 13a3 3 0 0 1-4 4L2 6z' fill='${encodeURIComponent(penColor)}' stroke='white' stroke-width='1.5' stroke-linejoin='round'/><path d='M6 2L2 6' stroke='white' stroke-width='1.5' stroke-linecap='round'/></svg>") 0 0, crosshair`,
-                  }
+                  cursor: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'><path d='M0 0l6 2 13 13a3 3 0 0 1-4 4L2 6z' fill='${encodeURIComponent(penColor)}' stroke='white' stroke-width='1.5' stroke-linejoin='round'/><path d='M6 2L2 6' stroke='white' stroke-width='1.5' stroke-linecap='round'/></svg>") 0 0, crosshair`,
+                }
                 : undefined
             }
             onPointerDown={startDrawing}
@@ -5089,29 +5122,29 @@ export default function PresentationOverlay({
                 willChange: "transform",
                 ...(drawingTool === "laser"
                   ? {
-                      width: "8px",
-                      height: "8px",
-                      backgroundColor: "#FF0000",
-                      borderRadius: "50%",
-                      boxShadow: "none",
-                      border: "1px solid rgba(255,255,255,0.5)",
-                    }
+                    width: "8px",
+                    height: "8px",
+                    backgroundColor: "#FF0000",
+                    borderRadius: "50%",
+                    boxShadow: "none",
+                    border: "1px solid rgba(255,255,255,0.5)",
+                  }
                   : drawingTool === "highlighter"
                     ? {
-                        width: `${penSize * 5}px`,
-                        height: `${penSize * 5}px`,
-                        backgroundColor: penColor,
-                        opacity: 0.5,
-                        borderRadius: "50%",
-                        mixBlendMode: "multiply",
-                      }
+                      width: `${penSize * 5}px`,
+                      height: `${penSize * 5}px`,
+                      backgroundColor: penColor,
+                      opacity: 0.5,
+                      borderRadius: "50%",
+                      mixBlendMode: "multiply",
+                    }
                     : {
-                        width: `${Math.max(penSize, 8)}px`,
-                        height: `${Math.max(penSize, 8)}px`,
-                        border: `2px solid ${penColor}`,
-                        borderRadius: "50%",
-                        backgroundColor: "transparent",
-                      }),
+                      width: `${Math.max(penSize, 8)}px`,
+                      height: `${Math.max(penSize, 8)}px`,
+                      border: `2px solid ${penColor}`,
+                      borderRadius: "50%",
+                      backgroundColor: "transparent",
+                    }),
               }}
             />
           )}
@@ -5753,14 +5786,14 @@ export default function PresentationOverlay({
               style={
                 isMagnified
                   ? {
-                      transform: "scale(1.7)",
-                      transformOrigin: `${magnifierPos.x}% ${magnifierPos.y}%`,
-                    }
+                    transform: "scale(1.7)",
+                    transformOrigin: `${magnifierPos.x}% ${magnifierPos.y}%`,
+                  }
                   : contentZoom !== 1
                     ? {
-                        transform: `scale(${contentZoom}) translate(${panOffset.x}px, ${panOffset.y}px)`,
-                        transformOrigin: "center center",
-                      }
+                      transform: `scale(${contentZoom}) translate(${panOffset.x}px, ${panOffset.y}px)`,
+                      transformOrigin: "center center",
+                    }
                     : {}
               }
               onWheel={handleContentWheel}
@@ -5769,491 +5802,531 @@ export default function PresentationOverlay({
             >
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={currentSlide}
+                  key={presentationStage === "slides" ? currentSlide : presentationStage}
                   initial={{ ...TRANSITION_VARIANTS[transitionType].initial }}
                   animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotateY: 0 }}
                   exit={{ ...TRANSITION_VARIANTS[transitionType].exit }}
                   transition={{ duration: animSpeed, ease: "easeOut" }}
                   className="w-full flex flex-col items-center flex-1 md:gap-0 gap-0"
                 >
-                  {/* Mobile Unified White Card Wrapper */}
-                  <div className="md:hidden w-full px-4 pt-4 pb-3 flex flex-col gap-3">
-                    {/* Question Card */}
-                    <div
-                      className={`relative rounded-t-[1rem] rounded-b-[0.3rem] shadow-md overflow-visible border-t-4 border-t-blue-500 mt-3 transition-colors duration-300 ${qBgColor !== "transparent" && !qBgColor.startsWith("#") ? qBgColor : bgTheme === "video" ? "bg-black/40 border border-white/10 backdrop-blur-md" : isDarkMode ? "bg-slate-800 border border-slate-700" : "bg-white border border-gray-100"}`}
-                      style={{
-                        backgroundColor:
-                          qBgColor !== "transparent" && qBgColor.startsWith("#")
-                            ? qBgColor
-                            : undefined,
-                        ...(bgTheme === "dots"
-                          ? {
-                              backgroundImage: `radial-gradient(${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"} 1.5px, transparent 1.5px)`,
-                              backgroundSize: "12px 12px",
-                            }
-                          : bgTheme === "grid"
-                            ? {
-                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px)`,
+                  {presentationStage === "intro" && (
+                    <div className="w-full flex flex-col items-center justify-center flex-1 h-full min-h-[70vh] gap-6 text-center animate-in fade-in zoom-in duration-500">
+                      <h1 className={`text-4xl md:text-6xl lg:text-8xl font-black ${isDarkMode ? "text-white" : "text-slate-800"} drop-shadow-xl uppercase tracking-wider`}>
+                        {displayTitle || (uiLang === "bn" ? "সাধারণ জ্ঞান কুইজ" : "General Knowledge Quiz")}
+                      </h1>
+                      {displayTaxonomy && (
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-extrabold text-blue-500 dark:text-blue-400 drop-shadow-md max-w-4xl">
+                          {displayTaxonomy}
+                        </h2>
+                      )}
+                      <p className="text-lg md:text-2xl text-slate-600 dark:text-slate-300 max-w-2xl mt-4 font-semibold">
+                        {uiLang === "bn" ? "আজকের কুইজে আপনাকে স্বাগতম! প্রস্তুত হলে শুরু করুন।" : "Welcome to today's quiz! Get ready to test your knowledge."}
+                      </p>
+                      <button
+                        onClick={nextStep}
+                        className="mt-8 px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-2xl md:text-3xl rounded-full shadow-[0_10px_30px_rgba(59,130,246,0.6)] hover:scale-105 active:scale-95 transition-all border-4 border-white/20"
+                      >
+                        {uiLang === "bn" ? "শুরু করুন" : "Start Quiz"}
+                      </button>
+                    </div>
+                  )}
+
+                  {presentationStage === "outro" && (
+                    <div className="w-full flex flex-col items-center justify-center flex-1 h-full min-h-[70vh] gap-6 text-center animate-in fade-in zoom-in duration-500">
+                      <h1 className={`text-5xl md:text-7xl lg:text-9xl font-black ${isDarkMode ? "text-white" : "text-slate-800"} drop-shadow-xl uppercase tracking-wider`}>
+                        {uiLang === "bn" ? "কুইজ সমাপ্ত!" : "Quiz Completed!"}
+                      </h1>
+                      <div className="text-8xl md:text-9xl my-4 animate-bounce drop-shadow-2xl">🏆</div>
+                      <p className="text-xl md:text-3xl font-extrabold text-slate-600 dark:text-slate-300 max-w-3xl mt-4 leading-relaxed">
+                        {uiLang === "bn" ? "অংশগ্রহণের জন্য ধন্যবাদ। ভিডিওটি ভালো লাগলে লাইক ও সাবস্ক্রাইব করতে ভুলবেন না!" : "Thank you for participating! Don't forget to like and subscribe."}
+                      </p>
+                      <button
+                        onClick={closePresentation}
+                        className="mt-8 px-10 py-5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-2xl rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.5)] hover:scale-105 active:scale-95 transition-all border-4 border-white/20"
+                      >
+                        {uiLang === "bn" ? "ফিরে যান" : "Finish & Exit"}
+                      </button>
+                    </div>
+                  )}
+
+                  {presentationStage === "slides" && (
+                    <>
+                      {/* Mobile Unified White Card Wrapper */}
+                      <div className="md:hidden w-full px-4 pt-4 pb-3 flex flex-col gap-3">
+                        {/* Question Card */}
+                        <div
+                          className={`relative rounded-t-[1rem] rounded-b-[0.3rem] shadow-md overflow-visible border-t-4 border-t-blue-500 mt-3 transition-colors duration-300 ${qBgColor !== "transparent" && !qBgColor.startsWith("#") ? qBgColor : bgTheme === "video" ? "bg-black/40 border border-white/10 backdrop-blur-md" : isDarkMode ? "bg-slate-800 border border-slate-700" : "bg-white border border-gray-100"}`}
+                          style={{
+                            backgroundColor:
+                              qBgColor !== "transparent" && qBgColor.startsWith("#")
+                                ? qBgColor
+                                : undefined,
+                            ...(bgTheme === "dots"
+                              ? {
+                                backgroundImage: `radial-gradient(${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"} 1.5px, transparent 1.5px)`,
                                 backgroundSize: "12px 12px",
                               }
-                            : {}),
-                      }}
-                    >
-                      {/* Mobile Question Number Pill (Top Center) */}
-                      <div className="absolute -top-[1.15rem] left-1/2 -translate-x-1/2 z-20 flex items-center bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-md border-2 border-white dark:border-slate-800 px-4 py-1.5 whitespace-nowrap">
-                        <span className="font-extrabold text-[13px] font-mono leading-none pt-[1px] text-white uppercase tracking-wider drop-shadow-sm">
-                          {uiLang === "bn"
-                            ? `প্রশ্ন ${toBanglaNumber(currentSlide + 1).padStart(2, "০")}`
-                            : `Q ${String(currentSlide + 1).padStart(2, "0")}`}
-                        </span>
-                      </div>{" "}
-                      {/* Mobile Question Text */}
-                      <div className="px-5 pb-4 pt-6">
-                        <div
-                          data-read-cursor-target="question"
-                          className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== "default" ? "text-[var(--q-color)] [&_*]:!text-[var(--q-color)]" : bgTheme === "video" ? "text-white [&_*]:!text-white" : "text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white"} ${activeTTSBlock === "question" ? "scale-[1.01] origin-left transition-all duration-300" : "transition-all duration-300"}`}
-                          style={
-                            {
-                              "--q-color":
-                                qTextColor !== "default"
-                                  ? qTextColor
-                                  : undefined,
-                            } as React.CSSProperties
-                          }
+                              : bgTheme === "grid"
+                                ? {
+                                  backgroundImage: `linear-gradient(to right, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px)`,
+                                  backgroundSize: "12px 12px",
+                                }
+                                : {}),
+                          }}
                         >
-                          <ReactMarkdown
-                            remarkPlugins={remarkPluginsList}
-                            rehypePlugins={rehypePluginsList}
-                          >
-                            {q.questionText}
-                          </ReactMarkdown>
-                        </div>
-                        {q.statements && q.statements.length > 0 && (
-                          <div className="mt-2 flex flex-col gap-1 w-full pl-3 border-l-4 border-indigo-200 dark:border-indigo-800/50">
-                            {q.statements.map((stmt: string, sIdx: number) => (
-                              <div
-                                key={sIdx}
-                                className="prose dark:prose-invert max-w-none w-full text-[calc(var(--q-size)*0.85)] leading-snug text-left font-bold text-slate-700 dark:text-gray-300"
-                              >
-                                <ReactMarkdown
-                                  remarkPlugins={remarkPluginsList}
-                                  rehypePlugins={rehypePluginsList}
-                                >
-                                  {stmt}
-                                </ReactMarkdown>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Mobile Options */}
-                    {!(
-                      (step >= 2 && q.explanation && isExpEnabled) ||
-                      isManualExpOpen
-                    ) &&
-                      parsedOptions.length > 0 && (
-                        <div className="flex flex-col gap-2.5">
-                          {parsedOptions.map(
-                            (
-                              opt: { key: string; text: string },
-                              oIdx: number,
-                            ) => {
-                              const isCorrect =
-                                q.correctAnswer &&
-                                q.correctAnswer.toLowerCase().includes(opt.key);
-                              const optLetter = getOptionLabel(opt.key, uiLang);
-                              const showCorrect = step >= 1 && isCorrect;
-                              const showWrong = step >= 1 && !isCorrect;
-                              const isSelected = selectedOption === opt.key;
-                              const isEliminated = eliminatedOptions.includes(
-                                opt.key,
-                              );
-
-                              const mobileColors = [
+                          {/* Mobile Question Number Pill (Top Center) */}
+                          <div className="absolute -top-[1.15rem] left-1/2 -translate-x-1/2 z-20 flex items-center bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-md border-2 border-white dark:border-slate-800 px-4 py-1.5 whitespace-nowrap">
+                            <span className="font-extrabold text-[13px] font-mono leading-none pt-[1px] text-white uppercase tracking-wider drop-shadow-sm">
+                              {uiLang === "bn"
+                                ? `প্রশ্ন ${toBanglaNumber(currentSlide + 1).padStart(2, "০")}`
+                                : `Q ${String(currentSlide + 1).padStart(2, "0")}`}
+                            </span>
+                          </div>{" "}
+                          {/* Mobile Question Text */}
+                          <div className="px-5 pb-4 pt-6">
+                            <div
+                              data-read-cursor-target="question"
+                              className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== "default" ? "text-[var(--q-color)] [&_*]:!text-[var(--q-color)]" : bgTheme === "video" ? "text-white [&_*]:!text-white" : "text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white"} ${activeTTSBlock === "question" ? "scale-[1.01] origin-left transition-all duration-300" : "transition-all duration-300"}`}
+                              style={
                                 {
-                                  bg: "bg-[#4285F4]",
-                                  selectedBg: "bg-blue-50 dark:bg-blue-950",
-                                  selectedBorder: "border-[#4285F4]",
-                                  border: "border-[#4285F4]/40",
-                                },
-                                {
-                                  bg: "bg-[#34A853]",
-                                  selectedBg: "bg-green-50 dark:bg-green-950",
-                                  selectedBorder: "border-[#34A853]",
-                                  border: "border-[#34A853]/40",
-                                },
-                                {
-                                  bg: "bg-[#F9AB00]",
-                                  selectedBg: "bg-yellow-50 dark:bg-yellow-950",
-                                  selectedBorder: "border-[#F9AB00]",
-                                  border: "border-[#F9AB00]/40",
-                                },
-                                {
-                                  bg: "bg-[#EA4335]",
-                                  selectedBg: "bg-red-50 dark:bg-red-950",
-                                  selectedBorder: "border-[#EA4335]",
-                                  border: "border-[#EA4335]/40",
-                                },
-                              ];
-                              const mc =
-                                mobileColors[oIdx % mobileColors.length];
-
-                              let rowBg =
-                                optBgColor !== "default" && !optBgColor.startsWith("#")
-                                  ? optBgColor
-                                  : bgTheme === "video"
-                                    ? "bg-black/40 backdrop-blur-md"
-                                    : "bg-[rgba(15,23,42,0.09)] dark:bg-slate-800";
-                              let rowBorder =
-                                bgTheme === "video"
-                                  ? "border border-white/10"
-                                  : `border ${mc.border} dark:border-slate-700`;
-                              let textOpacity = "";
-                              if (isEliminated && step === 0) {
-                                textOpacity = "opacity-40 grayscale";
-                              } else if (isSelected && step === 0) {
-                                rowBg = mc.selectedBg;
-                                rowBorder = `border border-l-4 ${mc.selectedBorder}`;
-                              } else if (showCorrect) {
-                                rowBg = "bg-green-50 dark:bg-green-950";
-                                rowBorder =
-                                  "border border-l-4 border-[#34A853]";
-                              } else if (showWrong && isSelected) {
-                                rowBg = "bg-red-50 dark:bg-red-950";
-                                rowBorder =
-                                  "border border-l-4 border-[#EA4335]";
+                                  "--q-color":
+                                    qTextColor !== "default"
+                                      ? qTextColor
+                                      : undefined,
+                                } as React.CSSProperties
                               }
-
-                              return (
-                                <div
-                                  id={`mobile-option-card-${opt.key}`}
-                                  key={oIdx}
-                                  className={`relative flex items-center gap-3 px-4 py-2 rounded-2xl shadow-md cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
-                                  style={{
-                                    backgroundColor:
-                                      optBgColor !== "default" &&
-                                      optBgColor.startsWith("#")
-                                        ? optBgColor
-                                        : undefined,
-                                    ...(bgTheme === "dots"
-                                      ? {
-                                          backgroundImage: `radial-gradient(${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"} 1.5px, transparent 1.5px)`,
-                                          backgroundSize: "12px 12px",
-                                        }
-                                      : bgTheme === "grid"
-                                        ? {
-                                            backgroundImage: `linear-gradient(to right, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px)`,
-                                            backgroundSize: "12px 12px",
-                                          }
-                                        : {}),
-                                  }}
-                                  onClick={(e) => {
-                                    if (step === 0 && !isEliminated) {
-                                      setSelectedOption(opt.key);
-                                      setStep(1);
-                                      if (q.correctAnswer) {
-                                        // Trigger confetti and celebration if correct
-                                        if (
-                                          q.correctAnswer
-                                            .toLowerCase()
-                                            .trim()
-                                            .includes(opt.key)
-                                        ) {
-                                          const newConsecutive =
-                                            consecutiveCorrect + 1;
-                                          setConsecutiveCorrect(newConsecutive);
-                                          setIsConfettiActive(true);
-
-                                          triggerCelebration(newConsecutive);
-
-                                          if (
-                                            newConsecutive > 0 &&
-                                            newConsecutive % 5 === 0
-                                          ) {
-                                            // Play WOW sound every 5 consecutive correct answers
-                                            if (wowAudioRef.current) {
-                                              wowAudioRef.current.currentTime = 0;
-                                              wowAudioRef.current
-                                                .play()
-                                                .catch((e) =>
-                                                  console.warn(
-                                                    "Wow audio failed:",
-                                                    e,
-                                                  ),
-                                                );
-                                            }
-                                          } else {
-                                            if (
-                                              !isCelebrationSoundEnabled &&
-                                              popAudioRef.current
-                                            ) {
-                                              popAudioRef.current.currentTime = 0;
-                                              popAudioRef.current
-                                                .play()
-                                                .catch((e) =>
-                                                  console.warn(
-                                                    "Pop audio failed:",
-                                                    e,
-                                                  ),
-                                                );
-                                            }
-                                            if (dingAudioRef.current) {
-                                              dingAudioRef.current.currentTime = 0;
-                                              dingAudioRef.current
-                                                .play()
-                                                .catch((e) =>
-                                                  console.warn(
-                                                    "Ding audio failed:",
-                                                    e,
-                                                  ),
-                                                );
-                                            }
-                                          }
-                                          setTimeout(
-                                            () => setIsConfettiActive(false),
-                                            2000,
-                                          );
-                                        } else {
-                                          // Reset on wrong answer and play buzzer
-                                          setConsecutiveCorrect(0);
-                                          if (wrongAudioRef.current) {
-                                            wrongAudioRef.current.currentTime = 0;
-                                            wrongAudioRef.current
-                                              .play()
-                                              .catch((e) =>
-                                                console.warn(
-                                                  "Wrong audio failed:",
-                                                  e,
-                                                ),
-                                              );
-                                          }
-                                        }
-                                        // Track session score
-                                        const isCor = q.correctAnswer
-                                          .toLowerCase()
-                                          .trim()
-                                          .includes(opt.key);
-                                        if (isCor) {
-                                          const id = Date.now();
-                                          setFloatingScores((prev) => [
-                                            ...prev,
-                                            { id, x: e.clientX, y: e.clientY },
-                                          ]);
-                                          setTimeout(() => {
-                                            updateSessionScore(
-                                              currentSlide,
-                                              true,
-                                            );
-                                          }, 800);
-                                        } else {
-                                          updateSessionScore(
-                                            currentSlide,
-                                            false,
-                                          );
-                                        }
-                                      }
-                                    }
-                                  }}
-                                >
+                            >
+                              <ReactMarkdown
+                                remarkPlugins={remarkPluginsList}
+                                rehypePlugins={rehypePluginsList}
+                              >
+                                {q.questionText}
+                              </ReactMarkdown>
+                            </div>
+                            {q.statements && q.statements.length > 0 && (
+                              <div className="mt-2 flex flex-col gap-1 w-full pl-3 border-l-4 border-indigo-200 dark:border-indigo-800/50">
+                                {q.statements.map((stmt: string, sIdx: number) => (
                                   <div
-                                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none transition-opacity duration-300 ${step >= 1 ? "opacity-100" : "opacity-0"}`}
-                                  >
-                                    <Confetti
-                                      active={
-                                        isConfettiActive &&
-                                        isSelected &&
-                                        showCorrect
-                                      }
-                                      config={CONFETTI_CONFIG}
-                                    />
-                                  </div>
-                                  <div
-                                    className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-base ${mc.bg} ${showCorrect ? "bg-[#34A853]" : showWrong && isSelected ? "bg-[#EA4335]" : ""}`}
-                                  >
-                                    {optLetter}
-                                  </div>
-                                  <div
-                                    className={`prose dark:prose-invert max-w-none flex-1 font-bold text-[17px] leading-snug [&_*]:!text-[17px] [&_*]:!leading-snug [&_*]:!m-0 ${optTextColor !== "default" ? "text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]" : "text-slate-800 dark:text-white [&_*]:!text-slate-800 dark:[&_*]:!text-white"}`}
-                                    style={
-                                      {
-                                        "--opt-color":
-                                          optTextColor !== "default"
-                                            ? optTextColor
-                                            : undefined,
-                                      } as React.CSSProperties
-                                    }
+                                    key={sIdx}
+                                    className="prose dark:prose-invert max-w-none w-full text-[calc(var(--q-size)*0.85)] leading-snug text-left font-bold text-slate-700 dark:text-gray-300"
                                   >
                                     <ReactMarkdown
                                       remarkPlugins={remarkPluginsList}
                                       rehypePlugins={rehypePluginsList}
                                     >
-                                      {opt.text}
+                                      {stmt}
                                     </ReactMarkdown>
                                   </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
 
-                                  {isSelected && step === 0 && (
-                                    <motion.div
-                                      initial={{ scale: 0, opacity: 0 }}
-                                      animate={{ scale: 1, opacity: 1 }}
-                                      className="shrink-0 text-white bg-blue-500 rounded-full p-1.5 shadow-sm relative z-20"
+                        {/* Mobile Options */}
+                        {!(
+                          (step >= 2 && q.explanation && isExpEnabled) ||
+                          isManualExpOpen
+                        ) &&
+                          parsedOptions.length > 0 && (
+                            <div className="flex flex-col gap-2.5">
+                              {parsedOptions.map(
+                                (
+                                  opt: { key: string; text: string },
+                                  oIdx: number,
+                                ) => {
+                                  const isCorrect =
+                                    q.correctAnswer &&
+                                    q.correctAnswer.toLowerCase().includes(opt.key);
+                                  const optLetter = getOptionLabel(opt.key, uiLang);
+                                  const showCorrect = step >= 1 && isCorrect;
+                                  const showWrong = step >= 1 && !isCorrect;
+                                  const isSelected = selectedOption === opt.key;
+                                  const isEliminated = eliminatedOptions.includes(
+                                    opt.key,
+                                  );
+
+                                  const mobileColors = [
+                                    {
+                                      bg: "bg-[#4285F4]",
+                                      selectedBg: "bg-blue-50 dark:bg-blue-950",
+                                      selectedBorder: "border-[#4285F4]",
+                                      border: "border-[#4285F4]/40",
+                                    },
+                                    {
+                                      bg: "bg-[#34A853]",
+                                      selectedBg: "bg-green-50 dark:bg-green-950",
+                                      selectedBorder: "border-[#34A853]",
+                                      border: "border-[#34A853]/40",
+                                    },
+                                    {
+                                      bg: "bg-[#F9AB00]",
+                                      selectedBg: "bg-yellow-50 dark:bg-yellow-950",
+                                      selectedBorder: "border-[#F9AB00]",
+                                      border: "border-[#F9AB00]/40",
+                                    },
+                                    {
+                                      bg: "bg-[#EA4335]",
+                                      selectedBg: "bg-red-50 dark:bg-red-950",
+                                      selectedBorder: "border-[#EA4335]",
+                                      border: "border-[#EA4335]/40",
+                                    },
+                                  ];
+                                  const mc =
+                                    mobileColors[oIdx % mobileColors.length];
+
+                                  let rowBg =
+                                    optBgColor !== "default" && !optBgColor.startsWith("#")
+                                      ? optBgColor
+                                      : bgTheme === "video"
+                                        ? "bg-black/40 backdrop-blur-md"
+                                        : "bg-[rgba(15,23,42,0.09)] dark:bg-slate-800";
+                                  let rowBorder =
+                                    bgTheme === "video"
+                                      ? "border border-white/10"
+                                      : `border ${mc.border} dark:border-slate-700`;
+                                  let textOpacity = "";
+                                  if (isEliminated && step === 0) {
+                                    textOpacity = "opacity-40 grayscale";
+                                  } else if (isSelected && step === 0) {
+                                    rowBg = mc.selectedBg;
+                                    rowBorder = `border border-l-4 ${mc.selectedBorder}`;
+                                  } else if (showCorrect) {
+                                    rowBg = "bg-green-50 dark:bg-green-950";
+                                    rowBorder =
+                                      "border border-l-4 border-[#34A853]";
+                                  } else if (showWrong && isSelected) {
+                                    rowBg = "bg-red-50 dark:bg-red-950";
+                                    rowBorder =
+                                      "border border-l-4 border-[#EA4335]";
+                                  }
+
+                                  return (
+                                    <div
+                                      id={`mobile-option-card-${opt.key}`}
+                                      key={oIdx}
+                                      className={`relative flex items-center gap-3 px-4 py-2 rounded-2xl shadow-md cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
+                                      style={{
+                                        backgroundColor:
+                                          optBgColor !== "default" &&
+                                            optBgColor.startsWith("#")
+                                            ? optBgColor
+                                            : undefined,
+                                        ...(bgTheme === "dots"
+                                          ? {
+                                            backgroundImage: `radial-gradient(${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"} 1.5px, transparent 1.5px)`,
+                                            backgroundSize: "12px 12px",
+                                          }
+                                          : bgTheme === "grid"
+                                            ? {
+                                              backgroundImage: `linear-gradient(to right, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px)`,
+                                              backgroundSize: "12px 12px",
+                                            }
+                                            : {}),
+                                      }}
+                                      onClick={(e) => {
+                                        if (step === 0 && !isEliminated) {
+                                          setSelectedOption(opt.key);
+                                          setStep(1);
+                                          if (q.correctAnswer) {
+                                            // Trigger confetti and celebration if correct
+                                            if (
+                                              q.correctAnswer
+                                                .toLowerCase()
+                                                .trim()
+                                                .includes(opt.key)
+                                            ) {
+                                              const newConsecutive =
+                                                consecutiveCorrect + 1;
+                                              setConsecutiveCorrect(newConsecutive);
+                                              setIsConfettiActive(true);
+
+                                              triggerCelebration(newConsecutive);
+
+                                              if (
+                                                newConsecutive > 0 &&
+                                                newConsecutive % 5 === 0
+                                              ) {
+                                                // Play WOW sound every 5 consecutive correct answers
+                                                if (wowAudioRef.current) {
+                                                  wowAudioRef.current.currentTime = 0;
+                                                  wowAudioRef.current
+                                                    .play()
+                                                    .catch((e) =>
+                                                      console.warn(
+                                                        "Wow audio failed:",
+                                                        e,
+                                                      ),
+                                                    );
+                                                }
+                                              } else {
+                                                if (
+                                                  !isCelebrationSoundEnabled &&
+                                                  popAudioRef.current
+                                                ) {
+                                                  popAudioRef.current.currentTime = 0;
+                                                  popAudioRef.current
+                                                    .play()
+                                                    .catch((e) =>
+                                                      console.warn(
+                                                        "Pop audio failed:",
+                                                        e,
+                                                      ),
+                                                    );
+                                                }
+                                                if (dingAudioRef.current) {
+                                                  dingAudioRef.current.currentTime = 0;
+                                                  dingAudioRef.current
+                                                    .play()
+                                                    .catch((e) =>
+                                                      console.warn(
+                                                        "Ding audio failed:",
+                                                        e,
+                                                      ),
+                                                    );
+                                                }
+                                              }
+                                              setTimeout(
+                                                () => setIsConfettiActive(false),
+                                                2000,
+                                              );
+                                            } else {
+                                              // Reset on wrong answer and play buzzer
+                                              setConsecutiveCorrect(0);
+                                              if (wrongAudioRef.current) {
+                                                wrongAudioRef.current.currentTime = 0;
+                                                wrongAudioRef.current
+                                                  .play()
+                                                  .catch((e) =>
+                                                    console.warn(
+                                                      "Wrong audio failed:",
+                                                      e,
+                                                    ),
+                                                  );
+                                              }
+                                            }
+                                            // Track session score
+                                            const isCor = q.correctAnswer
+                                              .toLowerCase()
+                                              .trim()
+                                              .includes(opt.key);
+                                            if (isCor) {
+                                              const id = Date.now();
+                                              setFloatingScores((prev) => [
+                                                ...prev,
+                                                { id, x: e.clientX, y: e.clientY },
+                                              ]);
+                                              setTimeout(() => {
+                                                updateSessionScore(
+                                                  currentSlide,
+                                                  true,
+                                                );
+                                              }, 800);
+                                            } else {
+                                              updateSessionScore(
+                                                currentSlide,
+                                                false,
+                                              );
+                                            }
+                                          }
+                                        }
+                                      }}
                                     >
-                                      <Check className="w-5 h-5 stroke-[3]" />
-                                    </motion.div>
-                                  )}
-
-                                  {step >= 1 &&
-                                    showCorrect &&
-                                    (isSavingImage ? (
-                                      <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20">
-                                        <Check className="w-6 h-6 stroke-[3]" />
-                                      </div>
-                                    ) : (
-                                      <motion.div
-                                        initial={{
-                                          x: -200,
-                                          opacity: 0,
-                                          scale: 0.5,
-                                        }}
-                                        animate={{ x: 0, opacity: 1, scale: 1 }}
-                                        transition={{
-                                          type: "spring",
-                                          stiffness: 200,
-                                          damping: 15,
-                                          delay: 0.1,
-                                        }}
-                                        className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20"
+                                      <div
+                                        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none transition-opacity duration-300 ${step >= 1 ? "opacity-100" : "opacity-0"}`}
                                       >
-                                        <Check className="w-6 h-6 stroke-[3]" />
-                                      </motion.div>
-                                    ))}
-
-                                  {step >= 1 &&
-                                    showWrong &&
-                                    isSelected &&
-                                    (isSavingImage ? (
-                                      <div className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20">
-                                        <X className="w-5 h-5 stroke-[3.5]" />
+                                        <Confetti
+                                          active={
+                                            isConfettiActive &&
+                                            isSelected &&
+                                            showCorrect
+                                          }
+                                          config={CONFETTI_CONFIG}
+                                        />
                                       </div>
-                                    ) : (
-                                      <motion.div
-                                        initial={{
-                                          scale: 0,
-                                          opacity: 0,
-                                          rotate: -45,
-                                        }}
-                                        animate={{
-                                          scale: 1,
-                                          opacity: 1,
-                                          rotate: 0,
-                                        }}
-                                        transition={{
-                                          type: "spring",
-                                          stiffness: 250,
-                                          damping: 12,
-                                        }}
-                                        className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20"
+                                      <div
+                                        className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-base ${mc.bg} ${showCorrect ? "bg-[#34A853]" : showWrong && isSelected ? "bg-[#EA4335]" : ""}`}
                                       >
-                                        <X className="w-5 h-5 stroke-[3.5]" />
-                                      </motion.div>
-                                    ))}
-                                </div>
-                              );
-                            },
-                          )}
-                        </div>
-                      )}
+                                        {optLetter}
+                                      </div>
+                                      <div
+                                        className={`prose dark:prose-invert max-w-none flex-1 font-bold text-[17px] leading-snug [&_*]:!text-[17px] [&_*]:!leading-snug [&_*]:!m-0 ${optTextColor !== "default" ? "text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]" : "text-slate-800 dark:text-white [&_*]:!text-slate-800 dark:[&_*]:!text-white"}`}
+                                        style={
+                                          {
+                                            "--opt-color":
+                                              optTextColor !== "default"
+                                                ? optTextColor
+                                                : undefined,
+                                          } as React.CSSProperties
+                                        }
+                                      >
+                                        <ReactMarkdown
+                                          remarkPlugins={remarkPluginsList}
+                                          rehypePlugins={rehypePluginsList}
+                                        >
+                                          {opt.text}
+                                        </ReactMarkdown>
+                                      </div>
 
-                    {/* Mobile Explanation */}
-                    {((step >= 2 && q.explanation && isExpEnabled) ||
-                      isManualExpOpen) &&
-                      q.explanation && (
-                        <div className="bg-blue-50 dark:bg-blue-950/50 rounded-2xl border border-blue-100 dark:border-blue-900 px-5 py-4 shadow-sm">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="bg-blue-500 text-white px-3 py-0.5 rounded-full text-xs font-bold">
-                              Explanation
+                                      {isSelected && step === 0 && (
+                                        <motion.div
+                                          initial={{ scale: 0, opacity: 0 }}
+                                          animate={{ scale: 1, opacity: 1 }}
+                                          className="shrink-0 text-white bg-blue-500 rounded-full p-1.5 shadow-sm relative z-20"
+                                        >
+                                          <Check className="w-5 h-5 stroke-[3]" />
+                                        </motion.div>
+                                      )}
+
+                                      {step >= 1 &&
+                                        showCorrect &&
+                                        (isSavingImage ? (
+                                          <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20">
+                                            <Check className="w-6 h-6 stroke-[3]" />
+                                          </div>
+                                        ) : (
+                                          <motion.div
+                                            initial={{
+                                              x: -200,
+                                              opacity: 0,
+                                              scale: 0.5,
+                                            }}
+                                            animate={{ x: 0, opacity: 1, scale: 1 }}
+                                            transition={{
+                                              type: "spring",
+                                              stiffness: 200,
+                                              damping: 15,
+                                              delay: 0.1,
+                                            }}
+                                            className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20"
+                                          >
+                                            <Check className="w-6 h-6 stroke-[3]" />
+                                          </motion.div>
+                                        ))}
+
+                                      {step >= 1 &&
+                                        showWrong &&
+                                        isSelected &&
+                                        (isSavingImage ? (
+                                          <div className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20">
+                                            <X className="w-5 h-5 stroke-[3.5]" />
+                                          </div>
+                                        ) : (
+                                          <motion.div
+                                            initial={{
+                                              scale: 0,
+                                              opacity: 0,
+                                              rotate: -45,
+                                            }}
+                                            animate={{
+                                              scale: 1,
+                                              opacity: 1,
+                                              rotate: 0,
+                                            }}
+                                            transition={{
+                                              type: "spring",
+                                              stiffness: 250,
+                                              damping: 12,
+                                            }}
+                                            className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20"
+                                          >
+                                            <X className="w-5 h-5 stroke-[3.5]" />
+                                          </motion.div>
+                                        ))}
+                                    </div>
+                                  );
+                                },
+                              )}
                             </div>
-                          </div>
-                          <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 text-[15px] leading-relaxed font-semibold">
-                            <ReactMarkdown
-                              remarkPlugins={remarkPluginsList}
-                              rehypePlugins={rehypePluginsList}
-                            >
-                              {q.explanation}
-                            </ReactMarkdown>
-                          </div>
-                        </div>
-                      )}
-                  </div>
+                          )}
 
-                  {/* Desktop Layout — hidden on mobile */}
-                  <div className="hidden md:contents">
-                    {/* Question */}
-                    <div
-                      className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] md:max-h-[260px] mx-auto mt-6 md:mt-1 transition-all duration-300 relative z-10 rounded-[2rem] md:rounded-t-2xl md:rounded-b-[0.5rem] border shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-5 md:p-8 md:px-10 ${qBgColor !== "transparent" ? `${qBgColor.startsWith("#") ? "bg-white dark:bg-slate-800" : qBgColor} md:border-gray-200/50 dark:border-gray-700/50` : "bg-white/90 dark:bg-slate-900/90 md:backdrop-blur-md border-gray-200 dark:border-slate-700 md:border-gray-100/80 md:dark:border-slate-700/40"}`}
-                      style={
-                        {
-                          containerType: "inline-size",
-                          backgroundColor: qBgColor.startsWith("#")
-                            ? qBgColor
-                            : undefined,
-                          "--q-size": (() => {
-                            const hasStmts =
-                              q.statements && q.statements.length > 0;
-                            const stmtLines = q.statements
-                              ? q.statements.length
-                              : 0;
-                            const stmtLen = q.statements
-                              ? q.statements.join(" ").length
-                              : 0;
-                            const tLen =
-                              (q.questionText?.length || 0) + stmtLen;
-                            const multiplier = tLen <= 45 ? 1.6 : 2.8;
-                            if (hasStmts) {
-                              return `min(calc(var(--base-q-size) * 0.85), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
-                            }
-                            return `min(var(--base-q-size), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
-                          })(),
-                          "--q-color":
-                            qTextColor !== "default" ? qTextColor : undefined,
-                          borderTopColor:
-                            bgTheme === "video"
-                              ? "rgba(255,255,255,0.4)"
-                              : [
-                                  "#6366f1",
-                                  "#3b82f6",
-                                  "#10b981",
-                                  "#f43f5e",
-                                  "#f59e0b",
-                                  "#a855f7",
-                                ][currentSlide % 6],
-                          borderTopWidth: "4px",
-                          ...(qBgColor !== "transparent" && bgTheme === "dots"
-                            ? {
-                                backgroundImage: `radial-gradient(${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"} 1.5px, transparent 1.5px)`,
-                                backgroundSize: "16px 16px",
-                              }
-                            : qBgColor !== "transparent" && bgTheme === "grid"
-                              ? {
-                                  backgroundImage: `linear-gradient(to right, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px)`,
+                        {/* Mobile Explanation */}
+                        {((step >= 2 && q.explanation && isExpEnabled) ||
+                          isManualExpOpen) &&
+                          q.explanation && (
+                            <div className="bg-blue-50 dark:bg-blue-950/50 rounded-2xl border border-blue-100 dark:border-blue-900 px-5 py-4 shadow-sm">
+                              <div className="flex items-center gap-2 mb-2">
+                                <div className="bg-blue-500 text-white px-3 py-0.5 rounded-full text-xs font-bold">
+                                  Explanation
+                                </div>
+                              </div>
+                              <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 text-[15px] leading-relaxed font-semibold">
+                                <ReactMarkdown
+                                  remarkPlugins={remarkPluginsList}
+                                  rehypePlugins={rehypePluginsList}
+                                >
+                                  {q.explanation}
+                                </ReactMarkdown>
+                              </div>
+                            </div>
+                          )}
+                      </div>
+
+                      {/* Desktop Layout — hidden on mobile */}
+                      <div className="hidden md:contents">
+                        {/* Question */}
+                        <div
+                          className={`flex flex-col items-center justify-center gap-4 w-[94%] sm:w-full min-w-[300px] md:min-w-[600px] max-w-4xl xl:max-w-5xl min-h-[120px] md:min-h-[160px] md:max-h-[260px] mx-auto mt-6 md:mt-1 transition-all duration-300 relative z-10 rounded-[2rem] md:rounded-t-2xl md:rounded-b-[0.5rem] border shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.10)] p-5 md:p-8 md:px-10 ${qBgColor !== "transparent" ? `${qBgColor.startsWith("#") ? "bg-white dark:bg-slate-800" : qBgColor} md:border-gray-200/50 dark:border-gray-700/50` : "bg-white/90 dark:bg-slate-900/90 md:backdrop-blur-md border-gray-200 dark:border-slate-700 md:border-gray-100/80 md:dark:border-slate-700/40"}`}
+                          style={
+                            {
+                              containerType: "inline-size",
+                              backgroundColor: qBgColor.startsWith("#")
+                                ? qBgColor
+                                : undefined,
+                              "--q-size": (() => {
+                                const hasStmts =
+                                  q.statements && q.statements.length > 0;
+                                const stmtLines = q.statements
+                                  ? q.statements.length
+                                  : 0;
+                                const stmtLen = q.statements
+                                  ? q.statements.join(" ").length
+                                  : 0;
+                                const tLen =
+                                  (q.questionText?.length || 0) + stmtLen;
+                                const multiplier = tLen <= 45 ? 1.6 : 2.8;
+                                if (hasStmts) {
+                                  return `min(calc(var(--base-q-size) * 0.85), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
+                                }
+                                return `min(var(--base-q-size), calc((min(94vw, 1000px) - 120px) * ${multiplier} / ${Math.max(1, tLen)}))`;
+                              })(),
+                              "--q-color":
+                                qTextColor !== "default" ? qTextColor : undefined,
+                              borderTopColor:
+                                bgTheme === "video"
+                                  ? "rgba(255,255,255,0.4)"
+                                  : [
+                                    "#6366f1",
+                                    "#3b82f6",
+                                    "#10b981",
+                                    "#f43f5e",
+                                    "#f59e0b",
+                                    "#a855f7",
+                                  ][currentSlide % 6],
+                              borderTopWidth: "4px",
+                              ...(qBgColor !== "transparent" && bgTheme === "dots"
+                                ? {
+                                  backgroundImage: `radial-gradient(${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"} 1.5px, transparent 1.5px)`,
                                   backgroundSize: "16px 16px",
                                 }
-                              : {
-                                  backgroundImage: "none",
-                                  backgroundSize: "auto",
-                                }),
-                        } as unknown as React.CSSProperties
-                      }
-                    >
-                      {/* Desktop Question Number Badge */}
-                      <div className="hidden md:flex absolute -top-10 left-1/2 -translate-x-1/2 items-center justify-center z-20">
-                        <div
-                          className={`w-20 h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-5xl ${
-                            bgTheme === "video"
-                              ? "bg-black/50 border-white/30 text-white"
-                              : `${
-                                  [
+                                : qBgColor !== "transparent" && bgTheme === "grid"
+                                  ? {
+                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px)`,
+                                    backgroundSize: "16px 16px",
+                                  }
+                                  : {
+                                    backgroundImage: "none",
+                                    backgroundSize: "auto",
+                                  }),
+                            } as unknown as React.CSSProperties
+                          }
+                        >
+                          {/* Desktop Question Number Badge */}
+                          <div className="hidden md:flex absolute -top-10 left-1/2 -translate-x-1/2 items-center justify-center z-20">
+                            <div
+                              className={`w-20 h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-5xl ${bgTheme === "video"
+                                  ? "bg-black/50 border-white/30 text-white"
+                                  : `${[
                                     "from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500",
                                     "from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500",
                                     "from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500",
@@ -6261,597 +6334,647 @@ export default function PresentationOverlay({
                                     "from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500",
                                     "from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500",
                                   ][currentSlide % 6]
-                                } bg-gradient-to-tr border-white dark:border-slate-800 text-white`
-                          }`}
-                        >
-                          {uiLang === "bn"
-                            ? toBanglaNumber(currentSlide + 1)
-                            : currentSlide + 1}
-                        </div>
-                      </div>
-
-                      {/* Mobile Question Number Pill */}
-                      <div className="md:hidden absolute -top-4 left-1/2 -translate-x-1/2 z-20">
-                        <div className="bg-blue-500 dark:bg-blue-600 text-white px-4 py-0.5 rounded-full text-[13px] font-bold shadow-md whitespace-nowrap">
-                          {uiLang === "bn" ? "প্রশ্ন" : "Question"}{" "}
-                          {uiLang === "bn"
-                            ? toBanglaNumber(currentSlide + 1).padStart(2, "০")
-                            : String(currentSlide + 1).padStart(2, "0")}
-                        </div>
-                      </div>
-
-                      {/* Top-Left Metallic Rivets / Screws (৩টি তারকাঁটা/স্ক্রু) */}
-                      <div className="absolute top-2.5 md:top-3.5 left-4 md:left-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none">
-                        <MetallicScrew rotation={15} />
-                        <MetallicScrew rotation={68} />
-                        <MetallicScrew rotation={125} />
-                      </div>
-
-                      {/* Top-Right Metallic Rivets / Screws (৩টি তারকাঁটা/স্ক্রু) */}
-                      <div className="absolute top-2.5 md:top-3.5 right-4 md:right-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none">
-                        <MetallicScrew rotation={35} />
-                        <MetallicScrew rotation={95} />
-                        <MetallicScrew rotation={155} />
-                      </div>
-
-                      {/* Subtle horizontal divider line */}
-                      <div className="w-full border-t border-gray-200 dark:border-gray-700/60 mt-1 md:mt-2 mb-1"></div>
-
-                      <div
-                        data-read-cursor-target="question"
-                        className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== "default" ? "text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm" : bgTheme === "video" ? "text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white"} ${activeTTSBlock === "question" ? (ttsHighlightStyle === "bg" ? "p-2 -m-2 transition-all duration-500" : "text-pink-600 dark:text-pink-400 [&_*]:!text-pink-600 dark:[&_*]:!text-pink-400 scale-[1.01] origin-left p-2 -m-2 transition-all duration-300 drop-shadow-md") : "p-2 -m-2 transition-all duration-300"}`}
-                      >
-                        <ReactMarkdown
-                          remarkPlugins={remarkPluginsList}
-                          rehypePlugins={rehypePluginsList}
-                        >
-                          {q.questionText}
-                        </ReactMarkdown>
-                      </div>
-                      {q.statements && q.statements.length > 0 && (
-                        <div className="mt-2 flex flex-col gap-1 w-full pl-3 md:pl-6 border-l-4 border-indigo-200 dark:border-indigo-800/50">
-                          {q.statements.map((stmt: string, sIdx: number) => (
-                            <div
-                              key={sIdx}
-                              className={`prose dark:prose-invert max-w-none w-full prose-p:font-bold text-[calc(var(--q-size)*0.85)] leading-[1] text-left font-bold [&_*]:!text-[calc(var(--q-size)*0.85)] [&_*]:!leading-[1] [&_*]:!m-0 ${qTextColor !== "default" ? "text-[var(--q-color)] [&_*]:!text-[var(--q-color)]" : bgTheme === "video" ? "text-white/90 [&_*]:!text-white/90" : "text-slate-700 dark:text-gray-300 [&_*]:!text-slate-700 dark:[&_*]:!text-gray-300"}`}
+                                  } bg-gradient-to-tr border-white dark:border-slate-800 text-white`
+                                }`}
                             >
-                              <ReactMarkdown
-                                remarkPlugins={remarkPluginsList}
-                                rehypePlugins={rehypePluginsList}
-                              >
-                                {stmt}
-                              </ReactMarkdown>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Options Area with Side Navigation */}
-                    <div className="relative w-full max-w-[1200px] flex justify-center mt-4 md:mt-4 mb-1 mx-auto">
-                      {/* Exp Toggle */}
-                      {q.explanation && (
-                        <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-[-60px] md:top-[-80px] z-[45] group hidden md:flex flex-col gap-4 items-center">
-                          <button
-                            onClick={() => setIsManualExpOpen(!isManualExpOpen)}
-                            className={`p-3 rounded-full shadow-lg backdrop-blur-sm border transition-all hover:scale-110 active:scale-95 ${isManualExpOpen ? "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600" : "bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600"}`}
-                            title="Toggle Explanation"
-                          >
-                            <Lightbulb
-                              className="w-8 h-8 md:w-6 md:h-6"
-                              strokeWidth={2.5}
-                            />
-                          </button>
-                        </div>
-                      )}
-                      {/* Prev Arrow */}
-                      {currentSlide > 0 && (
-                        <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
-                          <button
-                            onClick={prevStep}
-                            className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
-                          >
-                            <ChevronLeft
-                              className="w-8 h-8"
-                              strokeWidth={2.5}
-                            />
-                          </button>
-                        </div>
-                      )}
-
-                      <motion.div
-                        className={
-                          optionsLayout === "grid"
-                            ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl"
-                            : "flex flex-col gap-y-3 w-[90%] sm:w-fit min-w-[300px] md:min-w-[450px] lg:min-w-[500px] max-w-4xl mx-auto"
-                        }
-                        initial="hidden"
-                        animate="visible"
-                        variants={{
-                          hidden: {},
-                          visible: {
-                            transition: { staggerChildren: animSpeed / 2 },
-                          },
-                        }}
-                      >
-                        {!(
-                          (step >= 2 && q.explanation && isExpEnabled) ||
-                          isManualExpOpen
-                        ) &&
-                          parsedOptions.length > 0 &&
-                          parsedOptions.map(
-                            (
-                              opt: { key: string; text: string },
-                              oIdx: number,
-                            ) => {
-                              const isCorrect =
-                                q.correctAnswer &&
-                                q.correctAnswer.toLowerCase().includes(opt.key);
-                              const optLetter = getOptionLabel(opt.key, uiLang);
-
-                              const showCorrect = step >= 1 && isCorrect;
-                              const showWrong = step >= 1 && !isCorrect;
-                              const isSelected = selectedOption === opt.key;
-
-                              // Colors closely matching the image
-                              const colorThemes = [
-                                {
-                                  border: "border-[#4285F4]/30",
-                                  bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
-                                  letterBg: "bg-[#4285F4]",
-                                  letterText: "text-white",
-                                }, // Blue
-                                {
-                                  border: "border-[#34A853]/30",
-                                  bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
-                                  letterBg: "bg-[#34A853]",
-                                  letterText: "text-white",
-                                }, // Green
-                                {
-                                  border: "border-[#F9AB00]/30",
-                                  bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
-                                  letterBg: "bg-[#F9AB00]",
-                                  letterText: "text-white",
-                                }, // Yellow/Orange
-                                {
-                                  border: "border-[#EA4335]/30",
-                                  bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
-                                  letterBg: "bg-[#EA4335]",
-                                  letterText: "text-white",
-                                }, // Red
-                                {
-                                  border: "border-[#9C27B0]/30",
-                                  bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
-                                  letterBg: "bg-[#9C27B0]",
-                                  letterText: "text-white",
-                                }, // Purple
-                              ];
-
-                              const theme =
-                                colorThemes[oIdx % colorThemes.length];
-
-                              const bgClass =
-                                optBgColor === "default"
-                                  ? theme.bg
-                                  : optBgColor.startsWith("#")
-                                    ? ""
-                                    : optBgColor;
-                              let containerClasses = `flex items-center justify-between gap-2 sm:gap-3 md:gap-4 py-1.5 sm:py-2 md:py-2 px-3 sm:px-4 md:px-5 rounded-xl border-[1.5px] transition-all duration-200 shadow-md relative z-10 select-none ${bgClass} ${theme.border}`;
-                              let letterClasses = `shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 text-base md:text-lg flex items-center justify-center rounded-full font-black transition-colors duration-300 shadow-sm ${theme.letterBg} ${theme.letterText}`;
-
-                              if (step === 0) {
-                                if (eliminatedOptions.includes(opt.key)) {
-                                  containerClasses = `flex items-center justify-between gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800 relative z-10 cursor-not-allowed select-none`;
-                                  letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-gray-300 text-gray-500`;
-                                } else if (isSelected) {
-                                  containerClasses = `flex items-center justify-between gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#1e293b] border-[#4285F4] scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30 relative z-10 select-none active:scale-[0.99]`;
-                                  letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#4285F4] text-white`;
-                                } else {
-                                  containerClasses += ` hover:scale-[1.02] hover:shadow-md cursor-pointer hover:border-gray-300 active:scale-[0.99]`;
-                                }
-                              } else {
-                                if (showCorrect) {
-                                  containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative animate-pop-in select-none`;
-                                  letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#34A853] text-white`;
-                                } else if (showWrong && isSelected) {
-                                  containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] dark:bg-[#7f1d1d] border-[#EA4335] scale-[1.02] relative z-10 select-none`;
-                                  letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#EA4335] text-white`;
-                                } else if (showWrong) {
-                                  containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-sm bg-yellow-50 dark:bg-yellow-950/50 border-yellow-400 dark:border-yellow-600 relative z-10 select-none`;
-                                  letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-yellow-300 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-100`;
-                                }
-                              }
-
-                              const isActiveTTS =
-                                activeTTSBlock === `option-card-${opt.key}`;
-                              if (isActiveTTS) {
-                                let animClass = "";
-                                if (ttsAnimation === "zoom") {
-                                  animClass =
-                                    " transform scale-[1.06] z-20 shadow-[0_10px_30px_rgba(0,0,0,0.15)] ";
-                                } else if (ttsAnimation === "pulse") {
-                                  animClass =
-                                    " animate-pulse transform scale-[1.02] z-20 shadow-md ";
-                                } else if (ttsAnimation === "bounce") {
-                                  animClass = " animate-bounce z-20 shadow-md ";
-                                } else if (ttsAnimation === "pop") {
-                                  animClass = " animate-pop-in z-20 ";
-                                } else if (ttsAnimation === "glow") {
-                                  animClass =
-                                    " transform scale-[1.02] z-20 shadow-[0_0_30px_rgba(59,130,246,0.6)] dark:shadow-[0_0_30px_rgba(96,165,250,0.6)] ";
-                                } else {
-                                  animClass =
-                                    " transform scale-100 z-10 shadow-sm ";
-                                }
-
-                                if (ttsHighlightStyle === "bg") {
-                                  containerClasses +=
-                                    " bg-blue-50/80 dark:bg-blue-900/40 backdrop-blur-sm ring-2 ring-blue-400/50 dark:ring-blue-500/50 transition-all duration-300 " +
-                                    animClass;
-                                } else {
-                                  containerClasses +=
-                                    " ring-2 ring-pink-500/50 transition-all duration-300 text-pink-700 dark:text-pink-300 " +
-                                    animClass
-                                      .replace(
-                                        "rgba(59,130,246,0.6)",
-                                        "rgba(236,72,153,0.6)",
-                                      )
-                                      .replace(
-                                        "rgba(96,165,250,0.6)",
-                                        "rgba(244,114,182,0.6)",
-                                      );
-                                }
-                              }
-
-                              return (
-                                <motion.div
-                                  key={opt.key}
-                                  variants={{
-                                    hidden: { opacity: 0, y: 20 },
-                                    visible: {
-                                      opacity: 1,
-                                      y: 0,
-                                      transition: {
-                                        type: "spring",
-                                        stiffness: 100,
-                                        damping: 14,
-                                      },
-                                    },
-                                  }}
-                                  className="flex flex-col gap-2 w-full relative"
-                                >
-                                  <div
-                                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none transition-opacity duration-300 ${step >= 1 ? "opacity-100" : "opacity-0"}`}
-                                  >
-                                    <Confetti
-                                      active={
-                                        isConfettiActive &&
-                                        isSelected &&
-                                        showCorrect
-                                      }
-                                      config={CONFETTI_CONFIG}
-                                    />
-                                  </div>
-                                  <div
-                                    id={`desktop-option-card-${opt.key}`}
-                                    className={containerClasses}
-                                    style={{
-                                      containerType: "inline-size",
-                                      backgroundColor:
-                                        optBgColor !== "default" &&
-                                        optBgColor.startsWith("#")
-                                          ? optBgColor
-                                          : undefined,
-                                      ...(bgTheme === "dots"
-                                        ? {
-                                            backgroundImage: `radial-gradient(${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"} 1.5px, transparent 1.5px)`,
-                                            backgroundSize: "12px 12px",
-                                          }
-                                        : bgTheme === "grid"
-                                          ? {
-                                              backgroundImage: `linear-gradient(to right, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px)`,
-                                              backgroundSize: "12px 12px",
-                                            }
-                                          : {
-                                              backgroundImage: "none",
-                                              backgroundSize: "auto",
-                                            }),
-                                    }}
-                                    onContextMenu={(e) => {
-                                      e.preventDefault();
-                                      if (step === 0) {
-                                        setEliminatedOptions((prev) =>
-                                          prev.includes(opt.key)
-                                            ? prev.filter((k) => k !== opt.key)
-                                            : [...prev, opt.key],
-                                        );
-                                      }
-                                    }}
-                                    onClick={(e) => {
-                                      if (step === 0) {
-                                        if (eliminatedOptions.includes(opt.key))
-                                          return;
-                                        setSelectedOption(opt.key);
-                                        setStep(1);
-
-                                        // Trigger confetti and celebration if correct (Single Question Perform)
-                                        if (
-                                          q.correctAnswer &&
-                                          q.correctAnswer
-                                            .toLowerCase()
-                                            .trim()
-                                            .includes(opt.key)
-                                        ) {
-                                          const newConsecutive =
-                                            consecutiveCorrect + 1;
-                                          setConsecutiveCorrect(newConsecutive);
-                                          setIsConfettiActive(true);
-
-                                          // Show celebration on every 10 consecutive correct answers
-                                          triggerCelebration(newConsecutive);
-
-                                          if (
-                                            newConsecutive > 0 &&
-                                            newConsecutive % 5 === 0
-                                          ) {
-                                            // Play WOW sound every 5 consecutive correct answers
-                                            if (wowAudioRef.current) {
-                                              wowAudioRef.current.currentTime = 0;
-                                              wowAudioRef.current
-                                                .play()
-                                                .catch((e) =>
-                                                  console.warn(
-                                                    "Wow audio failed:",
-                                                    e,
-                                                  ),
-                                                );
-                                            }
-                                          } else {
-                                            if (
-                                              !isCelebrationSoundEnabled &&
-                                              popAudioRef.current
-                                            ) {
-                                              popAudioRef.current.currentTime = 0;
-                                              popAudioRef.current
-                                                .play()
-                                                .catch((e) =>
-                                                  console.warn(
-                                                    "Pop audio failed:",
-                                                    e,
-                                                  ),
-                                                );
-                                            }
-                                            if (dingAudioRef.current) {
-                                              dingAudioRef.current.currentTime = 0;
-                                              dingAudioRef.current
-                                                .play()
-                                                .catch((e) =>
-                                                  console.warn(
-                                                    "Ding audio failed:",
-                                                    e,
-                                                  ),
-                                                );
-                                            }
-                                          }
-                                          setTimeout(
-                                            () => setIsConfettiActive(false),
-                                            2000,
-                                          );
-                                        } else {
-                                          // Reset on wrong answer and play buzzer
-                                          setConsecutiveCorrect(0);
-                                          if (wrongAudioRef.current) {
-                                            wrongAudioRef.current.currentTime = 0;
-                                            wrongAudioRef.current
-                                              .play()
-                                              .catch((e) =>
-                                                console.warn(
-                                                  "Wrong audio failed:",
-                                                  e,
-                                                ),
-                                              );
-                                          }
-                                        }
-                                        // Feature 8: Track session score
-                                        if (q.correctAnswer) {
-                                          const isCor = q.correctAnswer
-                                            .toLowerCase()
-                                            .trim()
-                                            .includes(opt.key);
-                                          if (isCor) {
-                                            const id = Date.now();
-                                            setFloatingScores((prev) => [
-                                              ...prev,
-                                              {
-                                                id,
-                                                x: e.clientX,
-                                                y: e.clientY,
-                                              },
-                                            ]);
-                                            setTimeout(() => {
-                                              updateSessionScore(
-                                                currentSlide,
-                                                true,
-                                              );
-                                            }, 800);
-                                          } else {
-                                            updateSessionScore(
-                                              currentSlide,
-                                              false,
-                                            );
-                                          }
-                                        }
-                                      }
-                                    }}
-                                  >
-                                    <div
-                                      className={letterClasses}
-                                      style={{ fontSize: "var(--opt-size)" }}
-                                    >
-                                      {optLetter}
-                                    </div>
-                                    <div
-                                      className={`prose dark:prose-invert max-w-none ${optTextColor !== "default" ? "text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]" : "text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white"} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug [&>p]:whitespace-nowrap [&>p]:overflow-hidden [&>p]:text-ellipsis flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? "line-through opacity-50" : ""}`}
-                                      style={
-                                        {
-                                          "--opt-color":
-                                            optTextColor !== "default"
-                                              ? optTextColor
-                                              : undefined,
-                                          "--opt-size": (() => {
-                                            const maxOptLen =
-                                              parsedOptions.length > 0
-                                                ? Math.max(
-                                                    ...parsedOptions.map(
-                                                      (o: any) =>
-                                                        o.text?.length || 0,
-                                                    ),
-                                                  )
-                                                : 1;
-                                            const isGrid =
-                                              optionsLayout === "grid";
-                                            const cardWidth = isGrid
-                                              ? "min(45vw, 500px)"
-                                              : "min(94vw, 1000px)";
-                                            return `min(var(--base-opt-size), calc((${cardWidth} - 100px) * 1.2 / ${Math.max(1, maxOptLen)}))`;
-                                          })(),
-                                        } as React.CSSProperties
-                                      }
-                                    >
-                                      <ReactMarkdown
-                                        remarkPlugins={remarkPluginsList}
-                                        rehypePlugins={rehypePluginsList}
-                                      >
-                                        {opt.text}
-                                      </ReactMarkdown>
-                                    </div>
-
-                                    {step >= 1 &&
-                                      showCorrect &&
-                                      (isSavingImage ? (
-                                        <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20">
-                                          <Check className="w-7 h-7 stroke-[3]" />
-                                        </div>
-                                      ) : (
-                                        <motion.div
-                                          initial={{
-                                            x: -200,
-                                            opacity: 0,
-                                            scale: 0.5,
-                                          }}
-                                          animate={{
-                                            x: 0,
-                                            opacity: 1,
-                                            scale: 1,
-                                          }}
-                                          transition={{
-                                            type: "spring",
-                                            stiffness: 200,
-                                            damping: 15,
-                                            delay: 0.1,
-                                          }}
-                                          className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20"
-                                        >
-                                          <Check className="w-7 h-7 stroke-[3]" />
-                                        </motion.div>
-                                      ))}
-                                    {step >= 1 &&
-                                      showWrong &&
-                                      isSelected &&
-                                      (isSavingImage ? (
-                                        <div className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20">
-                                          <X className="w-7 h-7 stroke-[3]" />
-                                        </div>
-                                      ) : (
-                                        <motion.div
-                                          initial={{
-                                            x: -200,
-                                            opacity: 0,
-                                            scale: 0.5,
-                                          }}
-                                          animate={{
-                                            x: 0,
-                                            opacity: 1,
-                                            scale: 1,
-                                          }}
-                                          transition={{
-                                            type: "spring",
-                                            stiffness: 200,
-                                            damping: 15,
-                                            delay: 0.1,
-                                          }}
-                                          className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20"
-                                        >
-                                          <X className="w-7 h-7 stroke-[3]" />
-                                        </motion.div>
-                                      ))}
-                                  </div>
-
-                                  {/* Option Explanation */}
-                                  {step >= 2 &&
-                                    isOptionExpEnabled &&
-                                    q.optionExplanations?.[opt.key] && (
-                                      <div
-                                        className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50/90 dark:bg-gray-800/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose dark:prose-invert max-w-none [&>p]:m-0 [&_*]:!text-[length:var(--exp-size)]"
-                                        style={{ fontSize: "var(--exp-size)" }}
-                                      >
-                                        <ReactMarkdown
-                                          remarkPlugins={remarkPluginsList}
-                                          rehypePlugins={rehypePluginsList}
-                                        >
-                                          {q.optionExplanations[opt.key]}
-                                        </ReactMarkdown>
-                                      </div>
-                                    )}
-                                </motion.div>
-                              );
-                            },
-                          )}
-                      </motion.div>
-
-                      {/* Next Arrow */}
-                      {currentSlide < questions.length - 1 && (
-                        <div className="absolute right-[-10px] md:right-[-50px] lg:right-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
-                          <button
-                            onClick={nextStep}
-                            className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
-                          >
-                            <ChevronRight
-                              className="w-8 h-8"
-                              strokeWidth={2.5}
-                            />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Explanation */}
-                    {((step >= 2 && q.explanation && isExpEnabled) ||
-                      isManualExpOpen) &&
-                      q.explanation && (
-                        <div className="w-full max-w-5xl mt-6 animate-in fade-in slide-in-from-bottom-8 duration-700 !print-color-adjust-exact">
-                          <div className="bg-white dark:bg-gray-800 p-6 pt-10 md:p-8 md:pt-10 rounded-t-2xl rounded-b-[0.5rem] border-2 border-t-4 border-blue-600/30 border-t-blue-600 dark:border-blue-500/40 dark:border-t-blue-500 shadow-xl relative overflow-visible transition-colors duration-500">
-                            {/* Top Center Badge */}
-                            <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-500 to-sky-500 text-white px-8 py-2 rounded-full font-bold text-lg md:text-xl shadow-[0_4px_12px_rgba(59,130,246,0.3)] flex items-center gap-2 border-[4px] border-indigo-300 dark:border-indigo-700 z-10 whitespace-nowrap !print-color-adjust-exact">
-                              Explanation
-                            </div>
-
-                            <div
-                              className="prose prose-xl dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 font-medium [&_*]:!text-[length:var(--exp-size)] [&_*]:!leading-relaxed"
-                              style={{ fontSize: "var(--exp-size)" }}
-                            >
-                              <ReactMarkdown
-                                remarkPlugins={remarkPluginsList}
-                                rehypePlugins={rehypePluginsList}
-                              >
-                                {q.explanation}
-                              </ReactMarkdown>
+                              {uiLang === "bn"
+                                ? toBanglaNumber(currentSlide + 1)
+                                : currentSlide + 1}
                             </div>
                           </div>
+
+                          {/* Mobile Question Number Pill */}
+                          <div className="md:hidden absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+                            <div className="bg-blue-500 dark:bg-blue-600 text-white px-4 py-0.5 rounded-full text-[13px] font-bold shadow-md whitespace-nowrap">
+                              {uiLang === "bn" ? "প্রশ্ন" : "Question"}{" "}
+                              {uiLang === "bn"
+                                ? toBanglaNumber(currentSlide + 1).padStart(2, "০")
+                                : String(currentSlide + 1).padStart(2, "0")}
+                            </div>
+                          </div>
+
+                          {/* Top-Left Metallic Rivets / Screws (৩টি তারকাঁটা/স্ক্রু) */}
+                          <div className="absolute top-2.5 md:top-3.5 left-4 md:left-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none">
+                            <MetallicScrew rotation={15} />
+                            <MetallicScrew rotation={68} />
+                            <MetallicScrew rotation={125} />
+                          </div>
+
+                          {/* Top-Right Metallic Rivets / Screws (৩টি তারকাঁটা/স্ক্রু) */}
+                          <div className="absolute top-2.5 md:top-3.5 right-4 md:right-8 flex items-center gap-2 md:gap-2.5 z-20 pointer-events-none select-none">
+                            <MetallicScrew rotation={35} />
+                            <MetallicScrew rotation={95} />
+                            <MetallicScrew rotation={155} />
+                          </div>
+
+                          {/* Subtle horizontal divider line */}
+                          <div className="w-full border-t border-gray-200 dark:border-gray-700/60 mt-1 md:mt-2 mb-1"></div>
+
+                          <div
+                            data-read-cursor-target="question"
+                            className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== "default" ? "text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm" : bgTheme === "video" ? "text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white"} ${activeTTSBlock === "question"
+                                ? (ttsHighlightStyle === "bg"
+                                  ? "p-3 -m-3 transition-all duration-500 bg-blue-50/80 dark:bg-blue-900/40 rounded-xl"
+                                  : "text-pink-600 dark:text-pink-400 [&_*]:!text-pink-600 dark:[&_*]:!text-pink-400 p-2 -m-2 transition-all duration-300 drop-shadow-md origin-left")
+                                + " " + (
+                                  ttsAnimation === "zoom" ? "transform scale-[1.04] z-20 shadow-[0_10px_30px_rgba(0,0,0,0.1)]" :
+                                    ttsAnimation === "pulse" ? "animate-pulse transform scale-[1.02]" :
+                                      ttsAnimation === "bounce" ? "animate-bounce" :
+                                        ttsAnimation === "pop" ? "animate-pop-in" :
+                                          ttsAnimation === "glow" ? "shadow-[0_0_20px_rgba(236,72,153,0.5)] transform scale-[1.02]" : ""
+                                )
+                                : "p-2 -m-2 transition-all duration-300"
+                              }`}
+                          >
+                            <ReactMarkdown
+                              remarkPlugins={remarkPluginsList}
+                              rehypePlugins={rehypePluginsList}
+                            >
+                              {q.questionText}
+                            </ReactMarkdown>
+                          </div>
+                          {q.statements && q.statements.length > 0 && (
+                            <div className="mt-2 flex flex-col gap-1 w-full pl-3 md:pl-6 border-l-4 border-indigo-200 dark:border-indigo-800/50">
+                              {q.statements.map((stmt: string, sIdx: number) => (
+                                <div
+                                  key={sIdx}
+                                  className={`prose dark:prose-invert max-w-none w-full prose-p:font-bold text-[calc(var(--q-size)*0.85)] leading-[1] text-left font-bold [&_*]:!text-[calc(var(--q-size)*0.85)] [&_*]:!leading-[1] [&_*]:!m-0 ${qTextColor !== "default" ? "text-[var(--q-color)] [&_*]:!text-[var(--q-color)]" : bgTheme === "video" ? "text-white/90 [&_*]:!text-white/90" : "text-slate-700 dark:text-gray-300 [&_*]:!text-slate-700 dark:[&_*]:!text-gray-300"}`}
+                                >
+                                  <ReactMarkdown
+                                    remarkPlugins={remarkPluginsList}
+                                    rehypePlugins={rehypePluginsList}
+                                  >
+                                    {stmt}
+                                  </ReactMarkdown>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                      )}
-                  </div>
-                  {/* END: Desktop Layout hidden on mobile */}
+
+                        {/* Options Area with Side Navigation */}
+                        <div className="relative w-full max-w-[1200px] flex justify-center mt-4 md:mt-4 mb-1 mx-auto">
+                          {/* Exp Toggle */}
+                          {q.explanation && (
+                            <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-[-60px] md:top-[-80px] z-[45] group hidden md:flex flex-col gap-4 items-center">
+                              <button
+                                onClick={() => setIsManualExpOpen(!isManualExpOpen)}
+                                className={`p-3 rounded-full shadow-lg backdrop-blur-sm border transition-all hover:scale-110 active:scale-95 ${isManualExpOpen ? "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600" : "bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600"}`}
+                                title="Toggle Explanation"
+                              >
+                                <Lightbulb
+                                  className="w-8 h-8 md:w-6 md:h-6"
+                                  strokeWidth={2.5}
+                                />
+                              </button>
+                            </div>
+                          )}
+                          {/* Prev Arrow */}
+                          {currentSlide > 0 && (
+                            <div className="absolute left-[-10px] md:left-[-50px] lg:left-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
+                              <button
+                                onClick={prevStep}
+                                className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
+                              >
+                                <ChevronLeft
+                                  className="w-8 h-8"
+                                  strokeWidth={2.5}
+                                />
+                              </button>
+                            </div>
+                          )}
+
+                          <motion.div
+                            className={
+                              optionsLayout === "grid"
+                                ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full max-w-6xl"
+                                : "flex flex-col gap-y-3 w-[90%] sm:w-fit min-w-[300px] md:min-w-[450px] lg:min-w-[500px] max-w-4xl mx-auto"
+                            }
+                            initial="hidden"
+                            animate="visible"
+                            variants={{
+                              hidden: {},
+                              visible: {
+                                transition: { staggerChildren: animSpeed / 2 },
+                              },
+                            }}
+                          >
+                            {!(
+                              (step >= 2 && q.explanation && isExpEnabled) ||
+                              isManualExpOpen
+                            ) &&
+                              parsedOptions.length > 0 &&
+                              parsedOptions.map(
+                                (
+                                  opt: { key: string; text: string },
+                                  oIdx: number,
+                                ) => {
+                                  const isCorrect =
+                                    q.correctAnswer &&
+                                    q.correctAnswer.toLowerCase().includes(opt.key);
+                                  const optLetter = getOptionLabel(opt.key, uiLang);
+
+                                  const showCorrect = step >= 1 && isCorrect;
+                                  const showWrong = step >= 1 && !isCorrect;
+                                  const isSelected = selectedOption === opt.key;
+
+                                  // Colors closely matching the image
+                                  const colorThemes = [
+                                    {
+                                      border: "border-[#4285F4]/30",
+                                      bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
+                                      letterBg: "bg-[#4285F4]",
+                                      letterText: "text-white",
+                                    }, // Blue
+                                    {
+                                      border: "border-[#34A853]/30",
+                                      bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
+                                      letterBg: "bg-[#34A853]",
+                                      letterText: "text-white",
+                                    }, // Green
+                                    {
+                                      border: "border-[#F9AB00]/30",
+                                      bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
+                                      letterBg: "bg-[#F9AB00]",
+                                      letterText: "text-white",
+                                    }, // Yellow/Orange
+                                    {
+                                      border: "border-[#EA4335]/30",
+                                      bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
+                                      letterBg: "bg-[#EA4335]",
+                                      letterText: "text-white",
+                                    }, // Red
+                                    {
+                                      border: "border-[#9C27B0]/30",
+                                      bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
+                                      letterBg: "bg-[#9C27B0]",
+                                      letterText: "text-white",
+                                    }, // Purple
+                                  ];
+
+                                  const theme =
+                                    colorThemes[oIdx % colorThemes.length];
+
+                                  const bgClass =
+                                    optBgColor === "default"
+                                      ? theme.bg
+                                      : optBgColor.startsWith("#")
+                                        ? ""
+                                        : optBgColor;
+                                  let containerClasses = `flex items-center justify-between gap-2 sm:gap-3 md:gap-4 py-1.5 sm:py-2 md:py-2 px-3 sm:px-4 md:px-5 rounded-xl border-[1.5px] transition-all duration-200 shadow-md relative z-10 select-none ${bgClass} ${theme.border}`;
+                                  let letterClasses = `shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 text-base md:text-lg flex items-center justify-center rounded-full font-black transition-colors duration-300 shadow-sm ${theme.letterBg} ${theme.letterText}`;
+
+                                  if (step === 0) {
+                                    if (eliminatedOptions.includes(opt.key)) {
+                                      containerClasses = `flex items-center justify-between gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 opacity-40 grayscale border-gray-300 bg-gray-50 dark:bg-gray-800 relative z-10 cursor-not-allowed select-none`;
+                                      letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-gray-300 text-gray-500`;
+                                    } else if (isSelected) {
+                                      containerClasses = `flex items-center justify-between gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(66,133,244,0.15)] bg-[#e8f0fe] dark:bg-[#1e293b] border-[#4285F4] scale-[1.02] cursor-pointer ring-2 ring-[#4285F4]/30 relative z-10 select-none active:scale-[0.99]`;
+                                      letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#4285F4] text-white`;
+                                    } else {
+                                      containerClasses += ` hover:scale-[1.02] hover:shadow-md cursor-pointer hover:border-gray-300 active:scale-[0.99]`;
+                                    }
+                                  } else {
+                                    if (showCorrect) {
+                                      containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 ring-4 ring-[#34A853]/30 bg-[#f0fdf4] dark:bg-[#064e3b] border-[#34A853] z-10 relative animate-pop-in select-none`;
+                                      letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#34A853] text-white`;
+                                    } else if (showWrong && isSelected) {
+                                      containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-[0_8px_20px_rgba(234,67,53,0.15)] bg-[#fce8e6] dark:bg-[#7f1d1d] border-[#EA4335] scale-[1.02] relative z-10 select-none`;
+                                      letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-[#EA4335] text-white`;
+                                    } else if (showWrong) {
+                                      containerClasses = `flex items-center gap-3 md:gap-4 py-2 md:py-2 px-4 md:px-5 rounded-xl border-2 transition-all duration-200 shadow-sm bg-yellow-50 dark:bg-yellow-950/50 border-yellow-400 dark:border-yellow-600 relative z-10 select-none`;
+                                      letterClasses = `shrink-0 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full font-black transition-colors duration-300 bg-yellow-300 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-100`;
+                                    }
+                                  }
+
+                                  const isActiveTTS =
+                                    activeTTSBlock === `option-card-${opt.key}`;
+                                  if (isActiveTTS) {
+                                    let animClass = "";
+                                    if (ttsAnimation === "zoom") {
+                                      animClass =
+                                        " transform scale-[1.06] z-20 shadow-[0_10px_30px_rgba(0,0,0,0.15)] ";
+                                    } else if (ttsAnimation === "pulse") {
+                                      animClass =
+                                        " animate-pulse transform scale-[1.02] z-20 shadow-md ";
+                                    } else if (ttsAnimation === "bounce") {
+                                      animClass = " animate-bounce z-20 shadow-md ";
+                                    } else if (ttsAnimation === "pop") {
+                                      animClass = " animate-pop-in z-20 ";
+                                    } else if (ttsAnimation === "glow") {
+                                      animClass =
+                                        " transform scale-[1.02] z-20 shadow-[0_0_30px_rgba(59,130,246,0.6)] dark:shadow-[0_0_30px_rgba(96,165,250,0.6)] ";
+                                    } else {
+                                      animClass =
+                                        " transform scale-100 z-10 shadow-sm ";
+                                    }
+
+                                    if (ttsHighlightStyle === "bg") {
+                                      containerClasses +=
+                                        " bg-blue-50/80 dark:bg-blue-900/40 backdrop-blur-sm ring-2 ring-blue-400/50 dark:ring-blue-500/50 transition-all duration-300 " +
+                                        animClass;
+                                    } else {
+                                      containerClasses +=
+                                        " ring-2 ring-pink-500/50 transition-all duration-300 text-pink-700 dark:text-pink-300 " +
+                                        animClass
+                                          .replace(
+                                            "rgba(59,130,246,0.6)",
+                                            "rgba(236,72,153,0.6)",
+                                          )
+                                          .replace(
+                                            "rgba(96,165,250,0.6)",
+                                            "rgba(244,114,182,0.6)",
+                                          );
+                                    }
+                                  }
+
+                                  return (
+                                    <motion.div
+                                      key={opt.key}
+                                      variants={{
+                                        hidden: { opacity: 0, y: 20 },
+                                        visible: {
+                                          opacity: 1,
+                                          y: 0,
+                                          transition: {
+                                            type: "spring",
+                                            stiffness: 100,
+                                            damping: 14,
+                                          },
+                                        },
+                                      }}
+                                      className="flex flex-col gap-2 w-full relative"
+                                    >
+                                      <div
+                                        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none transition-opacity duration-300 ${step >= 1 ? "opacity-100" : "opacity-0"}`}
+                                      >
+                                        <Confetti
+                                          active={
+                                            isConfettiActive &&
+                                            isSelected &&
+                                            showCorrect
+                                          }
+                                          config={CONFETTI_CONFIG}
+                                        />
+                                      </div>
+                                      <div
+                                        id={`desktop-option-card-${opt.key}`}
+                                        className={containerClasses}
+                                        style={{
+                                          containerType: "inline-size",
+                                          backgroundColor:
+                                            optBgColor !== "default" &&
+                                              optBgColor.startsWith("#")
+                                              ? optBgColor
+                                              : undefined,
+                                          ...(bgTheme === "dots"
+                                            ? {
+                                              backgroundImage: `radial-gradient(${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"} 1.5px, transparent 1.5px)`,
+                                              backgroundSize: "12px 12px",
+                                            }
+                                            : bgTheme === "grid"
+                                              ? {
+                                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px)`,
+                                                backgroundSize: "12px 12px",
+                                              }
+                                              : {
+                                                backgroundImage: "none",
+                                                backgroundSize: "auto",
+                                              }),
+                                        }}
+                                        onContextMenu={(e) => {
+                                          e.preventDefault();
+                                          if (step === 0) {
+                                            setEliminatedOptions((prev) =>
+                                              prev.includes(opt.key)
+                                                ? prev.filter((k) => k !== opt.key)
+                                                : [...prev, opt.key],
+                                            );
+                                          }
+                                        }}
+                                        onClick={(e) => {
+                                          if (step === 0) {
+                                            if (eliminatedOptions.includes(opt.key))
+                                              return;
+                                            setSelectedOption(opt.key);
+                                            setStep(1);
+
+                                            // Trigger confetti and celebration if correct (Single Question Perform)
+                                            if (
+                                              q.correctAnswer &&
+                                              q.correctAnswer
+                                                .toLowerCase()
+                                                .trim()
+                                                .includes(opt.key)
+                                            ) {
+                                              const newConsecutive =
+                                                consecutiveCorrect + 1;
+                                              setConsecutiveCorrect(newConsecutive);
+                                              setIsConfettiActive(true);
+
+                                              // Show celebration on every 10 consecutive correct answers
+                                              triggerCelebration(newConsecutive);
+
+                                              if (
+                                                newConsecutive > 0 &&
+                                                newConsecutive % 5 === 0
+                                              ) {
+                                                // Play WOW sound every 5 consecutive correct answers
+                                                if (wowAudioRef.current) {
+                                                  wowAudioRef.current.currentTime = 0;
+                                                  wowAudioRef.current
+                                                    .play()
+                                                    .catch((e) =>
+                                                      console.warn(
+                                                        "Wow audio failed:",
+                                                        e,
+                                                      ),
+                                                    );
+                                                }
+                                              } else {
+                                                if (
+                                                  !isCelebrationSoundEnabled &&
+                                                  popAudioRef.current
+                                                ) {
+                                                  popAudioRef.current.currentTime = 0;
+                                                  popAudioRef.current
+                                                    .play()
+                                                    .catch((e) =>
+                                                      console.warn(
+                                                        "Pop audio failed:",
+                                                        e,
+                                                      ),
+                                                    );
+                                                }
+                                                if (dingAudioRef.current) {
+                                                  dingAudioRef.current.currentTime = 0;
+                                                  dingAudioRef.current
+                                                    .play()
+                                                    .catch((e) =>
+                                                      console.warn(
+                                                        "Ding audio failed:",
+                                                        e,
+                                                      ),
+                                                    );
+                                                }
+                                              }
+                                              setTimeout(
+                                                () => setIsConfettiActive(false),
+                                                2000,
+                                              );
+                                            } else {
+                                              // Reset on wrong answer and play buzzer
+                                              setConsecutiveCorrect(0);
+                                              if (wrongAudioRef.current) {
+                                                wrongAudioRef.current.currentTime = 0;
+                                                wrongAudioRef.current
+                                                  .play()
+                                                  .catch((e) =>
+                                                    console.warn(
+                                                      "Wrong audio failed:",
+                                                      e,
+                                                    ),
+                                                  );
+                                              }
+                                            }
+                                            // Feature 8: Track session score
+                                            if (q.correctAnswer) {
+                                              const isCor = q.correctAnswer
+                                                .toLowerCase()
+                                                .trim()
+                                                .includes(opt.key);
+                                              if (isCor) {
+                                                const id = Date.now();
+                                                setFloatingScores((prev) => [
+                                                  ...prev,
+                                                  {
+                                                    id,
+                                                    x: e.clientX,
+                                                    y: e.clientY,
+                                                  },
+                                                ]);
+                                                setTimeout(() => {
+                                                  updateSessionScore(
+                                                    currentSlide,
+                                                    true,
+                                                  );
+                                                }, 800);
+                                              } else {
+                                                updateSessionScore(
+                                                  currentSlide,
+                                                  false,
+                                                );
+                                              }
+                                            }
+                                          }
+                                        }}
+                                      >
+                                        <div
+                                          className={letterClasses}
+                                          style={{ fontSize: "var(--opt-size)" }}
+                                        >
+                                          {optLetter}
+                                        </div>
+                                        <div
+                                          className={`prose dark:prose-invert max-w-none ${optTextColor !== "default" ? "text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]" : "text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white"} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug [&>p]:whitespace-nowrap [&>p]:overflow-hidden [&>p]:text-ellipsis flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? "line-through opacity-50" : ""}`}
+                                          style={
+                                            {
+                                              "--opt-color":
+                                                optTextColor !== "default"
+                                                  ? optTextColor
+                                                  : undefined,
+                                              "--opt-size": (() => {
+                                                const maxOptLen =
+                                                  parsedOptions.length > 0
+                                                    ? Math.max(
+                                                      ...parsedOptions.map(
+                                                        (o: any) =>
+                                                          o.text?.length || 0,
+                                                      ),
+                                                    )
+                                                    : 1;
+                                                const isGrid =
+                                                  optionsLayout === "grid";
+                                                const cardWidth = isGrid
+                                                  ? "min(45vw, 500px)"
+                                                  : "min(94vw, 1000px)";
+                                                return `min(var(--base-opt-size), calc((${cardWidth} - 100px) * 1.2 / ${Math.max(1, maxOptLen)}))`;
+                                              })(),
+                                            } as React.CSSProperties
+                                          }
+                                        >
+                                          <ReactMarkdown
+                                            remarkPlugins={remarkPluginsList}
+                                            rehypePlugins={rehypePluginsList}
+                                          >
+                                            {opt.text}
+                                          </ReactMarkdown>
+                                        </div>
+
+                                        {step >= 1 &&
+                                          showCorrect &&
+                                          (isSavingImage ? (
+                                            <div className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20">
+                                              <Check className="w-7 h-7 stroke-[3]" />
+                                            </div>
+                                          ) : (
+                                            <motion.div
+                                              initial={{
+                                                x: -200,
+                                                opacity: 0,
+                                                scale: 0.5,
+                                              }}
+                                              animate={{
+                                                x: 0,
+                                                opacity: 1,
+                                                scale: 1,
+                                              }}
+                                              transition={{
+                                                type: "spring",
+                                                stiffness: 200,
+                                                damping: 15,
+                                                delay: 0.1,
+                                              }}
+                                              className="shrink-0 text-white bg-[#34A853] rounded-full p-1.5 shadow-sm relative z-20"
+                                            >
+                                              <Check className="w-7 h-7 stroke-[3]" />
+                                            </motion.div>
+                                          ))}
+                                        {step >= 1 &&
+                                          showWrong &&
+                                          isSelected &&
+                                          (isSavingImage ? (
+                                            <div className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20">
+                                              <X className="w-7 h-7 stroke-[3]" />
+                                            </div>
+                                          ) : (
+                                            <motion.div
+                                              initial={{
+                                                x: -200,
+                                                opacity: 0,
+                                                scale: 0.5,
+                                              }}
+                                              animate={{
+                                                x: 0,
+                                                opacity: 1,
+                                                scale: 1,
+                                              }}
+                                              transition={{
+                                                type: "spring",
+                                                stiffness: 200,
+                                                damping: 15,
+                                                delay: 0.1,
+                                              }}
+                                              className="shrink-0 text-white bg-[#EA4335] rounded-full p-1.5 shadow-sm relative z-20"
+                                            >
+                                              <X className="w-7 h-7 stroke-[3]" />
+                                            </motion.div>
+                                          ))}
+                                      </div>
+
+                                      {/* Option Explanation */}
+                                      {step >= 2 &&
+                                        isOptionExpEnabled &&
+                                        q.optionExplanations?.[opt.key] && (
+                                          <div
+                                            className="ml-4 mt-2 pl-4 pr-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50/90 dark:bg-gray-800/90 rounded-xl border-l-4 border-l-[#4285F4] shadow-sm animate-in fade-in duration-500 prose dark:prose-invert max-w-none [&>p]:m-0 [&_*]:!text-[length:var(--exp-size)]"
+                                            style={{ fontSize: "var(--exp-size)" }}
+                                          >
+                                            <ReactMarkdown
+                                              remarkPlugins={remarkPluginsList}
+                                              rehypePlugins={rehypePluginsList}
+                                            >
+                                              {q.optionExplanations[opt.key]}
+                                            </ReactMarkdown>
+                                          </div>
+                                        )}
+                                    </motion.div>
+                                  );
+                                },
+                              )}
+                          </motion.div>
+
+                          {/* Next Arrow */}
+                          {currentSlide < questions.length - 1 && (
+                            <div className="absolute right-[-10px] md:right-[-50px] lg:right-[-70px] top-1/2 -translate-y-1/2 z-[45] group hidden md:block">
+                              <button
+                                onClick={nextStep}
+                                className="p-3 bg-white/70 hover:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg backdrop-blur-sm border border-gray-200 dark:border-gray-600 transition-all hover:scale-110 active:scale-95"
+                              >
+                                <ChevronRight
+                                  className="w-8 h-8"
+                                  strokeWidth={2.5}
+                                />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Explanation */}
+                        {((step >= 2 && q.explanation && isExpEnabled) ||
+                          isManualExpOpen) &&
+                          q.explanation && (
+                            <div className="w-full max-w-5xl mt-6 animate-in fade-in slide-in-from-bottom-8 duration-700 !print-color-adjust-exact">
+                              <div className="bg-white dark:bg-gray-800 p-6 pt-10 md:p-8 md:pt-10 rounded-t-2xl rounded-b-[0.5rem] border-2 border-t-4 border-blue-600/30 border-t-blue-600 dark:border-blue-500/40 dark:border-t-blue-500 shadow-xl relative overflow-visible transition-colors duration-500">
+                                {/* Top Center Badge */}
+                                <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-500 to-sky-500 text-white px-8 py-2 rounded-full font-bold text-lg md:text-xl shadow-[0_4px_12px_rgba(59,130,246,0.3)] flex items-center gap-2 border-[4px] border-indigo-300 dark:border-indigo-700 z-10 whitespace-nowrap !print-color-adjust-exact">
+                                  Explanation
+                                </div>
+
+                                <div
+                                  className="prose prose-xl dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 font-medium [&_*]:!text-[length:var(--exp-size)] [&_*]:!leading-relaxed"
+                                  style={{ fontSize: "var(--exp-size)" }}
+                                >
+                                  <ReactMarkdown
+                                    remarkPlugins={remarkPluginsList}
+                                    rehypePlugins={rehypePluginsList}
+                                  >
+                                    {q.explanation}
+                                  </ReactMarkdown>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        {/* YouTube Suspense Timer */}
+                        {currentYoutubeTimer !== null && (
+                          <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+                            <div className="relative flex items-center justify-center animate-in zoom-in-50 duration-500 fade-in">
+                              <svg className="w-64 h-64 md:w-80 md:h-80 transform -rotate-90">
+                                <circle
+                                  cx="50%"
+                                  cy="50%"
+                                  r="40%"
+                                  stroke="currentColor"
+                                  strokeWidth="12"
+                                  fill="transparent"
+                                  className="text-gray-800/40 dark:text-gray-900/60"
+                                />
+                                <circle
+                                  cx="50%"
+                                  cy="50%"
+                                  r="40%"
+                                  stroke="currentColor"
+                                  strokeWidth="12"
+                                  fill="transparent"
+                                  strokeDasharray="1000" // approximated for percentage r
+                                  strokeDashoffset={1000 - (1000 * currentYoutubeTimer) / youtubeTimerDuration}
+                                  className={`transition-all duration-1000 ease-linear ${currentYoutubeTimer <= 3 ? "text-red-500 drop-shadow-[0_0_20px_rgba(239,68,68,0.8)]" : "text-emerald-400 drop-shadow-[0_0_20px_rgba(52,211,153,0.8)]"}`}
+                                  style={{
+                                    strokeDasharray: "251.2%",
+                                    strokeDashoffset: `${251.2 - (251.2 * currentYoutubeTimer) / youtubeTimerDuration}%`
+                                  }}
+                                />
+                              </svg>
+                              <div className={`absolute text-7xl md:text-9xl font-black tabular-nums transition-colors duration-300 ${currentYoutubeTimer <= 3 ? "text-red-500 drop-shadow-[0_0_20px_rgba(239,68,68,1)]" : "text-white drop-shadow-[0_0_15px_rgba(0,0,0,0.8)]"}`}>
+                                {currentYoutubeTimer}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      {/* END: Desktop Layout hidden on mobile */}
+                    </>
+                  )}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -6948,11 +7071,10 @@ export default function PresentationOverlay({
                 <button
                   onClick={handleSaveAsImage}
                   disabled={isSavingImage}
-                  className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${
-                    isSavingImage
+                  className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isSavingImage
                       ? "bg-white/30 text-white cursor-wait"
                       : "hover:bg-white/10 text-white/80 hover:text-white"
-                  }`}
+                    }`}
                   title="Save Slide as Image"
                 >
                   {isSavingImage ? (
@@ -6982,11 +7104,10 @@ export default function PresentationOverlay({
                 <button
                   onClick={downloadPdf}
                   disabled={isGeneratingPdf}
-                  className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${
-                    isGeneratingPdf
+                  className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isGeneratingPdf
                       ? "bg-white/30 text-white cursor-wait"
                       : "hover:bg-white/10 text-white/80 hover:text-white"
-                  }`}
+                    }`}
                   title="Download Presentation as PDF"
                 >
                   {isGeneratingPdf ? (
@@ -7016,11 +7137,10 @@ export default function PresentationOverlay({
                 {isRecording && (
                   <button
                     onClick={toggleRecordingPause}
-                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${
-                      isRecordingPaused
+                    className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isRecordingPaused
                         ? "bg-yellow-500 text-white shadow-md ring-2 ring-yellow-300"
                         : "hover:bg-white/10 text-white/80 hover:text-white"
-                    }`}
+                      }`}
                     title={
                       isRecordingPaused ? "Resume Recording" : "Pause Recording"
                     }
@@ -7036,11 +7156,10 @@ export default function PresentationOverlay({
                 {/* Screen Record Button */}
                 <button
                   onClick={toggleRecording}
-                  className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${
-                    isRecording
+                  className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isRecording
                       ? "bg-red-500 text-white shadow-md animate-pulse ring-2 ring-red-300"
                       : "hover:bg-white/10 text-white/80 hover:text-white"
-                  }`}
+                    }`}
                   title={isRecording ? "Stop Recording" : "Start Recording"}
                 >
                   {isRecording ? (
@@ -7053,11 +7172,10 @@ export default function PresentationOverlay({
                 {/* Toggle Webcam Button */}
                 <button
                   onClick={toggleWebcam}
-                  className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${
-                    isWebcamActive
+                  className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isWebcamActive
                       ? "bg-blue-500 text-white shadow-md ring-2 ring-blue-300"
                       : "hover:bg-white/10 text-white/80 hover:text-white"
-                  }`}
+                    }`}
                   title={isWebcamActive ? "Stop Webcam" : "Start Webcam"}
                 >
                   <Camera className="w-5 h-5 md:w-6 md:h-6" />
@@ -7066,11 +7184,10 @@ export default function PresentationOverlay({
                 {/* Audio Settings Button */}
                 <button
                   onClick={() => setShowAudioSettings(!showAudioSettings)}
-                  className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${
-                    showAudioSettings
+                  className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${showAudioSettings
                       ? "bg-blue-500 text-white shadow-md ring-2 ring-blue-300"
                       : "hover:bg-white/10 text-white/80 hover:text-white"
-                  }`}
+                    }`}
                   title="Advanced Audio Settings"
                 >
                   <Sliders className="w-5 h-5 md:w-6 md:h-6" />
@@ -7387,9 +7504,9 @@ export default function PresentationOverlay({
                           {uiLang === "bn" ? "বাকি" : "Left"} (
                           {uiLang === "bn"
                             ? toBanglaNumber(
-                                questions.length -
-                                  answeredSlidesRef.current.size,
-                              )
+                              questions.length -
+                              answeredSlidesRef.current.size,
+                            )
                             : questions.length - answeredSlidesRef.current.size}
                           )
                         </span>
@@ -7460,7 +7577,7 @@ export default function PresentationOverlay({
                       <span className="text-[11px] font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-0.5 rounded-full border border-blue-100 dark:border-blue-900/50">
                         {Math.round(
                           ((currentSlide + 1) / Math.max(questions.length, 1)) *
-                            100,
+                          100,
                         )}
                         %
                       </span>
@@ -7651,11 +7768,10 @@ export default function PresentationOverlay({
                   setIsPenActive(true);
                 }
               }}
-              className={`p-1.5 md:p-2 rounded-full transition-all ${
-                isPenActive && drawingTool === "pen"
+              className={`p-1.5 md:p-2 rounded-full transition-all ${isPenActive && drawingTool === "pen"
                   ? "bg-blue-500 text-white scale-110 shadow-lg"
                   : "bg-transparent text-white/70 hover:bg-white/10 hover:text-white"
-              }`}
+                }`}
               title="Quick Pen Toggle"
             >
               <Pen className="w-4 h-4 md:w-5 md:h-5" />
@@ -7792,7 +7908,7 @@ export default function PresentationOverlay({
                 ref={(video) => {
                   if (video) {
                     if (isSpeaking) {
-                      video.play().catch(() => {});
+                      video.play().catch(() => { });
                     } else {
                       video.pause();
                     }
@@ -7896,13 +8012,13 @@ export default function PresentationOverlay({
                   <span className="font-black text-teal-100">
                     {uiLang === "bn"
                       ? toBanglaNumber(
-                          questions.length -
-                            sessionScore.correct -
-                            sessionScore.wrong,
-                        )
-                      : questions.length -
+                        questions.length -
                         sessionScore.correct -
-                        sessionScore.wrong}
+                        sessionScore.wrong,
+                      )
+                      : questions.length -
+                      sessionScore.correct -
+                      sessionScore.wrong}
                   </span>
                 </div>
               </div>
@@ -8076,13 +8192,13 @@ export default function PresentationOverlay({
                     <p className="text-3xl font-black text-gray-400">
                       {uiLang === "bn"
                         ? toBanglaNumber(
-                            questions.length -
-                              sessionScore.correct -
-                              sessionScore.wrong,
-                          )
-                        : questions.length -
+                          questions.length -
                           sessionScore.correct -
-                          sessionScore.wrong}
+                          sessionScore.wrong,
+                        )
+                        : questions.length -
+                        sessionScore.correct -
+                        sessionScore.wrong}
                     </p>
                     <p className="text-xs font-semibold text-gray-500 mt-1">
                       {L.unanswered}
@@ -8185,15 +8301,15 @@ export default function PresentationOverlay({
             parsedOptions.length > 0
               ? parsedOptions
               : (() => {
-                  const arr = [
-                    { key: "a", text: q.options?.a || "" },
-                    { key: "b", text: q.options?.b || "" },
-                    { key: "c", text: q.options?.c || "" },
-                    { key: "d", text: q.options?.d || "" },
-                  ];
-                  if (q.options?.e) arr.push({ key: "e", text: q.options.e });
-                  return arr.filter((x: any) => x.text);
-                })();
+                const arr = [
+                  { key: "a", text: q.options?.a || "" },
+                  { key: "b", text: q.options?.b || "" },
+                  { key: "c", text: q.options?.c || "" },
+                  { key: "d", text: q.options?.d || "" },
+                ];
+                if (q.options?.e) arr.push({ key: "e", text: q.options.e });
+                return arr.filter((x: any) => x.text);
+              })();
 
           const renderQuestion = (isAnswerKey: boolean) => {
             const showHighlight =
@@ -8211,6 +8327,7 @@ export default function PresentationOverlay({
               >
                 {/* Main Presentation Area Only (No side banners) */}
                 <div
+                  style={{ backgroundColor: bgTheme === "solid" ? customBgColor : undefined }}
                   className={`responsive-fonts relative w-full ${isPrintAsList ? "" : "h-full"} ${getBgThemeClasses()} flex flex-col shadow-2xl ${isPrintAsList ? "" : "overflow-hidden"} z-10 transition-colors duration-500`}
                 >
                   {bgTheme !== "video" && (
@@ -8314,13 +8431,12 @@ export default function PresentationOverlay({
                       </div>
                     ) : (
                       <div
-                        className={`shrink-0 w-full px-4 sm:px-6 md:px-8 py-3 md:py-4 flex items-center justify-between border-b relative z-30 transition-colors duration-300 shadow-sm ${
-                          bgTheme === "video"
+                        className={`shrink-0 w-full px-4 sm:px-6 md:px-8 py-3 md:py-4 flex items-center justify-between border-b relative z-30 transition-colors duration-300 shadow-sm ${bgTheme === "video"
                             ? "bg-black/40 border-white/10 backdrop-blur-md"
                             : isDarkMode
                               ? "bg-[#111827] border-gray-800"
                               : "bg-[#7c3aed] border-purple-600"
-                        } !print-color-adjust-exact`}
+                          } !print-color-adjust-exact`}
                       >
                         <div className="flex items-center gap-3 w-1/3">
                           {showLogo && (
@@ -8496,7 +8612,7 @@ export default function PresentationOverlay({
                                 style={{
                                   backgroundColor:
                                     optBgColor !== "default" &&
-                                    optBgColor.startsWith("#")
+                                      optBgColor.startsWith("#")
                                       ? optBgColor
                                       : undefined,
                                 }}
@@ -8567,49 +8683,47 @@ export default function PresentationOverlay({
                                 bgTheme === "video"
                                   ? "rgba(255,255,255,0.4)"
                                   : [
-                                      "#6366f1",
-                                      "#3b82f6",
-                                      "#10b981",
-                                      "#f43f5e",
-                                      "#f59e0b",
-                                      "#a855f7",
-                                    ][idx % 6],
+                                    "#6366f1",
+                                    "#3b82f6",
+                                    "#10b981",
+                                    "#f43f5e",
+                                    "#f59e0b",
+                                    "#a855f7",
+                                  ][idx % 6],
                               borderTopWidth: "4px",
                               ...(qBgColor !== "transparent" &&
-                              bgTheme === "dots"
+                                bgTheme === "dots"
                                 ? {
-                                    backgroundImage: `radial-gradient(${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"} 1.5px, transparent 1.5px)`,
+                                  backgroundImage: `radial-gradient(${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"} 1.5px, transparent 1.5px)`,
+                                  backgroundSize: "16px 16px",
+                                }
+                                : qBgColor !== "transparent" &&
+                                  bgTheme === "grid"
+                                  ? {
+                                    backgroundImage: `linear-gradient(to right, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px)`,
                                     backgroundSize: "16px 16px",
                                   }
-                                : qBgColor !== "transparent" &&
-                                    bgTheme === "grid"
-                                  ? {
-                                      backgroundImage: `linear-gradient(to right, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px)`,
-                                      backgroundSize: "16px 16px",
-                                    }
                                   : {
-                                      backgroundImage: "none",
-                                      backgroundSize: "auto",
-                                    }),
+                                    backgroundImage: "none",
+                                    backgroundSize: "auto",
+                                  }),
                             } as unknown as React.CSSProperties
                           }
                         >
                           <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 flex items-center justify-center z-20 !print-color-adjust-exact">
                             <div
-                              className={`w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-3xl md:text-5xl ${
-                                bgTheme === "video"
+                              className={`w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-3xl md:text-5xl ${bgTheme === "video"
                                   ? "bg-black/50 border-white/30 text-white"
-                                  : `${
-                                      [
-                                        "from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500",
-                                        "from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500",
-                                        "from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500",
-                                        "from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500",
-                                        "from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500",
-                                        "from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500",
-                                      ][idx % 6]
-                                    } bg-gradient-to-tr border-white dark:border-slate-800 text-white`
-                              }`}
+                                  : `${[
+                                    "from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500",
+                                    "from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500",
+                                    "from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500",
+                                    "from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500",
+                                    "from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500",
+                                    "from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500",
+                                  ][idx % 6]
+                                  } bg-gradient-to-tr border-white dark:border-slate-800 text-white`
+                                }`}
                             >
                               {uiLang === "bn"
                                 ? toBanglaNumber(idx + 1)
@@ -8669,10 +8783,10 @@ export default function PresentationOverlay({
                               const maxOptLen =
                                 opts.length > 0
                                   ? Math.max(
-                                      ...opts.map(
-                                        (o: any) => o.text?.length || 0,
-                                      ),
-                                    )
+                                    ...opts.map(
+                                      (o: any) => o.text?.length || 0,
+                                    ),
+                                  )
                                   : 1;
                               if (
                                 (step >= 2 && q.explanation && isExpEnabled) ||
@@ -8751,23 +8865,23 @@ export default function PresentationOverlay({
                                         containerType: "inline-size",
                                         backgroundColor:
                                           optBgColor !== "default" &&
-                                          optBgColor.startsWith("#")
+                                            optBgColor.startsWith("#")
                                             ? optBgColor
                                             : undefined,
                                         ...(bgTheme === "dots"
                                           ? {
-                                              backgroundImage: `radial-gradient(${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"} 1.5px, transparent 1.5px)`,
-                                              backgroundSize: "12px 12px",
-                                            }
+                                            backgroundImage: `radial-gradient(${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"} 1.5px, transparent 1.5px)`,
+                                            backgroundSize: "12px 12px",
+                                          }
                                           : bgTheme === "grid"
                                             ? {
-                                                backgroundImage: `linear-gradient(to right, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px)`,
-                                                backgroundSize: "12px 12px",
-                                              }
+                                              backgroundImage: `linear-gradient(to right, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"} 1px, transparent 1px)`,
+                                              backgroundSize: "12px 12px",
+                                            }
                                             : {
-                                                backgroundImage: "none",
-                                                backgroundSize: "auto",
-                                              }),
+                                              backgroundImage: "none",
+                                              backgroundSize: "auto",
+                                            }),
                                       }}
                                     >
                                       <div className={letterClasses}>
@@ -9438,8 +9552,20 @@ export default function PresentationOverlay({
                     <option value="fire">Firescape</option>
                     <option value="nebula">Cosmic Nebula</option>
                     <option value="hologram">Holographic</option>
+                    <option value="solid">Solid Color (Chroma Key)</option>
                   </select>
                 </div>
+                {bgTheme === "solid" && (
+                  <div className="mt-2 flex items-center gap-3 bg-gray-50 dark:bg-gray-800/80 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap">Pick Color:</span>
+                    <input
+                      type="color"
+                      value={customBgColor}
+                      onChange={(e) => setCustomBgColor(e.target.value)}
+                      className="w-full h-8 cursor-pointer rounded-md border-0 p-0"
+                    />
+                  </div>
+                )}
                 {bgTheme === "video" && (
                   <div className="mt-2 space-y-2">
                     <select
@@ -10254,8 +10380,8 @@ export default function PresentationOverlay({
                     <div
                       className={
                         drawingTool === "laser" ||
-                        drawingTool === "text" ||
-                        drawingTool === "magnifier"
+                          drawingTool === "text" ||
+                          drawingTool === "magnifier"
                           ? "opacity-50 pointer-events-none transition-opacity flex flex-col gap-4 mt-2"
                           : "transition-opacity flex flex-col gap-4 mt-2"
                       }
@@ -10550,17 +10676,60 @@ export default function PresentationOverlay({
               </div>
               <button
                 onClick={() => setIsAutoPlayReadAloud(!isAutoPlayReadAloud)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  isAutoPlayReadAloud ? "bg-pink-500" : "bg-gray-600"
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isAutoPlayReadAloud ? "bg-pink-500" : "bg-gray-600"
+                  }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    isAutoPlayReadAloud ? "translate-x-6" : "translate-x-1"
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAutoPlayReadAloud ? "translate-x-6" : "translate-x-1"
+                    }`}
                 />
               </button>
             </div>
+
+            {/* YouTube Auto-Pilot Mode */}
+            <div className="flex items-center justify-between mt-1 border-t border-gray-800 pt-2">
+              <div>
+                <div className="text-sm font-bold text-white flex items-center gap-1">
+                  <span className="text-red-500">▶</span> YouTube Timer
+                </div>
+                <div className="text-[10px] text-gray-400">
+                  Suspense countdown before reveal
+                </div>
+              </div>
+              <button
+                onClick={() => setIsYoutubeMode(!isYoutubeMode)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isYoutubeMode ? "bg-red-500" : "bg-gray-600"
+                  }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isYoutubeMode ? "translate-x-6" : "translate-x-1"
+                    }`}
+                />
+              </button>
+            </div>
+
+            {/* YouTube Timer Duration */}
+            {isYoutubeMode && (
+              <div className="mt-2 bg-gray-800/50 p-2 rounded-lg border border-gray-700">
+                <div className="flex justify-between items-center mb-1">
+                  <div>
+                    <div className="text-xs font-bold text-white">Timer Duration</div>
+                  </div>
+                  <span className="font-mono text-xs font-bold text-red-400">
+                    {youtubeTimerDuration}s
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="3"
+                  max="30"
+                  step="1"
+                  value={youtubeTimerDuration}
+                  onChange={(e) => setYoutubeTimerDuration(Number(e.target.value))}
+                  className="w-full accent-red-500 h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+            )}
 
             {/* TTS Highlight Style */}
             <div className="flex items-center justify-between mt-1">

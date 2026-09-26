@@ -107,100 +107,107 @@ export default function ScreenRecorderPage() {
                 console.warn("Microphone not available or permission denied.", err);
             }
 
-            // 3. Mix Audio Tracks using AudioContext
+            // 3. Audio Mixing Logic
             let finalStream = displayStream;
+            let finalAudioTracks: MediaStreamTrack[] = [];
             
             const hasDisplayAudio = displayStream.getAudioTracks().length > 0;
             const hasMicAudio = micStream && micStream.getAudioTracks().length > 0;
 
-            if (hasDisplayAudio || hasMicAudio) {
-                const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-                if (AudioContextClass) {
-                    const audioCtx = new AudioContextClass();
-                    const dest = audioCtx.createMediaStreamDestination();
-
-                    if (hasDisplayAudio) {
+            if (hasDisplayAudio && hasMicAudio && micStream) {
+                try {
+                    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+                    if (AudioContextClass) {
+                        const audioCtx = new AudioContextClass();
+                        if (audioCtx.state === "suspended") {
+                            await audioCtx.resume();
+                        }
+                        const dest = audioCtx.createMediaStreamDestination();
+                        
                         const displaySource = audioCtx.createMediaStreamSource(new MediaStream([displayStream.getAudioTracks()[0]]));
                         displaySource.connect(dest);
-                    }
-
-                    if (hasMicAudio && micStream) {
+                        
                         const micSource = audioCtx.createMediaStreamSource(micStream);
-                        let currentNode: AudioNode = micSource;
-
-                        // 1. Noise Gate
-                        if (noiseGateThreshold > 0) {
-                            const scriptNode = audioCtx.createScriptProcessor(4096, 1, 1);
-                            const gateGain = audioCtx.createGain();
-                            let isOpen = true; // State to track if gate is open
-                            
-                            scriptNode.onaudioprocess = (e) => {
-                                const inputData = e.inputBuffer.getChannelData(0);
-                                let sum = 0;
-                                for (let i = 0; i < inputData.length; i++) {
-                                    sum += inputData[i] * inputData[i];
-                                }
-                                const rms = Math.sqrt(sum / inputData.length);
-                                
-                                // Hysteresis logic to prevent chopping/chattering
-                                if (!isOpen && rms > noiseGateThreshold) {
-                                    isOpen = true;
-                                    gateGain.gain.setTargetAtTime(1, audioCtx.currentTime, 0.02);
-                                } else if (isOpen && rms < noiseGateThreshold * 0.4) {
-                                    // Voice must drop to 40% of the threshold to close the gate
-                                    isOpen = false;
-                                    gateGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.4);
-                                }
-                            };
-                            
-                            micSource.connect(scriptNode);
-                            scriptNode.connect(audioCtx.destination);
-                            currentNode.connect(gateGain);
-                            currentNode = gateGain;
-                        }
-
-                        // 2. Low-Cut Filter
-                        if (lowCutFreq > 0) {
-                            const lowCut = audioCtx.createBiquadFilter();
-                            lowCut.type = 'highpass';
-                            lowCut.frequency.value = lowCutFreq;
-                            currentNode.connect(lowCut);
-                            currentNode = lowCut;
-                        }
-
-                        // 3. Treble Boost
-                        if (trebleBoost > 0) {
-                            const treble = audioCtx.createBiquadFilter();
-                            treble.type = 'highshelf';
-                            treble.frequency.value = 3000;
-                            treble.gain.value = trebleBoost;
-                            currentNode.connect(treble);
-                            currentNode = treble;
-                        }
-
-                        // 4. Compressor
-                        if (useCompressor) {
-                            const compressor = audioCtx.createDynamicsCompressor();
-                            compressor.threshold.value = -24;
-                            compressor.knee.value = 30;
-                            compressor.ratio.value = 4;
-                            compressor.attack.value = 0.003;
-                            compressor.release.value = 0.25;
-                            currentNode.connect(compressor);
-                            currentNode = compressor;
-                        }
-
-                        currentNode.connect(dest);
+                        micSource.connect(dest);
+                        
+                        finalAudioTracks = dest.stream.getAudioTracks();
+                    } else {
+                        finalAudioTracks = micStream.getAudioTracks();
                     }
+                } catch (e) {
+                    console.warn("Audio mixing failed, falling back to mic audio", e);
+                    finalAudioTracks = micStream.getAudioTracks();
+                }
+            } else if (hasMicAudio && micStream) {
+                finalAudioTracks = micStream.getAudioTracks();
+            } else if (hasDisplayAudio) {
+                finalAudioTracks = displayStream.getAudioTracks();
+            }
 
-                    const mixedTracks = dest.stream.getAudioTracks();
+            finalStream = new MediaStream([
+                displayStream.getVideoTracks()[0],
+                ...finalAudioTracks,
+            ]);
+
+            // --- Force Upscale to 4K / 1440p using Canvas ---
+            let videoTrackToUse = finalStream.getVideoTracks()[0];
+            let upscalerInterval: any = null;
+            let upscalerVideo: HTMLVideoElement | null = null;
+            let canvasStream: MediaStream | null = null;
+
+            if (recordingQuality === '4k' || recordingQuality === 'ultra') {
+                try {
+                    const targetWidth = recordingQuality === '4k' ? 3840 : 2560;
                     
-                    finalStream = new MediaStream([
-                        displayStream.getVideoTracks()[0],
-                        ...(mixedTracks.length > 0 ? mixedTracks : [])
-                    ]);
-                } else {
-                    console.warn("AudioContext not supported, falling back to basic stream");
+                    upscalerVideo = document.createElement("video");
+                    upscalerVideo.srcObject = new MediaStream([videoTrackToUse]);
+                    upscalerVideo.muted = true;
+                    // Must play the video to draw to canvas
+                    await upscalerVideo.play().catch(e => console.warn("Upscaler video play failed:", e));
+                    
+                    // Dynamically calculate height to perfectly preserve the aspect ratio!
+                    const settings = videoTrackToUse.getSettings();
+                    const sourceWidth = settings.width || 1920;
+                    const sourceHeight = settings.height || 1080;
+                    let targetHeight = Math.round(targetWidth * (sourceHeight / sourceWidth));
+                    // Ensure even dimensions for encoder compatibility
+                    if (targetHeight % 2 !== 0) targetHeight += 1;
+                    
+                    const canvas = document.createElement("canvas");
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    const ctx = canvas.getContext("2d", { alpha: false, desynchronized: true }); 
+                    
+                    if (ctx) {
+                        ctx.imageSmoothingEnabled = false;
+
+                        const fps = frameRate || 30;
+                        const interval = 1000 / fps;
+                        let lastTime = 0;
+
+                        const drawFrame = (time: number) => {
+                            if (upscalerVideo && upscalerVideo.readyState >= 2) {
+                                if (time - lastTime >= interval) {
+                                    ctx.drawImage(upscalerVideo, 0, 0, targetWidth, targetHeight);
+                                    lastTime = time;
+                                }
+                            }
+                            upscalerInterval = requestAnimationFrame(drawFrame);
+                        };
+                        upscalerInterval = requestAnimationFrame(drawFrame);
+                        
+                        canvasStream = canvas.captureStream(fps);
+                        videoTrackToUse = canvasStream.getVideoTracks()[0];
+
+                        // Rebuild final stream with the upscaled video track
+                        const audioTracks = finalStream.getAudioTracks();
+                        finalStream = new MediaStream([
+                            videoTrackToUse,
+                            ...audioTracks
+                        ]);
+                    }
+                } catch(e) {
+                    console.warn("Failed to setup 4K canvas upscaler, falling back to native resolution", e);
                 }
             }
 
@@ -243,9 +250,20 @@ export default function ScreenRecorderPage() {
                 window.URL.revokeObjectURL(url);
                 setIsRecording(false);
                 setIsPaused(false);
+                // Cleanup Upscaler
+                if (upscalerInterval) cancelAnimationFrame(upscalerInterval);
+                if (upscalerVideo) {
+                    upscalerVideo.pause();
+                    upscalerVideo.srcObject = null;
+                }
+                if (canvasStream) {
+                    canvasStream.getTracks().forEach((track) => track.stop());
+                }
                 
                 // Cleanup tracks
-                finalStream.getTracks().forEach(track => track.stop());
+                if (finalStream && finalStream !== displayStream) {
+                    finalStream.getTracks().forEach(track => track.stop());
+                }
                 displayStream.getTracks().forEach(track => track.stop());
                 if (micStream) micStream.getTracks().forEach(track => track.stop());
             };
