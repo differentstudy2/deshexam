@@ -359,7 +359,18 @@ export default function AcademyClient({
           // Fetch only 'class' nodes, not the entire database
           let allClasses = await getTaxonomyNodesByType('academic', 'class');
           if (preSelectedBoardSlug) {
-            fetchedClasses = allClasses.filter(c => c.boardSlug === preSelectedBoardSlug || (c.fullSlug && c.fullSlug.includes(preSelectedBoardSlug)));
+            const normalizedPre = preSelectedBoardSlug.toLowerCase();
+            fetchedClasses = allClasses.filter(c => {
+              const bSlug = c.boardSlug?.toLowerCase() || '';
+              const fSlug = c.fullSlug?.toLowerCase() || '';
+              
+              if (bSlug === normalizedPre || fSlug.includes(normalizedPre)) return true;
+              
+              // If user is looking for 'wbbse', show both WBBSE (Class 5-10) and WBCHSE (Class 11-12)
+              if (normalizedPre === 'wbbse' && (bSlug === 'wb-board' || bSlug === 'wbchse')) return true;
+              
+              return false;
+            });
           } else {
             fetchedClasses = allClasses;
           }
@@ -378,7 +389,9 @@ export default function AcademyClient({
             setSelectedClassId(fetchedClasses[0].id);
           }
         } else if (fetchedClasses.length > 0 && !selectedClassId) {
-          setSelectedClassId(fetchedClasses[0].id);
+          // Try to default to a class that has data, e.g., class-10-wb
+          const defaultClass = fetchedClasses.find(c => c.id === 'class-10-wb') || fetchedClasses[0];
+          setSelectedClassId(defaultClass.id);
         }
       } catch (error) {
         console.error("Error fetching classes:", error);
@@ -504,13 +517,24 @@ export default function AcademyClient({
                     Access comprehensive textbooks, interactive chapters, and curated practice materials specifically tailored for {selectedClassTitle}.
                   </p>
                   
-                  {/* Filter and Search Row */}
-                  <div className="flex flex-col sm:flex-row gap-4 pt-2 pb-2">
-                    <div className="flex flex-wrap gap-2 items-center">
+                  {/* Filter Row */}
+                  <div className="flex flex-col gap-4 pt-2 pb-2">
+                    <div className="flex flex-wrap gap-2 items-center flex-1">
                       {classesList.map((cls) => {
                         const href = preSelectedBoardSlug 
                           ? `/academy/${preSelectedBoardSlug}/${cls.slug || cls.id}`
-                          : `/academy/${cls.slug || cls.id}`;
+                          : `/academy/${cls.boardSlug === 'wb-board' ? 'wbbse' : (cls.boardSlug || 'board')}/${cls.slug || cls.id}`;
+                          
+                        // Get board acronym if no board is pre-selected
+                        let displayTitle = cls.title;
+                        if (!preSelectedBoardSlug && cls.ancestors) {
+                           const boardAncestor = cls.ancestors.find(a => a.type === 'board');
+                           if (boardAncestor) {
+                               // Assuming the board title is short like WBBSE, CBSE, etc.
+                               displayTitle = `${boardAncestor.title} ${cls.title}`;
+                           }
+                        }
+                        
                         return (
                           <Link 
                             key={cls.id} 
@@ -524,21 +548,10 @@ export default function AcademyClient({
                                 : "bg-white/10 text-emerald-50 hover:bg-white/20 border-white/20 dark:bg-white/5 dark:hover:bg-white/10 dark:border-white/10"
                             )}
                           >
-                            {cls.title}
+                            {displayTitle}
                           </Link>
                         );
                       })}
-                    </div>
-                    
-                    <div className="relative w-full max-w-xs bg-white/10 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-inner border border-white/20 dark:border-white/10">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-100/70 dark:text-emerald-200/50" />
-                      <Input 
-                        type="text" 
-                        placeholder={`Search in ${selectedClassTitle}...`}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-9 h-10 bg-transparent border-none focus-visible:ring-0 w-full text-sm text-white placeholder:text-emerald-100/70 dark:placeholder:text-emerald-200/50"
-                      />
                     </div>
                   </div>
                   
@@ -620,6 +633,20 @@ export default function AcademyClient({
                       <div className="h-2 bg-white/20 dark:bg-white/10 rounded-full overflow-hidden">
                         <div className="h-full bg-emerald-300 dark:bg-emerald-500 w-[12%] rounded-full shadow-[0_0_10px_rgba(110,231,183,0.5)] dark:shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
                       </div>
+                    </div>
+                  </div>
+                  
+                  {/* Search Bar */}
+                  <div className="pt-4 w-full max-w-md">
+                    <div className="relative w-full bg-white/10 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-inner border border-white/20 dark:border-white/10">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-100/70 dark:text-emerald-200/50" />
+                      <Input 
+                        type="text" 
+                        placeholder={`Search in ${selectedClassTitle}...`}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-9 h-11 bg-transparent border-none focus-visible:ring-0 w-full text-sm text-white placeholder:text-emerald-100/70 dark:placeholder:text-emerald-200/50"
+                      />
                     </div>
                   </div>
                 </div>

@@ -21,20 +21,14 @@ import {
   Trophy,
   Users
 } from 'lucide-react';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { ACHIEVEMENTS } from '@/lib/constants/achievements';
+import hardcodedSubjects from '@/data/hardcoded/taxonomy/subjects.json';
 
 // --- MOCK DATA ---
 
-const subjects = [
-  { name: 'সাহিত্য কণিকা', progress: 0.96 },
-  { name: 'আনন্দ পাঠ(বাংলা দ্রুত পঠন)', progress: 0.00 },
-  { name: 'বাংলা ব্যাকরণ ও নির্মিতি', progress: 0.29 },
-  { name: 'English for Today', progress: 0.00 },
-  { name: 'English Grammar and C...', progress: 0.00 },
-];
+// The subjects will be fetched dynamically from Firestore
 
 const recentActivities = [
   { title: 'Exam Taken', time: '2 months ago', xp: '+0 XP' },
@@ -68,10 +62,49 @@ const achievements = [
 export default function DashboardPage() {
   const { user } = useAuth();
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [subjects, setSubjects] = useState<{name: string, progress: number}[]>([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
 
   useEffect(() => {
     if (user) {
-      getUserProfile(user.uid).then(setUserProfile);
+      getUserProfile(user.uid).then(async (profile) => {
+        setUserProfile(profile);
+        
+        // Fetch real subjects based on user's classId
+        if (profile?.classId) {
+          try {
+            const { collection, query, where, getDocs } = await import('firebase/firestore');
+            const { db } = await import('@/lib/firebase/client');
+            
+            const q = query(
+              collection(db, 'taxonomy_nodes'),
+              where('type', '==', 'subject'),
+              where('parentId', '==', profile.classId)
+            );
+            
+            const snap = await getDocs(q);
+            let fetchedSubjects = snap.docs.map(doc => ({
+              name: doc.data().title || 'Unknown Subject',
+              progress: 0 // TODO: Implement real progress calculation based on exams/textbooks
+            }));
+            
+            // Fallback to hardcoded subjects if none in DB
+            if (fetchedSubjects.length === 0) {
+              fetchedSubjects = (hardcodedSubjects as any[])
+                .filter(sub => sub.parentId === profile.classId)
+                .map(sub => ({
+                  name: sub.title || 'Unknown Subject',
+                  progress: 0
+                }));
+            }
+            
+            setSubjects(fetchedSubjects);
+          } catch (error) {
+            console.error("Error fetching subjects:", error);
+          }
+        }
+        setLoadingSubjects(false);
+      });
     }
   }, [user]);
 
@@ -182,17 +215,23 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="p-0">
             <div className="divide-y divide-slate-100 dark:divide-slate-800">
-              {subjects.map((sub, i) => (
-                <div key={i} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer group">
-                  <span className="text-sm font-medium">{sub.name}</span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-green-600">{sub.progress.toFixed(2)}%</span>
-                    <div className="bg-slate-100 dark:bg-slate-800 rounded-md p-1 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
-                      <ChevronDown className="w-4 h-4 text-slate-500" />
+              {loadingSubjects ? (
+                <div className="p-8 text-center text-sm text-slate-500">Loading subjects...</div>
+              ) : subjects.length > 0 ? (
+                subjects.map((sub, i) => (
+                  <div key={i} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer group">
+                    <span className="text-sm font-medium">{sub.name}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-bold text-green-600">{sub.progress.toFixed(2)}%</span>
+                      <div className="bg-slate-100 dark:bg-slate-800 rounded-md p-1 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
+                        <ChevronDown className="w-4 h-4 text-slate-500" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="p-8 text-center text-sm text-slate-500">No subjects found for your profile.</div>
+              )}
             </div>
           </CardContent>
         </Card>

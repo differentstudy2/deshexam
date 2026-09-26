@@ -9,6 +9,8 @@ import { updateUserProfile } from "@/lib/firebase/firestore";
 import { TaxonomyNode } from "@/lib/firebase/taxonomy";
 import { GraduationCap, Briefcase, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import boardsData from "@/data/hardcoded/taxonomy/boards.json";
+import classesData from "@/data/hardcoded/taxonomy/classes.json";
 
 export default function OnboardingPage() {
   const { user, userProfile, loading: authLoading } = useAuth();
@@ -50,7 +52,19 @@ export default function OnboardingPage() {
         const snap = await getDocs(q);
         const fetchedBoards = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
         fetchedBoards.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
-        setBoards(fetchedBoards);
+        
+        // Hardcoded boards as fallback
+        const hardcodedBoards = boardsData as unknown as TaxonomyNode[];
+        
+        // Merge avoiding duplicates
+        const allBoards = [...fetchedBoards];
+        for (const hb of hardcodedBoards) {
+          if (!allBoards.find(b => b.id === hb.id)) {
+            allBoards.push(hb);
+          }
+        }
+        
+        setBoards(allBoards);
       } catch (err) {
         console.error(err);
       } finally {
@@ -77,7 +91,15 @@ export default function OnboardingPage() {
         const snap = await getDocs(q);
         const fetchedClasses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxonomyNode));
         fetchedClasses.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
-        setClasses(fetchedClasses);
+        
+        // Hardcoded classes as fallback if none exist in DB for this board
+        const hardcodedClasses = (classesData as unknown as TaxonomyNode[]).filter(c => c.parentId === selectedBoardId);
+        
+        if (fetchedClasses.length === 0) {
+          setClasses(hardcodedClasses);
+        } else {
+          setClasses(fetchedClasses);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -193,16 +215,9 @@ export default function OnboardingPage() {
                   >
                     <option value="">-- Choose Board --</option>
                     {boards.map(board => {
-                      const generateAcronym = (name: string) => {
-                        const ignoreWords = ['of', 'and', 'for', 'the', '&', 'in', 'on', 'at'];
-                        return name.split(/[\s-]+/)
-                          .filter(word => word && !ignoreWords.includes(word.toLowerCase()))
-                          .map(word => word[0]?.toUpperCase())
-                          .join('');
-                      };
-                      const shortName = board.acronym || generateAcronym(board.title);
+                      const title = board.title || 'Unknown Board';
                       return (
-                        <option key={board.id} value={board.id}>{shortName}</option>
+                        <option key={board.id} value={board.id}>{title}</option>
                       );
                     })}
                   </select>
