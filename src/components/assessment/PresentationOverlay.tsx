@@ -3208,6 +3208,23 @@ export default function PresentationOverlay({
         setIsConfettiActive(true);
         setTimeout(() => setIsConfettiActive(false), 2400);
 
+        // Play the correct sounds just like manual click
+        if (newConsecutive > 0 && newConsecutive % 5 === 0) {
+          if (wowAudioRef.current) {
+            wowAudioRef.current.currentTime = 0;
+            wowAudioRef.current.play().catch(console.warn);
+          }
+        } else {
+          if (!isCelebrationSoundEnabled && popAudioRef.current) {
+            popAudioRef.current.currentTime = 0;
+            popAudioRef.current.play().catch(console.warn);
+          }
+          if (dingAudioRef.current) {
+            dingAudioRef.current.currentTime = 0;
+            dingAudioRef.current.play().catch(console.warn);
+          }
+        }
+
         // Trigger grand celebration with dynamic praise and victory fanfare every 10 correct
         triggerCelebration(newConsecutive);
 
