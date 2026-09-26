@@ -2249,21 +2249,21 @@ export default function PresentationOverlay({
       let frameRate = 60;
       let width = 1920;
       let height = 1080;
-      let bitsPerSecond = 8000000;
+      let bitsPerSecond = 15000000; // 15 Mbps for crisp 1080p on YouTube
 
       if (recordingQuality === "standard") {
         frameRate = 30;
         width = 1280;
         height = 720;
-        bitsPerSecond = 2500000;
+        bitsPerSecond = 5000000; // 5 Mbps
       } else if (recordingQuality === "ultra") {
         width = 2560;
         height = 1440;
-        bitsPerSecond = 12000000;
+        bitsPerSecond = 30000000; // 30 Mbps
       } else if (recordingQuality === "4k") {
         width = 3840;
         height = 2160;
-        bitsPerSecond = 20000000;
+        bitsPerSecond = 60000000; // 60 Mbps for 4K (Note: actual captured resolution depends on user's monitor native resolution)
       }
 
       // 1. Get Screen & Tab/System Audio
@@ -4700,14 +4700,8 @@ export default function PresentationOverlay({
     <>
       <div
         style={{ fontFamily }}
-        className={`print:hidden fixed inset-0 w-full h-full z-[99999] flex flex-col md:flex-row items-center justify-between p-0 md:p-3 mb-0 md:mb-3 gap-0 md:gap-1 xl:gap-1 select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? "dark" : ""} ${getBgThemeClasses()}`}
+        className={`print:hidden fixed inset-0 w-full h-full z-[99999] flex flex-col md:flex-row items-center justify-between p-0 md:p-3 mb-0 md:mb-3 gap-0 md:gap-1 xl:gap-1 select-none font-sans overflow-hidden transition-colors duration-500 ${isDarkMode ? "dark bg-[#0f1115]" : "bg-slate-200"}`}
       >
-        {bgTheme !== "video" && (
-          <div
-            className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 ${getBgThemeOverlayClasses()}`}
-            style={{ opacity: bgOpacity / 100 }}
-          />
-        )}
         <style>{`
                     ::highlight(tts-word-highlight) {
                         ${ttsWordHighlightStyle === "bg" ? `background-color: ${ttsWordHighlightColor}88; color: inherit; border-radius: ${ttsWordHighlightRadius}px; text-shadow: 0 0 8px ${ttsWordHighlightColor}66;` : ""}
