@@ -4764,7 +4764,9 @@ export default function PresentationOverlay({
         {/* Left Sidebar Column */}
         <div className="hidden xl:flex w-[160px] h-full shrink-0 flex-col gap-1 z-10">
           {/* Stream Widgets */}
-          <LeftStreamWidgets currentQuestion={q} isSpeaking={isSpeaking} />
+          <div className="flex-1 overflow-hidden">
+            <LeftStreamWidgets currentQuestion={q} isSpeaking={isSpeaking} />
+          </div>
           {/* ── Analog Clock (Moved here) ── */}
           {isTimerEnabled ? (
             (() => {
@@ -7839,11 +7841,11 @@ export default function PresentationOverlay({
             </div>
           )}
 
-          {/* Live Subscribers Feed */}
-          <LiveSubscriberFeed />
-
-          {/* Stream Engagement Widgets */}
-          <StreamEngagementWidget />
+          {/* Live Subscribers Feed & Engagement Widgets */}
+          <div className="flex-1 overflow-hidden flex flex-col gap-1">
+            <LiveSubscriberFeed />
+            <StreamEngagementWidget />
+          </div>
 
           {/* ── Bottom Section: Future Right Content OR Webcam ── */}
           {isWebcamActive ? (
