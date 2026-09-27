@@ -3159,10 +3159,6 @@ export default function PresentationOverlay({
         targetY + 150 + (Math.random() * 60 - 30),
       );
 
-      // Mid waypoint for a natural arc feel
-      const midX = (startX + targetX) / 2 + (Math.random() * 40 - 20);
-      const midY = (startY + targetY) / 2 - 30;
-
       setVirtualCursor({
         visible: true,
         x: startX,
@@ -3170,15 +3166,10 @@ export default function PresentationOverlay({
         isClicking: false,
       });
 
-      // Step 1: glide to midpoint
-      const midTimer = setTimeout(() => {
-        setVirtualCursor((prev) => ({ ...prev, x: midX, y: midY }));
-      }, 60);
-
-      // Step 2: glide to target
+      // Give React time to render at start position, then start the CSS glide
       const glideTimer = setTimeout(() => {
         setVirtualCursor((prev) => ({ ...prev, x: targetX, y: targetY }));
-      }, 300);
+      }, 50);
 
       const clickTimer = setTimeout(() => {
         setVirtualCursor((prev) => ({ ...prev, isClicking: true }));
@@ -3220,7 +3211,6 @@ export default function PresentationOverlay({
       }, 700);
 
       return () => {
-        clearTimeout(midTimer);
         clearTimeout(glideTimer);
         clearTimeout(clickTimer);
       };
@@ -5714,7 +5704,7 @@ export default function PresentationOverlay({
                 transition: virtualCursor.isClicking
                   ? "transform 0.08s ease-in"
                   : virtualCursor.visible
-                    ? `left ${(0.25 / ttsRate).toFixed(3)}s cubic-bezier(0.25,0.46,0.45,0.94), top ${(0.25 / ttsRate).toFixed(3)}s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.12s ease-out`
+                    ? "left 0.7s cubic-bezier(0.25, 1, 0.5, 1), top 0.7s ease-out, transform 0.12s ease-out"
                     : "left 0s, top 0s, transform 0.12s ease-out",
                 filter: virtualCursor.isClicking
                   ? "drop-shadow(0 0 12px rgba(59,130,246,0.95)) drop-shadow(0 0 24px rgba(99,102,241,0.7))"
