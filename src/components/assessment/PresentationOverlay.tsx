@@ -2257,12 +2257,12 @@ export default function PresentationOverlay({
         height = 720;
         bitsPerSecond = 5000000; // 5 Mbps
       } else if (recordingQuality === "ultra") {
-        frameRate = 60; 
+        frameRate = 60;
         width = 2560;
         height = 1440;
         bitsPerSecond = 30000000; // 30 Mbps
       } else if (recordingQuality === "4k") {
-        frameRate = 60; 
+        frameRate = 60;
         width = 3840;
         height = 2160;
         bitsPerSecond = 60000000; // 60 Mbps for 4K 
@@ -2312,13 +2312,13 @@ export default function PresentationOverlay({
               await audioCtx.resume();
             }
             const dest = audioCtx.createMediaStreamDestination();
-            
+
             const displaySource = audioCtx.createMediaStreamSource(new MediaStream([displayStream.getAudioTracks()[0]]));
             displaySource.connect(dest);
-            
+
             const micSource = audioCtx.createMediaStreamSource(micStream);
             micSource.connect(dest);
-            
+
             finalAudioTracks = dest.stream.getAudioTracks();
           } else {
             finalAudioTracks = micStream.getAudioTracks();
@@ -2347,13 +2347,13 @@ export default function PresentationOverlay({
       if (recordingQuality === "4k" || recordingQuality === "ultra") {
         try {
           const targetWidth = recordingQuality === "4k" ? 3840 : 2560;
-          
+
           upscalerVideo = document.createElement("video");
           upscalerVideo.srcObject = new MediaStream([videoTrackToUse]);
           upscalerVideo.muted = true;
           // Must play the video to draw to canvas
           await upscalerVideo.play().catch(e => console.warn("Upscaler video play failed:", e));
-          
+
           // Dynamically calculate height to perfectly preserve the aspect ratio!
           const settings = videoTrackToUse.getSettings();
           const sourceWidth = settings.width || 1920;
@@ -2361,12 +2361,12 @@ export default function PresentationOverlay({
           let targetHeight = Math.round(targetWidth * (sourceHeight / sourceWidth));
           // Ensure even dimensions for encoder compatibility
           if (targetHeight % 2 !== 0) targetHeight += 1;
-          
+
           const canvas = document.createElement("canvas");
           canvas.width = targetWidth;
           canvas.height = targetHeight;
-          const ctx = canvas.getContext("2d", { alpha: false, desynchronized: true }); 
-          
+          const ctx = canvas.getContext("2d", { alpha: false, desynchronized: true });
+
           if (ctx) {
             // Disable smoothing for 4K - it's an integer scale usually and vastly improves performance!
             ctx.imageSmoothingEnabled = false;
@@ -2387,7 +2387,7 @@ export default function PresentationOverlay({
               upscalerInterval = requestAnimationFrame(drawFrame);
             };
             upscalerInterval = requestAnimationFrame(drawFrame);
-            
+
             canvasStream = canvas.captureStream(frameRate || 60);
             videoTrackToUse = canvasStream.getVideoTracks()[0];
 
@@ -2398,7 +2398,7 @@ export default function PresentationOverlay({
               ...audioTracks
             ]);
           }
-        } catch(e) {
+        } catch (e) {
           console.warn("Failed to setup 4K canvas upscaler, falling back to native resolution", e);
         }
       }
@@ -2406,10 +2406,10 @@ export default function PresentationOverlay({
       let mimeType = 'video/webm;codecs=vp9,opus';
       let extension = 'webm';
       if (!MediaRecorder.isTypeSupported(mimeType)) {
-          mimeType = 'video/webm;codecs=vp8,opus';
-          if (!MediaRecorder.isTypeSupported(mimeType)) {
-              mimeType = 'video/webm';
-          }
+        mimeType = 'video/webm;codecs=vp8,opus';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'video/webm';
+        }
       }
 
       const mediaRecorder = new MediaRecorder(finalStream, {
@@ -2656,11 +2656,12 @@ export default function PresentationOverlay({
     "text",
   );
   const [ttsAnimation, setTtsAnimation] = useState<
-    "zoom" | "pulse" | "bounce" | "pop" | "glow" | "none"
-  >("zoom");
+    "zoom" | "pulse" | "bounce" | "pop" | "glow" | "none" | "typewriter" | "shake"
+  >("typewriter");
+  const [ttsDuration, setTtsDuration] = useState<number>(2.5);
   const [ttsVolume, setTtsVolume] = useState(1); // 0 to 1
   const [ttsPitch, setTtsPitch] = useState(1); // 0.5 to 2
-  const [ttsDelay, setTtsDelay] = useState(0.5); // seconds between segments
+  const [ttsDelay, setTtsDelay] = useState(0.7); // seconds between segments
   const [ttsReadParts, setTtsReadParts] = useState<
     "both" | "question" | "options"
   >("both");
@@ -3970,7 +3971,7 @@ export default function PresentationOverlay({
         Math.sin(wavePhase * (1.4 / Math.max(0.5, ttsRate))) * 4;
 
       setVirtualCursor({
-        visible: true,
+        visible: false,
         x: waveX,
         y: waveY,
         isClicking: false,
@@ -4010,6 +4011,7 @@ export default function PresentationOverlay({
           let interval: any;
 
           audio.onloadedmetadata = () => {
+            setTtsDuration((audio.duration || 2.5) * 0.25);
             setIsSpeaking(true);
             setIsCloudTTSLoading(false);
             const totalChars = isCorrectAnswer
@@ -4105,7 +4107,7 @@ export default function PresentationOverlay({
                 const waveY =
                   wordRect.bottom + 6 + Math.sin(wavePhase * 1.4) * 4;
                 setVirtualCursor({
-                  visible: true,
+                  visible: false,
                   x: waveX,
                   y: waveY,
                   isClicking: false,
@@ -4116,7 +4118,10 @@ export default function PresentationOverlay({
             }
           };
         }
-        utt.onstart = () => setIsSpeaking(true);
+        utt.onstart = () => {
+          setTtsDuration((textToRead.length / (12 * ttsRate) || 2.5) * 0.25);
+          setIsSpeaking(true);
+        };
         utt.onend = onEndCallback;
         utt.onerror = () => setIsSpeaking(false);
         window.speechSynthesis.speak(utt);
@@ -6009,6 +6014,7 @@ export default function PresentationOverlay({
                                       key={oIdx}
                                       className={`relative flex items-center gap-3 px-4 py-2 rounded-2xl shadow-md cursor-pointer active:scale-[0.99] select-none transition-all duration-150 ${rowBg} ${rowBorder} ${textOpacity}`}
                                       style={{
+                                        animationDuration: (ttsAnimation === 'typewriter' && activeTTSBlock === `option-card-${opt.key}`) ? `${ttsDuration}s` : undefined,
                                         backgroundColor:
                                           optBgColor !== "default" &&
                                             optBgColor.startsWith("#")
@@ -6327,16 +6333,16 @@ export default function PresentationOverlay({
                           <div className="hidden md:flex absolute -top-10 left-1/2 -translate-x-1/2 items-center justify-center z-20">
                             <div
                               className={`w-20 h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-5xl ${bgTheme === "video"
-                                  ? "bg-black/50 border-white/30 text-white"
-                                  : `${[
-                                    "from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500",
-                                    "from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500",
-                                    "from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500",
-                                    "from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500",
-                                    "from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500",
-                                    "from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500",
-                                  ][currentSlide % 6]
-                                  } bg-gradient-to-tr border-white dark:border-slate-800 text-white`
+                                ? "bg-black/50 border-white/30 text-white"
+                                : `${[
+                                  "from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500",
+                                  "from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500",
+                                  "from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500",
+                                  "from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500",
+                                  "from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500",
+                                  "from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500",
+                                ][currentSlide % 6]
+                                } bg-gradient-to-tr border-white dark:border-slate-800 text-white`
                                 }`}
                             >
                               {uiLang === "bn"
@@ -6375,18 +6381,21 @@ export default function PresentationOverlay({
                           <div
                             data-read-cursor-target="question"
                             className={`prose dark:prose-invert max-w-none w-full prose-p:font-extrabold text-[length:var(--q-size)] leading-relaxed text-left font-extrabold [&_*]:!text-[length:var(--q-size)] [&_*]:!leading-relaxed [&_*]:!m-0 ${qTextColor !== "default" ? "text-[var(--q-color)] [&_*]:!text-[var(--q-color)] drop-shadow-sm [&_*]:!drop-shadow-sm" : bgTheme === "video" ? "text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] [&_*]:!text-white [&_*]:!drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white"} ${activeTTSBlock === "question"
-                                ? (ttsHighlightStyle === "bg"
-                                  ? "p-3 -m-3 transition-all duration-500 bg-blue-50/80 dark:bg-blue-900/40 rounded-xl"
-                                  : "text-pink-600 dark:text-pink-400 [&_*]:!text-pink-600 dark:[&_*]:!text-pink-400 p-2 -m-2 transition-all duration-300 drop-shadow-md origin-left")
-                                + " " + (
-                                  ttsAnimation === "zoom" ? "transform scale-[1.04] z-20 shadow-[0_10px_30px_rgba(0,0,0,0.1)]" :
-                                    ttsAnimation === "pulse" ? "animate-pulse transform scale-[1.02]" :
-                                      ttsAnimation === "bounce" ? "animate-bounce" :
-                                        ttsAnimation === "pop" ? "animate-pop-in" :
-                                          ttsAnimation === "glow" ? "shadow-[0_0_20px_rgba(236,72,153,0.5)] transform scale-[1.02]" : ""
-                                )
-                                : "p-2 -m-2 transition-all duration-300"
+                              ? (ttsHighlightStyle === "bg"
+                                ? "p-3 -m-3 transition-all duration-500 bg-blue-50/80 dark:bg-blue-900/40 rounded-xl"
+                                : "text-pink-600 dark:text-pink-400 [&_*]:!text-pink-600 dark:[&_*]:!text-pink-400 p-2 -m-2 transition-all duration-300 drop-shadow-md origin-left")
+                              + " " + (
+                                ttsAnimation === "zoom" ? "transform scale-[1.04] z-20 shadow-[0_10px_30px_rgba(0,0,0,0.1)]" :
+                                  ttsAnimation === "pulse" ? "animate-pulse transform scale-[1.02]" :
+                                    ttsAnimation === "bounce" ? "animate-bounce" :
+                                      ttsAnimation === "pop" ? "animate-pop-in" :
+                                        ttsAnimation === "glow" ? "shadow-[0_0_20px_rgba(236,72,153,0.5)] transform scale-[1.02]" :
+                                          ttsAnimation === "typewriter" ? "animate-typewriter shadow-[0_10px_30px_rgba(0,0,0,0.1)]" :
+                                            ttsAnimation === "shake" ? "animate-shake transform scale-[1.02]" : ""
+                              )
+                              : "p-2 -m-2 transition-all duration-300"
                               }`}
+                            style={{ animationDuration: ttsAnimation === 'typewriter' ? `${ttsDuration}s` : undefined }}
                           >
                             <ReactMarkdown
                               remarkPlugins={remarkPluginsList}
@@ -6566,6 +6575,10 @@ export default function PresentationOverlay({
                                     } else if (ttsAnimation === "glow") {
                                       animClass =
                                         " transform scale-[1.02] z-20 shadow-[0_0_30px_rgba(59,130,246,0.6)] dark:shadow-[0_0_30px_rgba(96,165,250,0.6)] ";
+                                    } else if (ttsAnimation === "typewriter") {
+                                      animClass = " animate-typewriter z-20 overflow-hidden shadow-md ";
+                                    } else if (ttsAnimation === "shake") {
+                                      animClass = " animate-shake z-20 transform scale-[1.02] shadow-md ";
                                     } else {
                                       animClass =
                                         " transform scale-100 z-10 shadow-sm ";
@@ -6623,6 +6636,7 @@ export default function PresentationOverlay({
                                         id={`desktop-option-card-${opt.key}`}
                                         className={containerClasses}
                                         style={{
+                                          animationDuration: (ttsAnimation === 'typewriter' && isActiveTTS) ? `${ttsDuration}s` : undefined,
                                           containerType: "inline-size",
                                           backgroundColor:
                                             optBgColor !== "default" &&
@@ -7074,8 +7088,8 @@ export default function PresentationOverlay({
                   onClick={handleSaveAsImage}
                   disabled={isSavingImage}
                   className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isSavingImage
-                      ? "bg-white/30 text-white cursor-wait"
-                      : "hover:bg-white/10 text-white/80 hover:text-white"
+                    ? "bg-white/30 text-white cursor-wait"
+                    : "hover:bg-white/10 text-white/80 hover:text-white"
                     }`}
                   title="Save Slide as Image"
                 >
@@ -7107,8 +7121,8 @@ export default function PresentationOverlay({
                   onClick={downloadPdf}
                   disabled={isGeneratingPdf}
                   className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isGeneratingPdf
-                      ? "bg-white/30 text-white cursor-wait"
-                      : "hover:bg-white/10 text-white/80 hover:text-white"
+                    ? "bg-white/30 text-white cursor-wait"
+                    : "hover:bg-white/10 text-white/80 hover:text-white"
                     }`}
                   title="Download Presentation as PDF"
                 >
@@ -7140,8 +7154,8 @@ export default function PresentationOverlay({
                   <button
                     onClick={toggleRecordingPause}
                     className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isRecordingPaused
-                        ? "bg-yellow-500 text-white shadow-md ring-2 ring-yellow-300"
-                        : "hover:bg-white/10 text-white/80 hover:text-white"
+                      ? "bg-yellow-500 text-white shadow-md ring-2 ring-yellow-300"
+                      : "hover:bg-white/10 text-white/80 hover:text-white"
                       }`}
                     title={
                       isRecordingPaused ? "Resume Recording" : "Pause Recording"
@@ -7159,8 +7173,8 @@ export default function PresentationOverlay({
                 <button
                   onClick={toggleRecording}
                   className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isRecording
-                      ? "bg-red-500 text-white shadow-md animate-pulse ring-2 ring-red-300"
-                      : "hover:bg-white/10 text-white/80 hover:text-white"
+                    ? "bg-red-500 text-white shadow-md animate-pulse ring-2 ring-red-300"
+                    : "hover:bg-white/10 text-white/80 hover:text-white"
                     }`}
                   title={isRecording ? "Stop Recording" : "Start Recording"}
                 >
@@ -7175,8 +7189,8 @@ export default function PresentationOverlay({
                 <button
                   onClick={toggleWebcam}
                   className={`hidden md:block p-2 md:p-3 rounded-full transition-all shrink-0 ${isWebcamActive
-                      ? "bg-blue-500 text-white shadow-md ring-2 ring-blue-300"
-                      : "hover:bg-white/10 text-white/80 hover:text-white"
+                    ? "bg-blue-500 text-white shadow-md ring-2 ring-blue-300"
+                    : "hover:bg-white/10 text-white/80 hover:text-white"
                     }`}
                   title={isWebcamActive ? "Stop Webcam" : "Start Webcam"}
                 >
@@ -7187,8 +7201,8 @@ export default function PresentationOverlay({
                 <button
                   onClick={() => setShowAudioSettings(!showAudioSettings)}
                   className={`p-2 md:p-3 rounded-full transition-all shrink-0 ${showAudioSettings
-                      ? "bg-blue-500 text-white shadow-md ring-2 ring-blue-300"
-                      : "hover:bg-white/10 text-white/80 hover:text-white"
+                    ? "bg-blue-500 text-white shadow-md ring-2 ring-blue-300"
+                    : "hover:bg-white/10 text-white/80 hover:text-white"
                     }`}
                   title="Advanced Audio Settings"
                 >
@@ -7771,8 +7785,8 @@ export default function PresentationOverlay({
                 }
               }}
               className={`p-1.5 md:p-2 rounded-full transition-all ${isPenActive && drawingTool === "pen"
-                  ? "bg-blue-500 text-white scale-110 shadow-lg"
-                  : "bg-transparent text-white/70 hover:bg-white/10 hover:text-white"
+                ? "bg-blue-500 text-white scale-110 shadow-lg"
+                : "bg-transparent text-white/70 hover:bg-white/10 hover:text-white"
                 }`}
               title="Quick Pen Toggle"
             >
@@ -8434,10 +8448,10 @@ export default function PresentationOverlay({
                     ) : (
                       <div
                         className={`shrink-0 w-full px-4 sm:px-6 md:px-8 py-3 md:py-4 flex items-center justify-between border-b relative z-30 transition-colors duration-300 shadow-sm ${bgTheme === "video"
-                            ? "bg-black/40 border-white/10 backdrop-blur-md"
-                            : isDarkMode
-                              ? "bg-[#111827] border-gray-800"
-                              : "bg-[#7c3aed] border-purple-600"
+                          ? "bg-black/40 border-white/10 backdrop-blur-md"
+                          : isDarkMode
+                            ? "bg-[#111827] border-gray-800"
+                            : "bg-[#7c3aed] border-purple-600"
                           } !print-color-adjust-exact`}
                       >
                         <div className="flex items-center gap-3 w-1/3">
@@ -8715,16 +8729,16 @@ export default function PresentationOverlay({
                           <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 flex items-center justify-center z-20 !print-color-adjust-exact">
                             <div
                               className={`w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full shadow-xl border-2 backdrop-blur-md font-black text-3xl md:text-5xl ${bgTheme === "video"
-                                  ? "bg-black/50 border-white/30 text-white"
-                                  : `${[
-                                    "from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500",
-                                    "from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500",
-                                    "from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500",
-                                    "from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500",
-                                    "from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500",
-                                    "from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500",
-                                  ][idx % 6]
-                                  } bg-gradient-to-tr border-white dark:border-slate-800 text-white`
+                                ? "bg-black/50 border-white/30 text-white"
+                                : `${[
+                                  "from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500",
+                                  "from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500",
+                                  "from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500",
+                                  "from-rose-600 to-pink-600 dark:from-rose-500 dark:to-pink-500",
+                                  "from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500",
+                                  "from-fuchsia-600 to-purple-600 dark:from-fuchsia-500 dark:to-purple-500",
+                                ][idx % 6]
+                                } bg-gradient-to-tr border-white dark:border-slate-800 text-white`
                                 }`}
                             >
                               {uiLang === "bn"
@@ -10777,6 +10791,8 @@ export default function PresentationOverlay({
                 <option value="bounce">Bounce</option>
                 <option value="pop">Pop In</option>
                 <option value="glow">Neon Glow</option>
+                <option value="typewriter">Typewriter</option>
+                <option value="shake">Shake</option>
                 <option value="none">None</option>
               </select>
             </div>
