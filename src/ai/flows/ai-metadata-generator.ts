@@ -29,6 +29,7 @@ export async function generateMetadata(input: AIMetadataGeneratorInput): Promise
 
 const prompt = ai.definePrompt({
   name: 'aiMetadataGeneratorPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: { schema: AIMetadataGeneratorInputSchema },
   output: { schema: AIMetadataGeneratorOutputSchema },
   prompt: `You are an expert in educational content structures. Your task is to generate a list of relevant metadata items based on a given topic and type.

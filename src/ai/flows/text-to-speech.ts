@@ -11,8 +11,9 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { googleAI } from '@genkit-ai/googleai';
+import { googleAI } from '@genkit-ai/google-genai';
 import wav from 'wav';
+import { getSettings } from '@/lib/firebase/firestore';
 
 const TextToSpeechInputSchema = z.object({
   text: z.string().describe('The text to convert to speech.'),
@@ -63,13 +64,17 @@ const textToSpeechFlow = ai.defineFlow(
     outputSchema: TextToSpeechOutputSchema,
   },
   async ({ text, lang }) => {
+    const settings = await getSettings();
+    const voiceName = settings?.ttsVoice || 'Algenib';
+    const modelName = settings?.ttsModel || 'gemini-2.5-flash-preview-tts';
+
     const { media } = await ai.generate({
-      model: googleAI.model('gemini-2.5-flash-preview-tts'),
+      model: googleAI.model(modelName),
       config: {
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Algenib' },
+            prebuiltVoiceConfig: { voiceName: voiceName },
           },
           languageCode: lang,
         },

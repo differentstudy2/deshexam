@@ -1,0 +1,15 @@
+{
+  "Navigation": {
+    "home": "Home",
+    "exams": "Exams",
+    "courses": "Courses",
+    "books": "Books",
+    "login": "Login",
+    "signup": "Sign Up"
+  },
+  "Hero": {
+    "title1": "DESH",
+    "title2": "EXAM",
+    "subtitle": "One Stop Learning Platform"
+  }
+}

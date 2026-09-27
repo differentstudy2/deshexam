@@ -1,0 +1,459 @@
+[
+  {
+    "id": "inst-1",
+    "type": "institution",
+    "slug": "delhi-public-school-rk-puram",
+    "title": "Delhi Public School, R.K. Puram",
+    "description": "Delhi Public School R.K. Puram is one of the most prestigious schools in India, offering world-class education and state-of-the-art facilities.",
+    "category": "School",
+    "boardType": "Central Board",
+    "stateRegion": "Delhi",
+    "city": "New Delhi",
+    "address": "Sector 12, R.K. Puram, New Delhi, Delhi 110022",
+    "contactPhone": "+91 11 2617 1267",
+    "contactEmail": "principal@dpsrkp.net",
+    "website": "https://dpsrkp.net",
+    "websiteUrl": "https://dpsrkp.net",
+    "phoneNumber": "+911126171267",
+    "establishedYear": "1972",
+    "rating": 4.8,
+    "userRatingsTotal": 320,
+    "featureImage": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1200",
+    "logoUrl": "https://dpsrkp.net/wp-content/uploads/2021/08/dps-logo-1.png",
+    "galleryImages": [
+      "https://images.unsplash.com/photo-1592280771190-3e2e4d571952?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1576495199011-eb94736d05d6?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800"
+    ],
+    "latitude": 28.5677,
+    "longitude": 77.1724,
+    "admission": {
+      "admissionOpen": true,
+      "applicationStartDate": "2026-11-01T00:00:00Z",
+      "applicationEndDate": "2026-12-15T00:00:00Z",
+      "admissionMode": "Online",
+      "applicationFee": "2500",
+      "admissionProcess": "The admission process involves an online application followed by an interaction session and document verification.",
+      "admissionUrl": "https://dpsrkp.net/admissions"
+    },
+    "placement": {
+      "placementDescription": "100% placement record in top national and international universities including Ivy League schools."
+    },
+    "socialProfiles": {
+      "facebook": "https://facebook.com",
+      "twitter": "https://twitter.com",
+      "instagram": "https://instagram.com",
+      "linkedin": "https://linkedin.com",
+      "youtube": "https://youtube.com"
+    },
+    "aiReviewSummary": "Students and parents highly recommend DPS R.K. Puram for its exceptional academic standards, experienced faculty, and outstanding extracurricular facilities. The rigorous curriculum is well-balanced with sports and arts.",
+    "status": "published",
+    "track": "academic",
+    "parentId": null,
+    "orderIndex": 1
+  },
+  {
+    "id": "inst-2",
+    "type": "institution",
+    "slug": "st-xaviers-college-kolkata",
+    "title": "St. Xavier's College, Kolkata",
+    "description": "St. Xavier's College is a prestigious college in Kolkata offering undergraduate and postgraduate courses in Arts, Science, and Commerce.",
+    "category": "College",
+    "boardType": "State Board",
+    "stateRegion": "West Bengal",
+    "city": "Kolkata",
+    "address": "30 Mother Teresa Sarani, Kolkata, West Bengal 700016",
+    "contactPhone": "+91 33 2255 1101",
+    "contactEmail": "principal@sxccal.edu",
+    "website": "https://www.sxccal.edu",
+    "websiteUrl": "https://www.sxccal.edu",
+    "phoneNumber": "+913322551101",
+    "establishedYear": "1860",
+    "rating": 4.9,
+    "userRatingsTotal": 850,
+    "featureImage": "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1200",
+    "logoUrl": "https://upload.wikimedia.org/wikipedia/en/0/0d/XavKolKata.png?utm_source=en.wikipedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "galleryImages": [
+      "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1525926472898-7521c7d23d9b?auto=format&fit=crop&q=80&w=800"
+    ],
+    "latitude": 22.5499,
+    "longitude": 88.3554,
+    "admission": {
+      "admissionOpen": false,
+      "applicationStartDate": "2026-05-01T00:00:00Z",
+      "applicationEndDate": "2026-06-30T00:00:00Z",
+      "admissionMode": "Online / Offline",
+      "applicationFee": "1000",
+      "admissionProcess": "Admissions are purely merit-based on previous qualifying exam scores. Some courses may require a written entrance test.",
+      "admissionUrl": "https://www.sxccal.edu/admissions"
+    },
+    "placement": {
+      "placementAvailable": true,
+      "placementRate": "98%",
+      "highestPackage": "24 LPA",
+      "averagePackage": "8.5 LPA",
+      "recruiters": [
+        "Google",
+        "Microsoft",
+        "TCS",
+        "Infosys",
+        "Deloitte",
+        "PwC",
+        "KPMG"
+      ],
+      "placementDescription": "<p>The Career Development Cell at St. Xavier College ensures top-notch placement opportunities. Over 98% of registered students secure placements in leading multinational companies and Big 4 accounting firms.</p>"
+    },
+    "socialProfiles": {
+      "facebook": "https://facebook.com",
+      "linkedin": "https://linkedin.com",
+      "youtube": "https://youtube.com"
+    },
+    "aiReviewSummary": "A highly reputed institution known for its strict discipline, excellent faculty, and vibrant campus life. The alumni network is one of the strongest in the country.",
+    "status": "published",
+    "track": "higher-education",
+    "parentId": null,
+    "orderIndex": 2,
+    "courses": [
+      {
+        "id": 101,
+        "title": "B.Sc Physics (Hons)",
+        "degreeType": "Bachelors",
+        "duration": "3 Years",
+        "fees": "₹45,000 / yr",
+        "seats": 60,
+        "eligibility": "10+2 with Science",
+        "isNew": true
+      },
+      {
+        "id": 102,
+        "title": "B.Com (Hons)",
+        "degreeType": "Bachelors",
+        "duration": "3 Years",
+        "fees": "₹55,000 / yr",
+        "seats": 120,
+        "eligibility": "10+2 Commerce",
+        "isNew": false
+      },
+      {
+        "id": 103,
+        "title": "M.Sc Computer Science",
+        "degreeType": "Masters",
+        "duration": "2 Years",
+        "fees": "₹80,000 / yr",
+        "seats": 40,
+        "eligibility": "B.Sc CS or IT",
+        "isNew": true
+      }
+    ],
+    "scholarships": [
+      {
+        "id": 1,
+        "name": "St. Xavier Excellence Scholarship",
+        "amount": "₹1,00,000",
+        "eligibility": "95% and above in 10+2"
+      },
+      {
+        "id": 2,
+        "name": "Need-based Financial Aid",
+        "amount": "₹40,000",
+        "eligibility": "Family Income < 3 LPA"
+      }
+    ]
+  },
+  {
+    "id": "inst-dc-001",
+    "type": "institution",
+    "slug": "dinhata-college-cooch-behar",
+    "title": "Dinhata College",
+    "description": "Dinhata College, established in 1956, is a prominent higher education institution situated in the sub-divisional town of Dinhata, Cooch Behar, West Bengal. Affiliated with the Cooch Behar Panchanan Barma University and recognized by the UGC, the college has been a beacon of learning for students in the region for decades.The institution offers a diverse range of undergraduate programs in Arts, Science, and Commerce. With a dedicated faculty, well-equipped laboratories, and a rich central library, Dinhata College is committed to fostering academic excellence and empowering the youth through inclusive and quality education.",
+    "category": "College",
+    "boardType": "UGC",
+    "stateRegion": "West Bengal",
+    "city": "Dinhata",
+    "address": "Dinhata College Road, Ward No 7, Dinhata, Cooch Behar, West Bengal, 736135",
+    "contactPhone": "+91-3581-255094",
+    "contactEmail": "principal@dinhatacollege.ac.in",
+    "website": "https://www.dinhatacollege.ac.in",
+    "status": "published",
+    "establishedYear": "1956",
+    "totalStudents": "4000+",
+    "facultyCount": "70+",
+    "campusSize": "12 Acres",
+    "seo": {
+      "seoTitle": "Dinhata College | Admission, Courses, Fees & Details",
+      "seoDescription": "Explore Dinhata College in Cooch Behar. Discover BA, BSc, BCom courses, admission details, fee structures, and campus facilities at this UGC recognized college.",
+      "seoKeywords": [
+        "Dinhata College",
+        "Cooch Behar College",
+        "UG admission West Bengal",
+        "Dinhata College courses",
+        "Cooch Behar Panchanan Barma University"
+      ],
+      "focusKeyword": "Dinhata College"
+    },
+    "featureImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Dinhata_College_Main_Gate.jpg/1280px-Dinhata_College_Main_Gate.jpg?utm_source=en.wikipedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Dinhata_College_Main_Gate.jpg/1280px-Dinhata_College_Main_Gate.jpg?utm_source=en.wikipedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "galleryImages": [
+      "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80"
+    ],
+    "facilities": [
+      "Library",
+      "Wi-Fi",
+      "Cafeteria",
+      "Sports Complex",
+      "Labs",
+      "Medical Facility",
+      "Auditorium"
+    ],
+    "courses": [
+      {
+        "id": 101,
+        "title": "B.A. (Honours) Bengali",
+        "degreeType": "Bachelors",
+        "duration": "4 Years",
+        "fees": "₹4,500 / yr",
+        "seats": 150,
+        "eligibility": "10+2 with 50% in aggregate and 55% in Bengali",
+        "isNew": false
+      },
+      {
+        "id": 102,
+        "title": "B.Sc. (Honours) Mathematics",
+        "degreeType": "Bachelors",
+        "duration": "4 Years",
+        "fees": "₹6,200 / yr",
+        "seats": 40,
+        "eligibility": "10+2 with Science and minimum 55% in Mathematics",
+        "isNew": false
+      },
+      {
+        "id": 103,
+        "title": "B.Com. (General)",
+        "degreeType": "Bachelors",
+        "duration": "3 Years",
+        "fees": "₹4,800 / yr",
+        "seats": 100,
+        "eligibility": "10+2 passing marks from any recognized board",
+        "isNew": false
+      }
+    ],
+    "placement": {
+      "placementAvailable": true,
+      "placementRate": "45%",
+      "highestPackage": "3.5 LPA",
+      "averagePackage": "2 LPA",
+      "recruiters": [
+        "TCS",
+        "L&T",
+        "Bandhan Bank",
+        "Muthoot Finance"
+      ],
+      "placementDescription": "The placement and career counseling cell at Dinhata College actively organizes seminars, skill development workshops, and occasional campus recruitment drives. While primarily a general degree college, it assists students in securing entry-level roles in banking, finance, and IT sectors through off-campus and on-campus initiatives."
+    },
+    "scholarships": [
+      {
+        "id": 201,
+        "name": "Swami Vivekananda Merit Cum Means Scholarship (SVMCM)",
+        "amount": "₹12,000 to ₹18,000 / yr",
+        "eligibility": "Minimum 60% marks in 10+2, family income below ₹2.5 Lakhs"
+      },
+      {
+        "id": 202,
+        "name": "Kanyashree Prakalpa",
+        "amount": "₹25,000 (One time)",
+        "eligibility": "Unmarried female students turning 18 years of age"
+      },
+      {
+        "id": 203,
+        "name": "OASIS Scholarship",
+        "amount": "Variable",
+        "eligibility": "SC/ST/OBC students of West Bengal"
+      }
+    ],
+    "admission": {
+      "admissionOpen": false,
+      "applicationStartDate": "2026-07-01",
+      "applicationEndDate": "2026-07-20",
+      "admissionMode": "Online",
+      "applicationFee": "0",
+      "admissionUrl": "https://admission.dinhatacollege.ac.in",
+      "admissionProcess": "Admission to all undergraduate courses is conducted strictly on a merit basis through the centralized online portal according to the guidelines of the Higher Education Department, Govt. of West Bengal, and Cooch Behar Panchanan Barma University. Applicants must submit their academic details online, after which a merit list is generated based on 10+2 board marks.",
+      "steps": [
+        {
+          "step": "Step 1",
+          "title": "Online Registration",
+          "desc": "Fill out the online application form with personal and academic details on the admission portal.",
+          "date": "July 01"
+        },
+        {
+          "step": "Step 2",
+          "title": "Document Upload",
+          "desc": "Upload scanned copies of marksheet, age proof, caste certificate (if applicable), photo, and signature."
+        },
+        {
+          "step": "Step 3",
+          "title": "Merit List Publication",
+          "desc": "Check the official college website for the category-wise merit list publication.",
+          "date": "July 25"
+        },
+        {
+          "step": "Step 4",
+          "title": "E-Counseling & Admission",
+          "desc": "Pay the admission fee online through the payment gateway (UPI/Cards) to confirm the seat."
+        }
+      ]
+    }
+  },
+  {
+    "id": "inst-dsdj-002",
+    "type": "institution",
+    "slug": "dinhata-soni-debi-jain-high-school",
+    "title": "Dinhata Soni Debi Jain High School",
+    "description": "Dinhata Soni Debi Jain High School is a reputed government-sponsored educational institution located in the heart of Dinhata, Cooch Behar. Established with the vision of imparting quality education to the local community, the school offers a rigorous academic curriculum combined with holistic developmental activities.Affiliated with the West Bengal Board of Secondary Education (WBBSE) and the West Bengal Council of Higher Secondary Education (WBCHSE), the school is equipped with standard classrooms, science laboratories, and a dedicated faculty committed to nurturing the academic and personal growth of its students.",
+    "category": "School",
+    "boardType": "WBBSE / WBCHSE",
+    "stateRegion": "West Bengal",
+    "city": "Dinhata",
+    "address": "Main Road, Ward No 5, Dinhata, Cooch Behar, West Bengal, 736135",
+    "contactPhone": "+91-3581-255222",
+    "contactEmail": "contact@sonidebijainschool.org",
+    "website": "[https://www.sonidebijainschool.org](https://www.google.com/search?q=https://www.sonidebijainschool.org)",
+    "status": "published",
+    "establishedYear": "1972",
+    "totalStudents": "1200+",
+    "facultyCount": "45+",
+    "campusSize": "2 Acres",
+    "latitude": 26.1287,
+    "longitude": 89.4671,
+    "seo": {
+      "seoTitle": "Dinhata Soni Debi Jain High School | Admission & Details",
+      "seoDescription": "Explore Dinhata Soni Debi Jain High School in Cooch Behar. Discover admission details, higher secondary courses, and facilities at this WBBSE recognized school.",
+      "seoKeywords": [
+        "Dinhata Soni Debi Jain High School",
+        "Dinhata School Admission",
+        "WBBSE School Cooch Behar",
+        "WBCHSE Higher Secondary"
+      ],
+      "focusKeyword": "Dinhata Soni Debi Jain High School"
+    },
+    "featureImage": "https://school.banglarshiksha.gov.in/sms/templates/uploads/ws/20030/777819.jpg",
+    "logoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTswpHgYbaIFG5xcRscitN6zqABF8--VpMPjVy6HDOXPBTJoRJ-rRPLfIF&s=10",
+    "galleryImages": [
+      "https://school.banglarshiksha.gov.in/sms/templates/uploads/ws/20030/777819.jpg",
+      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80](https://www.google.com/search?q=https://images.unsplash.com/photo-1497633762265-9d179a990aa6%3Fixlib%3Drb-4.0.3%26auto%3Dformat%26fit%3Dcrop%26w%3D800%26q%3D80)",
+      "[https://images.unsplash.com/photo-1427504494785-319ce508ae64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80](https://www.google.com/search?q=https://images.unsplash.com/photo-1427504494785-319ce508ae64%3Fixlib%3Drb-4.0.3%26auto%3Dformat%26fit%3Dcrop%26w%3D800%26q%3D80)"
+    ],
+    "facilities": [
+      "Library",
+      "Sports Complex",
+      "Labs",
+      "Auditorium",
+      "Smart Board"
+    ],
+    "courses": [
+      {
+        "id": 201,
+        "title": "Higher Secondary (Arts)",
+        "degreeType": "Higher Secondary",
+        "duration": "2 Years",
+        "fees": "₹1,500 / yr",
+        "seats": 150,
+        "eligibility": "Passed Madhyamik (10th) from a recognized board",
+        "isNew": false
+      },
+      {
+        "id": 202,
+        "title": "Higher Secondary (Science)",
+        "degreeType": "Higher Secondary",
+        "duration": "2 Years",
+        "fees": "₹2,500 / yr",
+        "seats": 60,
+        "eligibility": "Passed Madhyamik (10th) with minimum 60% in Science/Math",
+        "isNew": false
+      },
+      {
+        "id": 203,
+        "title": "Higher Secondary (Commerce)",
+        "degreeType": "Higher Secondary",
+        "duration": "2 Years",
+        "fees": "₹1,800 / yr",
+        "seats": 60,
+        "eligibility": "Passed Madhyamik (10th) from a recognized board",
+        "isNew": false
+      }
+    ],
+    "placement": {
+      "placementAvailable": true,
+      "placementRate": "75%",
+      "highestPackage": "2.4 LPA",
+      "averagePackage": "1.5 LPA",
+      "recruiters": [
+        "Local Retail Sectors",
+        "Data Entry Firms",
+        "TCS BPS",
+        "Bandhan Bank (Clerical)"
+      ],
+      "placementDescription": "As a higher secondary school, direct corporate placements are rare. However, the school operates a Career Guidance Cell that assists 12th-pass students in securing entry-level apprenticeships, BPO roles, and part-time jobs, while heavily encouraging and guiding the majority of the batch towards prestigious university admissions for higher education."
+    },
+    "scholarships": [
+      {
+        "id": 301,
+        "name": "Swami Vivekananda Merit Cum Means Scholarship",
+        "amount": "₹12,000 / yr",
+        "eligibility": "Minimum 60% marks in Class 10, family income below ₹2.5 Lakhs"
+      },
+      {
+        "id": 302,
+        "name": "OASIS Scholarship",
+        "amount": "Variable",
+        "eligibility": "SC/ST/OBC students of West Bengal"
+      },
+      {
+        "id": 303,
+        "name": "Kanyashree Prakalpa",
+        "amount": "₹25,000 (One time)",
+        "eligibility": "Unmarried female students turning 18 years of age"
+      }
+    ],
+    "admission": {
+      "admissionOpen": false,
+      "applicationStartDate": "2026-05-10",
+      "applicationEndDate": "2026-05-30",
+      "admissionMode": "Offline",
+      "applicationFee": "200",
+      "admissionUrl": "[https://www.sonidebijainschool.org/admission](https://www.google.com/search?q=https://www.sonidebijainschool.org/admission)",
+      "admissionProcess": "Admissions to Class 11 are conducted based on the marks obtained in the Madhyamik (Class 10) examination. Forms are distributed at the school office immediately after the publication of the Class 10 board results. A merit list is subsequently published on the school notice board for respective streams.",
+      "steps": [
+        {
+          "step": "Step 1",
+          "title": "Form Collection",
+          "desc": "Collect the physical admission form from the school office by showing the Class 10 marksheet.",
+          "date": "May 10"
+        },
+        {
+          "step": "Step 2",
+          "title": "Form Submission",
+          "desc": "Submit the duly filled form along with photocopies of the marksheet, admit card, and caste certificate (if applicable).",
+          "date": "May 30"
+        },
+        {
+          "step": "Step 3",
+          "title": "Merit List Publication",
+          "desc": "Check the school notice board for the stream-wise merit list.",
+          "date": "June 10"
+        },
+        {
+          "step": "Step 4",
+          "title": "Final Admission",
+          "desc": "Pay the admission fees at the school counter on the designated date to secure the seat."
+        }
+      ]
+    }
+  }
+]

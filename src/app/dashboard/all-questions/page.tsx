@@ -25,6 +25,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { DocumentSnapshot } from 'firebase/firestore';
 import { useAuth } from '@/hooks/use-auth';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import rehypeRaw from 'rehype-raw';
 
 type Question = {
     id: string;
@@ -87,7 +93,7 @@ export default function AllQuestionsPage() {
   const handlePrevPage = () => {
       if (currentPage > 1) {
           const prevPage = currentPage - 1;
-          const prevStartAfter = pageHistory[prevPage - 1]; // -1 because pageHistory is 0-indexed and has a null at the beginning
+          const prevStartAfter = pageHistory[prevPage - 1]; 
           fetchQuestions(prevPage, prevStartAfter);
           setCurrentPage(prevPage);
       }
@@ -108,11 +114,7 @@ export default function AllQuestionsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-           {loading ? (
-             <div className="flex items-center justify-center min-h-[200px]">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-             </div>
-           ) : !user ? (
+           {!user && !loading ? (
             <div className="text-center py-16 text-muted-foreground">
                 <p>Please log in to view the question bank.</p>
             </div>
@@ -130,10 +132,23 @@ export default function AllQuestionsPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {questions.length > 0 ? (
+                        {loading ? (
+                             Array.from({ length: 10 }).map((_, i) => (
+                                <TableRow key={i}>
+                                    <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                                    <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                                    <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                                </TableRow>
+                            ))
+                        ) : questions.length > 0 ? (
                         questions.map((question) => (
                             <TableRow key={question.id}>
-                                <TableCell className="font-medium truncate max-w-sm">{question.text}</TableCell>
+                                <TableCell className="font-medium max-w-sm truncate">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                        {question.text}
+                                    </ReactMarkdown>
+                                </TableCell>
                                 <TableCell className="hidden md:table-cell">{question.authorName}</TableCell>
                                 <TableCell className="hidden lg:table-cell">{question.createdAt}</TableCell>
                                 <TableCell className="text-right">

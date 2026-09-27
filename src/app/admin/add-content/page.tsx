@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, SubmitHandler, useFieldArray, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -32,12 +32,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState, getGradesByClass } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload, GripVertical, Image as ImageIcon, CalendarIcon, Book } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { useEffect, useState, useRef, Suspense } from 'react';
+import { getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, getSettings, getClasses, addClass, getStates, addState, getGradesByClass, addContent, getContentTypes } from '@/lib/firebase/firestore';
+import { PlusCircle, Loader2, Save, Sparkles, CalendarIcon } from 'lucide-react';
+import { useEffect, useState, useRef, Suspense, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -51,33 +49,27 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import { generateDescription } from '@/ai/flows/ai-description-generator';
-import { generateImage } from '@/ai/flows/ai-image-generator';
 import Image from 'next/image';
-import { Label } from '@/components/ui/label';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { Checkbox } from '@/components/ui/checkbox';
+import { QuestionEditorCard } from '@/components/feature/question-editor-card';
 
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
-  explanation: z.string().optional(),
-});
-
-const matchingOptionSchema = z.object({
-    a: z.string().min(1, 'Column A item cannot be empty.'),
-    aImage: z.string().optional(),
-    b: z.string().min(1, 'Column B item cannot be empty.'),
-    bImage: z.string().optional(),
+  image: z.string().optional(),
+  audio: z.string().optional(),
 });
 
 const questionSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
-  marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
+  image: z.string().optional(),
+  audio: z.string().optional(),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Descriptive']),
+  answerImage: z.string().optional(),
+  answerAudio: z.string().optional(),
   options: z.array(optionSchema).optional(),
   matchingOptions: z.object({
       columnA: z.array(z.object({ text: z.string(), image: z.string().optional() })),
@@ -86,6 +78,7 @@ const questionSchema = z.object({
   correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
 });
+
 
 const formSchema = z.object({
   title: z.string().optional(),
@@ -106,14 +99,13 @@ const formSchema = z.object({
   newExamCategory: z.string().optional(),
   newExam: z.string().optional(),
   newChapterName: z.string().optional(),
-  testType: z.string().optional(),
+  testType: z.array(z.string()).min(1, { message: 'Please select at least one content type.'}),
   description: z.string().optional(),
-  body: z.string().optional(),
   featureImage: z.string().optional(),
   duration: z.coerce
     .number()
     .int()
-    .positive('Duration must be a positive number of minutes.').optional(),
+    .min(0, 'Duration must be a positive number.').optional(),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).optional(),
   access: z.enum(['free', 'premium', 'pro']),
   price: z.coerce.number().optional(),
@@ -124,7 +116,6 @@ const formSchema = z.object({
 
 
 type FormValues = z.infer<typeof formSchema>;
-type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
 type ClassCategory = { id: string, name: string };
@@ -133,182 +124,20 @@ type State = { id: string, name: string };
 type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
-
-const aiGeneratorFormSchema = z.object({
-    sourceType: z.enum(['topic', 'text', 'file']),
-    sourceTopic: z.string().optional(),
-    sourceText: z.string().optional(),
-    sourceFile: z.string().optional(),
-    numQuestions: z.coerce.number().int().min(1).max(20),
-    difficulty: z.enum(['Easy', 'Medium', 'Hard']),
-    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Any']),
-}).refine(data => {
-    if (data.sourceType === 'topic') return !!data.sourceTopic && data.sourceTopic.length >= 3;
-    if (data.sourceType === 'text') return !!data.sourceText && data.sourceText.length >= 3;
-    if (data.sourceType === 'file') return !!data.sourceFile && data.sourceFile.length >= 3;
-    return false;
-}, {
-    message: 'Source content must be at least 3 characters.',
-    path: ['sourceTopic'], 
-});
-type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
-
-
-const ImageUploader = ({ fieldName, onUrlChange }: { fieldName: string, onUrlChange: (url: string) => void }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [url, setUrl] = useState('');
-    const [isUploading, setIsUploading] = useState(false);
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [prompt, setPrompt] = useState('');
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setIsUploading(true);
-            try {
-                const downloadURL = await uploadFile(file);
-                onUrlChange(downloadURL);
-                setIsOpen(false);
-            } catch (error) {
-                console.error("Upload error:", error);
-            } finally {
-                setIsUploading(false);
-            }
-        }
-    };
-    
-    const handleGenerate = async () => {
-        if (!prompt) return;
-        setIsGenerating(true);
-        try {
-            const result = await generateImage({ prompt });
-            onUrlChange(result.imageUrl);
-            setIsOpen(false);
-        } catch (error) {
-            console.error("AI Generation error:", error);
-        } finally {
-            setIsGenerating(false);
-        }
-    };
-
-    return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                <Button variant="outline" size="sm" type="button"><ImageIcon className="mr-2 h-4 w-4" />Set Image</Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Set Image</DialogTitle>
-                </DialogHeader>
-                <Tabs defaultValue="upload">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="upload">Upload</TabsTrigger>
-                        <TabsTrigger value="url">From URL</TabsTrigger>
-                        <TabsTrigger value="ai">Generate with AI</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="upload" className="pt-4">
-                        <div 
-                            className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer"
-                            onClick={() => fileInputRef.current?.click()}
-                        >
-                            <div className="space-y-1 text-center">
-                                <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                <p>Click to upload a file</p>
-                                <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
-                            </div>
-                        </div>
-                        <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/png, image/jpeg, image/gif" />
-                        {isUploading && <div className="mt-2 flex items-center justify-center"><Loader2 className="animate-spin" /> Uploading...</div>}
-                    </TabsContent>
-                    <TabsContent value="url" className="pt-4 space-y-2">
-                        <Label htmlFor="imageUrl">Image URL</Label>
-                        <Input id="imageUrl" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://example.com/image.png" />
-                        <Button type="button" onClick={() => { onUrlChange(url); setIsOpen(false); }}>Set URL</Button>
-                    </TabsContent>
-                    <TabsContent value="ai" className="pt-4 space-y-2">
-                         <Label htmlFor="aiPrompt">Image Prompt</Label>
-                        <Input id="aiPrompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g., A majestic dragon soaring" />
-                        <Button type="button" onClick={handleGenerate} disabled={isGenerating}>
-                            {isGenerating ? <><Loader2 className="animate-spin" /> Generating...</> : "Generate"}
-                        </Button>
-                    </TabsContent>
-                </Tabs>
-            </DialogContent>
-        </Dialog>
-    );
-};
-
-
-const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any, questionIndex: number, setValue: any }) => {
-    const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
-        control: control,
-        name: `questions.${questionIndex}.correctAnswer` as any,
-    });
-
-    const handleImageUrlChange = (pairIndex: number, field: 'aImage' | 'bImage', url: string) => {
-        setValue(`questions.${questionIndex}.correctAnswer.${pairIndex}.${field}`, url);
-    };
-
-    return (
-        <div className='space-y-4'>
-            <FormLabel>Matching Pairs</FormLabel>
-            <div className='grid grid-cols-[1fr_auto_1fr] items-center gap-2 font-semibold text-center'>
-                <div>Column A</div>
-                <div></div>
-                <div>Column B</div>
-            </div>
-            {matchingPairFields.map((pair, pairIndex) => (
-                 <div key={pair.id} className="p-4 border rounded-lg space-y-3">
-                    <div className="flex justify-between items-center">
-                        <FormLabel className="text-sm">Pair {pairIndex + 1}</FormLabel>
-                        <Button type="button" variant="ghost" size="sm" onClick={() => removeMatchingPair(pairIndex)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                    </div>
-                    <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-4">
-                        <div className="space-y-2">
-                            <FormField control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.a`} render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1} Text`} />} />
-                            <Controller control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.aImage`} render={({ field }) => (
-                                <>
-                                  <ImageUploader fieldName={field.name} onUrlChange={(url) => handleImageUrlChange(pairIndex, 'aImage', url)} />
-                                  {field.value && <img src={field.value} alt="Preview" className="w-20 h-20 object-cover mt-2 rounded-md" />}
-                                </>
-                            )} />
-                        </div>
-                        <div className="pt-2">
-                            <GripVertical className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                        <div className="space-y-2">
-                             <FormField control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.b`} render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1} Text`} />} />
-                             <Controller control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.bImage`} render={({ field }) => (
-                                <>
-                                  <ImageUploader fieldName={field.name} onUrlChange={(url) => handleImageUrlChange(pairIndex, 'bImage', url)} />
-                                  {field.value && <img src={field.value} alt="Preview" className="w-20 h-20 object-cover mt-2 rounded-md" />}
-                                </>
-                            )} />
-                        </div>
-                    </div>
-                 </div>
-            ))}
-            <Button type="button" variant="outline" size="sm" onClick={() => appendMatchingPair({ a: '', aImage: '', b: '', bImage: '' })}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add Pair
-            </Button>
-        </div>
-    );
-};
+type ContentType = { id: string, name: string };
 
 
 function AddContentForm() {
   const { toast } = useToast();
-  const searchParams = useSearchParams();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
   const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
   const [states, setStates] = useState<State[]>([]);
   const [examCategories, setExamCategories] = useState<ExamType[]>([]);
+  const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
   const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
@@ -317,10 +146,8 @@ function AddContentForm() {
   const [isAddingNewExamCategory, setIsAddingNewExamCategory] = useState(false);
   const [isAddingNewExam, setIsAddingNewExam] = useState(false);
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [settings, setSettings] = useState({
     enableMatching: true,
     enableMultipleChoice: true,
@@ -344,6 +171,7 @@ function AddContentForm() {
     defaultExam: '',
   });
 
+  const contentType = 'Mock Test';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -366,9 +194,8 @@ function AddContentForm() {
       newExamCategory: '',
       newExam: '',
       newChapterName: '',
-      testType: 'Mock Test',
+      testType: [contentType],
       description: '',
-      body: '',
       featureImage: '',
       duration: 0,
       difficulty: 'Medium',
@@ -386,6 +213,101 @@ function AddContentForm() {
   });
   
   const selectedClassCategory = form.watch('classCategory');
+  
+  const fetchFormData = useCallback(async () => {
+      try {
+        setLoadingData(true);
+        const [subjectData, boardData, classData, stateData, examTypeData, siteSettings, contentTypesData] = await Promise.all([
+            getSubjects(),
+            getBoards(),
+            getClasses(),
+            getStates(),
+            getExamTypes(),
+            getSettings(),
+            getContentTypes()
+        ]);
+        
+        setSubjects(subjectData);
+        setBoards(boardData);
+        setClassCategories(classData);
+        setStates(stateData);
+        setExamCategories(examTypeData);
+        setContentTypes(contentTypesData);
+
+        if (siteSettings) {
+          setSettings({
+              enableMatching: siteSettings.enableMatching ?? true,
+              enableMultipleChoice: siteSettings.enableMultipleChoice ?? true,
+              enableTrueFalse: siteSettings.enableTrueFalse ?? true,
+              enableShortAnswer: siteSettings.enableShortAnswer ?? true,
+              enableFillInTheBlank: true,
+              enableSubjectMetafield: siteSettings.enableSubjectMetafield ?? true,
+              enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
+              enableClassMetafield: siteSettings.enableClassMetafield ?? true,
+              enableExamCategoryMetafield: siteSettings.enableExamCategoryMetafield ?? true,
+              enableStateMetafield: siteSettings.enableStateMetafield ?? true,
+              enableExamMetafield: siteSettings.enableExamMetafield ?? true,
+              enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
+              defaultBoard: siteSettings.defaultBoard ?? '',
+              defaultClassCategory: siteSettings.defaultClassCategory ?? '',
+              defaultClass: siteSettings.defaultClass ?? '',
+              defaultSubject: siteSettings.defaultSubject ?? '',
+              defaultChapter: siteSettings.defaultChapter ?? '',
+              defaultExamCategory: siteSettings.defaultExamCategory ?? '',
+              defaultState: siteSettings.defaultState ?? '',
+              defaultExam: siteSettings.defaultExam ?? '',
+          });
+
+          const currentValues = form.getValues();
+          form.reset({
+              ...currentValues,
+              board: currentValues.board || siteSettings.defaultBoard || '',
+              classCategory: currentValues.classCategory || siteSettings.defaultClassCategory || '',
+              class: currentValues.class || siteSettings.defaultClass || '',
+              subject: currentValues.subject || siteSettings.defaultSubject || '',
+              examCategory: currentValues.examCategory || siteSettings.defaultExamCategory || '',
+              state: currentValues.state || siteSettings.defaultState || '',
+              testType: [contentType],
+          });
+          
+          const defaultClassCat = siteSettings.defaultClassCategory || form.getValues('classCategory');
+          if (defaultClassCat) {
+            const fetchedGrades = await getGradesByClass(defaultClassCat);
+            setGrades(fetchedGrades);
+          }
+
+           if (form.getValues('subject')) {
+              const selectedSubject = subjectData.find(s => s.name === form.getValues('subject'));
+              if (selectedSubject) {
+                  const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
+                  setChapters(fetchedChapters);
+                  if (siteSettings.defaultChapter && !form.getValues('chapter')) {
+                    form.setValue('chapter', siteSettings.defaultChapter);
+                  }
+              }
+          }
+          if (form.getValues('examCategory')) {
+              const selectedExamCategory = examTypeData.find(e => e.name === form.getValues('examCategory'));
+              if (selectedExamCategory) {
+                  const fetchedExams = await getExamsByCategory(selectedExamCategory.id);
+                  setExams(fetchedExams);
+                   if (siteSettings.defaultExam && !form.getValues('exam')) {
+                    form.setValue('exam', siteSettings.defaultExam);
+                  }
+              }
+          }
+        }
+      } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Error loading data",
+            description: "Could not load form data from the database."
+        });
+      } finally {
+        setLoadingData(false);
+      }
+    }, [form, toast, contentType]);
+
   useEffect(() => {
     const fetchGrades = async () => {
       if (selectedClassCategory) {
@@ -398,8 +320,9 @@ function AddContentForm() {
     fetchGrades();
   }, [selectedClassCategory]);
 
-
   useEffect(() => {
+    fetchFormData();
+
     const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
     if (aiQuestionsRaw) {
       try {
@@ -407,7 +330,7 @@ function AddContentForm() {
         const existingQuestions = form.getValues('questions') || [];
         const combinedQuestions = [...existingQuestions, ...newQuestions.map((q: any) => ({
             ...q,
-            options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+            options: q.options || (q.type === 'Multiple Choice' ? [{text:''}, {text:''}, {text:''}, {text:''}] : undefined),
             explanation: q.explanation || ''
         }))];
         replace(combinedQuestions);
@@ -432,9 +355,10 @@ function AddContentForm() {
             form.setValue('title', aiContent.title);
             form.setValue('description', aiContent.description);
             form.setValue('difficulty', aiContent.difficulty);
+            form.setValue('testType', aiContent.testType);
             replace(aiContent.questions.map((q: any) => ({
                 ...q,
-                options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+                options: q.options || (q.type === 'Multiple Choice' ? [{text:''}, {text:''}, {text:''}, {text:''}] : undefined),
                 explanation: q.explanation || ''
             })));
             toast({
@@ -452,149 +376,18 @@ function AddContentForm() {
           }
         }
     }
-    
-    fetchFormData();
-  }, [form, replace, toast]);
-
-  const initialContentType = searchParams.get('type');
-  
-  const currentTestType = form.watch('testType');
-
-  const fetchFormData = async () => {
-    try {
-      setLoadingData(true);
-      const [types, subjectData, boardData, classData, stateData, examTypeData, siteSettings] = await Promise.all([
-          getContentTypes(),
-          getSubjects(),
-          getBoards(),
-          getClasses(),
-          getStates(),
-          getExamTypes(),
-          getSettings()
-      ]);
-      
-      const allContentTypes = [...types, { id: 'textbook', name: 'Textbook' }];
-      setContentTypes(allContentTypes);
-
-      setSubjects(subjectData);
-      setBoards(boardData);
-      setClassCategories(classData);
-      setStates(stateData);
-      setExamCategories(examTypeData);
-
-      if (siteSettings) {
-        setSettings({
-            enableMatching: siteSettings.enableMatching ?? true,
-            enableMultipleChoice: siteSettings.enableMultipleChoice ?? true,
-            enableTrueFalse: siteSettings.enableTrueFalse ?? true,
-            enableShortAnswer: siteSettings.enableShortAnswer ?? true,
-            enableFillInTheBlank: siteSettings.enableFillInTheBlank ?? true,
-            enableSubjectMetafield: siteSettings.enableSubjectMetafield ?? true,
-            enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
-            enableClassMetafield: siteSettings.enableClassMetafield ?? true,
-            enableExamCategoryMetafield: siteSettings.enableExamCategoryMetafield ?? true,
-            enableStateMetafield: siteSettings.enableStateMetafield ?? true,
-            enableExamMetafield: siteSettings.enableExamMetafield ?? true,
-            enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
-            defaultBoard: siteSettings.defaultBoard ?? '',
-            defaultClassCategory: siteSettings.defaultClassCategory ?? '',
-            defaultClass: siteSettings.defaultClass ?? '',
-            defaultSubject: siteSettings.defaultSubject ?? '',
-            defaultChapter: siteSettings.defaultChapter ?? '',
-            defaultExamCategory: siteSettings.defaultExamCategory ?? '',
-            defaultState: siteSettings.defaultState ?? '',
-            defaultExam: siteSettings.defaultExam ?? '',
-        });
-
-        const currentValues = form.getValues();
-        form.reset({
-            ...currentValues,
-            board: currentValues.board || siteSettings.defaultBoard || '',
-            classCategory: currentValues.classCategory || siteSettings.defaultClassCategory || '',
-            class: currentValues.class || siteSettings.defaultClass || '',
-            subject: currentValues.subject || siteSettings.defaultSubject || '',
-            examCategory: currentValues.examCategory || siteSettings.defaultExamCategory || '',
-            state: currentValues.state || siteSettings.defaultState || '',
-            testType: initialContentType || currentValues.testType || 'Mock Test',
-        });
-        
-        const defaultClassCat = siteSettings.defaultClassCategory || form.getValues('classCategory');
-        if (defaultClassCat) {
-          const fetchedGrades = await getGradesByClass(defaultClassCat);
-          setGrades(fetchedGrades);
-        }
-
-         if (form.getValues('subject')) {
-            const selectedSubject = subjectData.find(s => s.name === form.getValues('subject'));
-            if (selectedSubject) {
-                const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
-                setChapters(fetchedChapters);
-                if (siteSettings.defaultChapter && !form.getValues('chapter')) {
-                  form.setValue('chapter', siteSettings.defaultChapter);
-                }
-            }
-        }
-        if (form.getValues('examCategory')) {
-            const selectedExamCategory = examTypeData.find(e => e.name === form.getValues('examCategory'));
-            if (selectedExamCategory) {
-                const fetchedExams = await getExamsByCategory(selectedExamCategory.id);
-                setExams(fetchedExams);
-                 if (siteSettings.defaultExam && !form.getValues('exam')) {
-                  form.setValue('exam', siteSettings.defaultExam);
-                }
-            }
-        }
-      }
-
-      if (types.length > 0 && !form.getValues('testType')) {
-        const mockTestType = types.find(t => t.name === 'Mock Test');
-        if (mockTestType) {
-          form.setValue('testType', mockTestType.name);
-        } else {
-          form.setValue('testType', types[0].name);
-        }
-      }
-
-       if (initialContentType) {
-        form.setValue('testType', initialContentType);
-      }
-    } catch (error) {
-      toast({
-          variant: "destructive",
-          title: "Error loading data",
-          description: "Could not load form data from the database."
-      });
-    } finally {
-      setLoadingData(false);
-    }
-  };
-
-
-  const aiForm = useForm<AIGeneratorFormValues>({
-    resolver: zodResolver(aiGeneratorFormSchema),
-    defaultValues: {
-      sourceType: 'topic',
-      sourceTopic: '',
-      sourceText: '',
-      sourceFile: '',
-      numQuestions: 5,
-      difficulty: 'Medium',
-      questionType: 'Any',
-    },
-  });
+  }, [form, replace, toast, fetchFormData]);
   
   const questions = form.watch('questions');
   useEffect(() => {
-    if (currentTestType !== 'Learn' && currentTestType !== 'Textbook') {
-        const totalMarks = questions?.reduce((total, q) => {
-            if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
-                return total + (q.correctAnswer.length || 0);
-            }
-            return total + (q.marks || 1);
-        }, 0) || 0;
-        form.setValue('duration', totalMarks, { shouldValidate: true });
-    }
-  }, [questions, currentTestType, form]);
+    const totalMarks = questions?.reduce((total, q) => {
+        if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
+            return total + (q.correctAnswer.length || 0);
+        }
+        return total + 1; // Each question is worth 1 mark/minute
+    }, 0) || 0;
+    form.setValue('duration', totalMarks, { shouldValidate: true });
+  }, [questions, form]);
 
   const handleFormSubmit = async (data: FormValues, resetType: 'full' | 'partial') => {
     try {
@@ -652,31 +445,6 @@ function AddContentForm() {
         setIsAddingNewChapter(false);
       }
 
-      if (data.testType === 'Learn') {
-        contentToSave = {
-          title: data.title,
-          description: data.description,
-          body: data.body,
-          testType: data.testType,
-          createdAt: data.publishedAt || new Date(),
-        };
-      } else if (data.testType === 'Textbook') {
-         contentToSave = {
-          title: data.title,
-          description: data.description,
-          featureImage: data.featureImage,
-          board: boardName,
-          classCategory: data.classCategory,
-          class: className,
-          subject: subjectName,
-          examCategory: examCategoryName,
-          exam: examName,
-          state: stateName,
-          school: data.school,
-          semester: data.semester,
-          testType: 'Textbook',
-        };
-      } else {
         // Process matching questions
         const processedQuestions = data.questions?.map(q => {
             if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
@@ -694,7 +462,6 @@ function AddContentForm() {
         });
         
         contentToSave = { ...data, subject: subjectName, board: boardName, class: className, state: stateName, examCategory: examCategoryName, exam: examName, chapter: chapterName, questions: processedQuestions };
-        delete contentToSave.body;
         delete contentToSave.newSubject;
         delete contentToSave.newBoard;
         delete contentToSave.newClass;
@@ -702,13 +469,11 @@ function AddContentForm() {
         delete contentToSave.newExamCategory;
         delete contentToSave.newExam;
         delete contentToSave.newChapterName;
-      }
-
-
+      
       await addContent(contentToSave);
       toast({
         title: 'Content Created!',
-        description: `The ${data.testType?.toLowerCase()} "${data.title}" has been successfully saved.`,
+        description: `The content "${data.title}" has been successfully saved.`,
       });
       
       if (resetType === 'full') {
@@ -719,12 +484,11 @@ function AddContentForm() {
             classCategory: settings.defaultClassCategory || '',
             class: settings.defaultClass || '',
             subject: settings.defaultSubject || '',
-            chapter: '', // Reset chapter as it depends on subject
+            chapter: '',
             examCategory: settings.defaultExamCategory || '',
             state: settings.defaultState || '',
-            exam: '', // Reset exam as it depends on category
+            exam: '',
             description: '',
-            body: '',
             duration: 0,
             featureImage: '',
             access: 'free',
@@ -752,7 +516,6 @@ function AddContentForm() {
             ...form.getValues(),
             title: '',
             description: '',
-            body: '',
             duration: 0,
             access: 'free',
             featureImage: '',
@@ -806,11 +569,6 @@ function AddContentForm() {
       setIsGeneratingDesc(false);
     }
   };
-
-  const handleTabChange = (value: string) => {
-    form.setValue('testType', value, { shouldValidate: true });
-    form.trigger(); // Trigger validation after changing type
-  }
 
   const handleSubjectChange = async (value: string) => {
       form.setValue('subject', value);
@@ -899,27 +657,6 @@ function AddContentForm() {
       setIsAddingNewChapter(false);
     }
   };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-        if (file.type === 'text/plain') {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const text = e.target?.result as string;
-                aiForm.setValue('sourceFile', text, { shouldValidate: true });
-                aiForm.setValue('sourceType', 'file');
-            };
-            reader.readAsText(file);
-        } else {
-            toast({
-                variant: 'destructive',
-                title: 'Invalid File Type',
-                description: 'Please upload a .txt file.',
-            });
-        }
-    }
-  };
   
   const accessLevel = form.watch('access');
 
@@ -932,14 +669,13 @@ function AddContentForm() {
     )
   }
   
-
   return (
     <div>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <div>
-                <h1 className="font-headline text-3xl font-bold">Add New Content</h1>
+                <h1 className="font-headline text-3xl font-bold">Add New Mock Test</h1>
                 <p className="text-muted-foreground">
-                    Select a content type and fill out the form to create new content.
+                    Fill out the form to create new content.
                 </p>
             </div>
              <Button asChild variant="outline" className="w-full md:w-auto">
@@ -949,20 +685,8 @@ function AddContentForm() {
                 </Link>
             </Button>
         </div>
-
-
-    {contentTypes.length > 0 && (
-      <Tabs defaultValue={initialContentType || form.getValues('testType') || contentTypes[0].name} className="w-full mb-6" onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-4">
-          {contentTypes.map((type) => (
-            <TabsTrigger key={type.id} value={type.name}>{type.name}</TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-    )}
-
-
-      <Form {...form}>
+        
+      <FormProvider {...form}>
         <form className="space-y-8">
           <Card>
             <CardHeader>
@@ -986,8 +710,55 @@ function AddContentForm() {
                 )}
               />
                 
-            {currentTestType !== 'Learn' && (
-                <>
+                <FormField
+                    control={form.control}
+                    name="testType"
+                    render={() => (
+                        <FormItem>
+                        <FormLabel>Content Type(s)</FormLabel>
+                        <FormDescription>
+                            Select all categories this content should appear under.
+                        </FormDescription>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                            {contentTypes.map((item) => (
+                            <FormField
+                                key={item.id}
+                                control={form.control}
+                                name="testType"
+                                render={({ field }) => {
+                                return (
+                                    <FormItem
+                                    key={item.id}
+                                    className="flex flex-row items-center space-x-3 space-y-0"
+                                    >
+                                    <FormControl>
+                                        <Checkbox
+                                        checked={field.value?.includes(item.name)}
+                                        onCheckedChange={(checked) => {
+                                            return checked
+                                            ? field.onChange([...(field.value || []), item.name])
+                                            : field.onChange(
+                                                field.value?.filter(
+                                                (value) => value !== item.name
+                                                )
+                                            )
+                                        }}
+                                        />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                        {item.name}
+                                    </FormLabel>
+                                    </FormItem>
+                                )
+                                }}
+                            />
+                            ))}
+                        </div>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {settings.enableBoardMetafield && <FormField
                     control={form.control}
@@ -1190,7 +961,7 @@ function AddContentForm() {
                     </FormItem>
                   )}
                 />}
-                {settings.enableChapterMetafield && currentTestType !== 'Textbook' && <FormField
+                {settings.enableChapterMetafield && <FormField
                     control={form.control}
                     name="chapter"
                     render={({ field }) => (
@@ -1297,8 +1068,6 @@ function AddContentForm() {
                   )}
                 />}
               </div>
-              </>
-            )}
 
               <FormField
                 control={form.control}
@@ -1329,53 +1098,13 @@ function AddContentForm() {
                 )}
               />
 
-              {currentTestType === 'Learn' && (
-                <FormField
-                  control={form.control}
-                  name="body"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Content Body</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Write your article content here. You can use Markdown for formatting."
-                          {...field}
-                          className="min-h-[300px]"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-              {currentTestType === 'Textbook' && (
-                 <FormField
-                    control={form.control}
-                    name="featureImage"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Feature Image</FormLabel>
-                        <div className="flex items-center gap-4">
-                            <ImageUploader
-                                fieldName={field.name}
-                                onUrlChange={(url) => form.setValue('featureImage', url)}
-                            />
-                            {field.value && <Image src={field.value} alt="Feature image preview" width={80} height={80} className="rounded-md object-cover" />}
-                        </div>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-              )}
-
-              {currentTestType !== 'Learn' && currentTestType !== 'Textbook' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
                   <FormField
                     control={form.control}
                     name="duration"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Duration / Total Marks</FormLabel>
+                        <FormLabel>Duration / Total Questions</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} readOnly disabled />
                         </FormControl>
@@ -1517,208 +1246,18 @@ function AddContentForm() {
                       )}
                   </div>
                 </div>
-              )}
             </CardContent>
           </Card>
           
-          {currentTestType !== 'Learn' && currentTestType !== 'Textbook' && (
-            <Card>
+          <Card>
               <CardHeader>
                   <CardTitle>Questions</CardTitle>
                   <CardDescription>Add questions to your content.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                  {fields.map((question, index) => {
-                      const questionType = form.watch(`questions.${index}.type`);
-
-                      return (
-                          <Card key={question.id} className="p-4">
-                              <div className="flex justify-between items-center mb-4 gap-4">
-                                  <h4 className="font-semibold text-lg whitespace-nowrap">Question {index + 1}</h4>
-                                  <FormField
-                                      control={form.control}
-                                      name={`questions.${index}.type`}
-                                      render={({ field }) => (
-                                          <FormItem className="w-full">
-                                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                  <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
-                                                  <SelectContent>
-                                                      {settings.enableMultipleChoice && <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>}
-                                                      {settings.enableTrueFalse && <SelectItem value="True/False">True/False</SelectItem>}
-                                                      {settings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>}
-                                                      {settings.enableFillInTheBlank && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
-                                                      {settings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
-                                                  </SelectContent>
-                                              </Select>
-                                              <FormMessage />
-                                          </FormItem>
-                                      )}
-                                  />
-                                  <FormField
-                                      control={form.control}
-                                      name={`questions.${index}.marks`}
-                                      render={({ field }) => (
-                                          <FormItem>
-                                              <FormControl>
-                                                  <Input type="number" placeholder="Marks" className="w-24" {...field} disabled={questionType === 'Matching'} />
-                                              </FormControl>
-                                              <FormMessage />
-                                          </FormItem>
-                                      )}
-                                  />
-                                  <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
-                                      <Trash2 className="mr-2 h-4 w-4" />
-                                      Remove
-                                  </Button>
-                              </div>
-                              <div className="space-y-4">
-                                  <FormField
-                                      control={form.control}
-                                      name={`questions.${index}.text`}
-                                      render={({ field }) => (
-                                          <FormItem>
-                                              <FormLabel>Question Text</FormLabel>
-                                              <FormControl>
-                                                  <Input {...field} />
-                                              </FormControl>
-                                               {questionType === 'Fill in the Blank' && (
-                                                <FormDescription>
-                                                    Use "____" (four underscores) to indicate where the blank should be.
-                                                </FormDescription>
-                                                )}
-                                                {questionType === 'Matching' && (
-                                                <FormDescription>
-                                                    Provide the instruction for matching, e.g., "Match Column A with Column B".
-                                                </FormDescription>
-                                                )}
-                                              <FormMessage />
-                                          </FormItem>
-                                      )}
-                                  />
-                                  
-                                  {questionType === 'Multiple Choice' && (
-                                      <div className="space-y-4">
-                                          <FormLabel>Options</FormLabel>
-                                          <Controller
-                                              control={form.control}
-                                              name={`questions.${index}.correctAnswer`}
-                                              render={({ field }) => (
-                                                  <RadioGroup
-                                                    key={`${question.id}-${field.value}`}
-                                                    onValueChange={field.onChange} 
-                                                    value={field.value} 
-                                                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                                                  >
-                                                      {[0, 1, 2, 3].map(optionIndex => (
-                                                          <div key={optionIndex} className="flex items-start gap-4">
-                                                              <FormControl>
-                                                                  <RadioGroupItem value={form.getValues(`questions.${index}.options.${optionIndex}.text`)} className="mt-2.5" />
-                                                              </FormControl>
-                                                               <div className="space-y-2 flex-1">
-                                                                  <FormField
-                                                                      control={form.control}
-                                                                      name={`questions.${index}.options.${optionIndex}.text`}
-                                                                      render={({ field: optionField }) => (
-                                                                          <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
-                                                                      )}
-                                                                  />
-                                                                  <FormField
-                                                                      control={form.control}
-                                                                      name={`questions.${index}.options.${optionIndex}.explanation`}
-                                                                      render={({ field: explanationField }) => (
-                                                                          <Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} />
-                                                                      )}
-                                                                  />
-                                                              </div>
-                                                          </div>
-                                                      ))}
-                                                  </RadioGroup>
-                                              )}
-                                          />
-                                          <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
-
-                                      </div>
-                                  )}
-                                  {questionType === 'True/False' && (
-                                      <div className='space-y-4'>
-                                          <FormField
-                                              control={form.control}
-                                              name={`questions.${index}.correctAnswer`}
-                                              render={({ field }) => (
-                                                  <FormItem>
-                                                      <FormLabel>Correct Answer</FormLabel>
-                                                      <FormControl>
-                                                          <RadioGroup onValueChange={field.onChange} value={field.value} className="flex space-x-4">
-                                                              <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
-                                                              <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
-                                                          </RadioGroup>
-                                                      </FormControl>
-                                                      <FormMessage />
-                                                  </FormItem>
-                                              )}
-                                          />
-                                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                               <FormField
-                                                  control={form.control}
-                                                  name={`questions.${index}.options.0.explanation`}
-                                                  render={({ field }) => (
-                                                      <FormItem>
-                                                          <FormLabel>Explanation for "True"</FormLabel>
-                                                          <FormControl><Textarea placeholder="Explain why it's true..." {...field} /></FormControl>
-                                                          <FormMessage />
-                                                      </FormItem>
-                                                  )}
-                                              />
-                                               <FormField
-                                                  control={form.control}
-                                                  name={`questions.${index}.options.1.explanation`}
-                                                  render={({ field }) => (
-                                                      <FormItem>
-                                                          <FormLabel>Explanation for "False"</FormLabel>
-                                                          <FormControl><Textarea placeholder="Explain why it's false..." {...field} /></FormControl>
-                                                          <FormMessage />
-                                                      </FormItem>
-                                                  )}
-                                              />
-                                          </div>
-                                      </div>
-                                  )}
-                                  {questionType === 'Matching' && (
-                                    <MatchingPairsField control={form.control} questionIndex={index} setValue={form.setValue} />
-                                  )}
-                                  {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
-                                      <FormField
-                                          control={form.control}
-                                          name={`questions.${index}.correctAnswer`}
-                                          render={({ field }) => (
-                                              <FormItem>
-                                                  <FormLabel>Answer</FormLabel>
-                                                  <FormControl>
-                                                      <Input {...field} placeholder="Enter the correct answer" />
-                                                  </FormControl>
-                                                  <FormMessage />
-                                              </FormItem>
-                                          )}
-                                      />
-                                  )}
-
-                                  <FormField
-                                      control={form.control}
-                                      name={`questions.${index}.explanation`}
-                                      render={({ field }) => (
-                                          <FormItem>
-                                              <FormLabel>General Explanation</FormLabel>
-                                              <FormControl>
-                                                  <Textarea {...field} placeholder="Explain why the correct answer is right." />
-                                              </FormControl>
-                                              <FormMessage />
-                                          </FormItem>
-                                      )}
-                                  />
-                              </div>
-                          </Card>
-                      );
-                  })}
+                  {fields.map((question, index) => (
+                      <QuestionEditorCard key={question.id} index={index} onRemove={remove} settings={settings} />
+                  ))}
               </CardContent>
               <CardFooter>
                 <div className="flex flex-col sm:flex-row gap-4">
@@ -1729,8 +1268,7 @@ function AddContentForm() {
                         const newQuestion: any = { 
                             text: '', 
                             type: 'Multiple Choice', 
-                            marks: 1, 
-                            options: [{text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}], 
+                            options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], 
                             correctAnswer: '', 
                             explanation: '' 
                         };
@@ -1744,7 +1282,7 @@ function AddContentForm() {
                       Add Question Manually
                   </Button>
                    <Button asChild variant="outline">
-                        <Link href="/admin/add-content/add-ai-question">
+                        <Link href="/admin/add-content/add-ai-question?redirect=/admin/add-content">
                             <Sparkles className="mr-2 h-4 w-4" />
                             Add Questions with AI
                         </Link>
@@ -1752,7 +1290,6 @@ function AddContentForm() {
                 </div>
               </CardFooter>
             </Card>
-          )}
           
            <div className="flex items-center gap-4">
                 <Button 
@@ -1773,12 +1310,12 @@ function AddContentForm() {
                 </Button>
            </div>
         </form>
-      </Form>
+      </FormProvider>
     </div>
   );
 }
 
-export default function CreateTestPage() {
+export default function CreateQuizPage() {
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <AddContentForm />

@@ -1,0 +1,733 @@
+{
+  "id": "generated-mock-test-sahaj-path-tritiya-path",
+  "slug": "sahaj-path-prothom-bhag-tritiya-path-mock-test",
+  "title": "সহজ পাঠ: প্রথম ভাগ - তৃতীয় পাঠ মক টেস্ট",
+  "description": "এই মক টেস্টটি পশ্চিমবঙ্গ প্রাথমিক শিক্ষা পর্ষদের প্রথম শ্রেণির 'সহজ পাঠ' বইয়ের 'তৃতীয় পাঠ' এবং 'মোতিবিল' কবিতার ওপর ভিত্তি করে তৈরি। দাদা, মামা ও আশাদাদার হাটে যাওয়ার গল্প এবং মোতিবিলের প্রাকৃতিক দৃশ্য সম্পর্কিত মোট ৩০টি MCQ প্রশ্ন রয়েছে। ছোটদের পাঠ্যক্রমের প্রস্তুতি যাচাই করার জন্য এটি বিশেষভাবে উপযোগী।",
+  "thumbnail": "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=800&q=80",
+  "status": "Published",
+  "difficulty": "Easy",
+  "language": "Bengali",
+  "questionType": "MCQ",
+  "questionCount": 30,
+  "questionIds": [],
+  "durationMin": 30,
+  "totalMarks": 30,
+  "passingMarks": 23,
+  "negativeMarking": 0,
+  "attemptsAllowed": 0,
+  "accessType": "free",
+  "attemptCount": 3145,
+  "averageScore": 72,
+  "instructions": "* এই পরীক্ষায় মোট ৩০টি MCQ প্রশ্ন থাকবে。\n* প্রতিটি সঠিক উত্তরের জন্য ১ নম্বর পাবে。\n* কোনো নেগেটিভ মার্কিং নেই。\n* প্রতিটি প্রশ্নের চারটি অপশনের মধ্যে একটিই সঠিক উত্তর。\n* পরীক্ষা শুরু হলে সময় গণনা শুরু হয়ে যাবে。\n* সময়সীমার মধ্যে সর্বোচ্চ প্রশ্নের উত্তর দেওয়ার চেষ্টা করুন。\n* একবার উত্তর সেভ করার পরেও পরীক্ষা শেষ হওয়ার আগে পরিবর্তন করা যাবে。\n* পরীক্ষা সাবমিট করার পর উত্তরপত্র ও ব্যাখ্যা দেখা যাবে。\n* পরীক্ষা চলাকালীন পেজ রিফ্রেশ করলে অগ্রগতি সংরক্ষিত থাকবে。\n* সৎভাবে পরীক্ষা দাও এবং নিজের প্রস্তুতি যাচাই করো।",
+  "examRules": "* পরীক্ষার সময় অন্য কোনো বই বা নোট দেখা যাবে না।\n* অভিভাবকের সাহায্য ছাড়া নিজে উত্তর দেওয়ার চেষ্টা করো।\n* প্রতিটি প্রশ্নের শুধুমাত্র একটি সঠিক উত্তর নির্বাচন করুন।\n* সময় শেষ হলে স্বয়ংক্রিয়ভাবে পরীক্ষা সাবমিট হয়ে যাবে।\n* একই পরীক্ষা একাধিকবার দেওয়া যাবে।\n* ফলাফল দেখতে সাবমিট বাটনে ক্লিক করুন।\n* যেকোনো প্রযুক্তিগত সমস্যায় পেজ রিফ্রেশ করুন।\n* মনোযোগ সহকারে প্রতিটি প্রশ্ন পড়ে উত্তর দাও।",
+  "boardId": "board-wbbpe",
+  "classId": "class-1-wbbpe",
+  "subjectId": "subject-bengali-class-1-wbbpe",
+  "textbookId": "textbook-sahaj-path-prothom-bhag-class-1-wbbpe",
+  "chapterId": "chapter-tritiya-path-sahaj-path-1-wbbpe",
+  "topicId": "topic-tritiya-path-text-sahaj-path-1-wbbpe",
+  "competitiveExam": null,
+  "verificationBadges": [
+    "WBBPE Verified"
+  ],
+  "tags": [
+    "Sahaj Path",
+    "Class 1",
+    "Bengali",
+    "Tritiya Path",
+    "Motibil"
+  ],
+  "createdAt": "2026-09-15T03:30:14.000Z",
+  "questions": [
+    {
+      "id": "q1",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ছাতার রঙ কী?",
+      "options": {
+        "a": "কালো",
+        "b": "সাদা",
+        "c": "লাল",
+        "d": "নীল"
+      },
+      "correctAnswer": "b",
+      "explanation": "পাঠ্যাংশ অনুযায়ী ছাতার রঙ সাদা।",
+      "optionExplanations": {
+        "a": "ছাতার রঙ কালো বলে পাঠে উল্লেখ নেই।",
+        "b": "সঠিক! পাঠ্যাংশে সাদা ছাতার কথা বলা হয়েছে।",
+        "c": "দাদার জামার রঙ হলো লাল, ছাতার নয়।",
+        "d": "ছাতার রঙ নীল বলে পাঠে উল্লেখ নেই।"
+      }
+    },
+    {
+      "id": "q2",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "দাদা কোথায় যায়?",
+      "options": {
+        "a": "মাঠে",
+        "b": "ঘাটে",
+        "c": "হাটে",
+        "d": "স্কুলে"
+      },
+      "correctAnswer": "c",
+      "explanation": "পাঠ্যাংশ থেকে জানা যায় যে দাদা হাটে যায়।",
+      "optionExplanations": {
+        "a": "দাদার মাঠে যাওয়ার কথা পাঠে নেই।",
+        "b": "দাদার ঘাটে যাওয়ার কথা পাঠে নেই।",
+        "c": "সঠিক! দাদা হাটে যায়।",
+        "d": "দাদার স্কুলে যাওয়ার কথা পাঠে নেই।"
+      }
+    },
+    {
+      "id": "q3",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "দাদার গায়ে কী রঙের জামা?",
+      "options": {
+        "a": "নীল",
+        "b": "সাদা",
+        "c": "লাল",
+        "d": "হলুদ"
+      },
+      "correctAnswer": "c",
+      "explanation": "পাঠ্যাংশ অনুযায়ী দাদার গায়ে লাল রঙের জামা আছে।",
+      "optionExplanations": {
+        "a": "দাদার জামার রঙ নীল নয়।",
+        "b": "ছাতা ও মামার শালের রঙ সাদা।",
+        "c": "সঠিক! দাদার গায়ে লাল জামা।",
+        "d": "দাদার জামার রঙ হলুদ নয়।"
+      }
+    },
+    {
+      "id": "q4",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "মামার হাতে কী থাকে?",
+      "options": {
+        "a": "বই",
+        "b": "খাতা",
+        "c": "কলম",
+        "d": "ছাতা"
+      },
+      "correctAnswer": "b",
+      "explanation": "মামা খাতা হাতে করে যায় বলে উল্লেখ রয়েছে।",
+      "optionExplanations": {
+        "a": "মামার হাতে বই থাকার কথা নেই।",
+        "b": "সঠিক! মামার হাতে খাতা থাকে।",
+        "c": "মামার হাতে কলম থাকার কথা নেই।",
+        "d": "ছাতার রঙের কথা বলা হয়েছে, কিন্তু তা মামার হাতে নেই।"
+      }
+    },
+    {
+      "id": "q5",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "মামা হাট থেকে কী কী আনে?",
+      "options": {
+        "a": "চাল ডাল",
+        "b": "মাছ মাংস",
+        "c": "শাক সবজি",
+        "d": "ফল মূল"
+      },
+      "correctAnswer": "a",
+      "explanation": "মামা হাট থেকে চাল ও ডাল আনে।",
+      "optionExplanations": {
+        "a": "সঠিক! মামা হাট থেকে চাল ডাল আনে।",
+        "b": "মাছ মাংস আনার কথা পাঠে উল্লেখ নেই।",
+        "c": "শাক আনার কথা আছে, তবে সবজির কথা নেই।",
+        "d": "ফলমূল আনার কথা সরাসরি বলা নেই, তবে দাদা আতা কেনে।"
+      }
+    },
+    {
+      "id": "q6",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "চাল ও ডাল ছাড়া মামা আর কী কী কেনে?",
+      "options": {
+        "a": "খাজা গজা",
+        "b": "শাক আর আটা",
+        "c": "জাম আর আখ",
+        "d": "মাছ আর ডিম"
+      },
+      "correctAnswer": "b",
+      "explanation": "চাল-ডালের পাশাপাশি মামা শাক এবং আটা কেনে।",
+      "optionExplanations": {
+        "a": "খাজা গজা মা আনতে বলেছেন, মামা কেনেনি।",
+        "b": "সঠিক! মামা শাক আর আটা কেনে।",
+        "c": "জাম আর আখ দাদা কিনেছে।",
+        "d": "মাছ আর ডিমের উল্লেখ পাঠে নেই।"
+      }
+    },
+    {
+      "id": "q7",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "দাদা পাকা আতা কত দিয়ে কেনে?",
+      "options": {
+        "a": "চার আনা",
+        "b": "আট আনা",
+        "c": "সাত আনা",
+        "d": "দশ আনা"
+      },
+      "correctAnswer": "c",
+      "explanation": "দাদা সাত আনা দিয়ে পাকা আতা কেনে।",
+      "optionExplanations": {
+        "a": "চার আনা দিয়ে আখ আর জাম কেনে।",
+        "b": "আট আনার কথা গল্পে বলা নেই।",
+        "c": "সঠিক! দাদা সাত আনা দিয়ে পাকা আতা কেনে।",
+        "d": "দশ আনার কথা গল্পে বলা নেই।"
+      }
+    },
+    {
+      "id": "q8",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "দাদা চার আনা দিয়ে কী কেনে?",
+      "options": {
+        "a": "আখ আর জাম",
+        "b": "খাজা আর গজা",
+        "c": "পাকা আতা",
+        "d": "চাল আর ডাল"
+      },
+      "correctAnswer": "a",
+      "explanation": "দাদা চার আনা দিয়ে আখ আর জাম কেনে।",
+      "optionExplanations": {
+        "a": "সঠিক! চার আনা দিয়ে আখ আর জাম কেনা হয়।",
+        "b": "খাজা আর গজা দাদা পরে কিনে আনবে মায়ের কথায়।",
+        "c": "পাকা আতা কেনা হয় সাত আনা দিয়ে।",
+        "d": "চাল আর ডাল মামা কিনে আনে।"
+      }
+    },
+    {
+      "id": "q9",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "দাদার কেনা আখ ও জাম কে কে খাবে?",
+      "options": {
+        "a": "দাদা ও মামা",
+        "b": "বাবা, কাকা ও মামা",
+        "c": "আশাদাদা ও কালা",
+        "d": "মা ও কাকা"
+      },
+      "correctAnswer": "b",
+      "explanation": "আখ ও জাম বাবা, কাকা ও মামা খাবে বলে পাঠে বলা আছে।",
+      "optionExplanations": {
+        "a": "শুধু দাদা ও মামা নয়, আরও অনেকে খাবে।",
+        "b": "সঠিক! বাবা খাবে, কাকা খাবে, আর খাবে মামা।",
+        "c": "আশাদাদা খাজা, গজা আর ছানা খাবে।",
+        "d": "মায়ের কথা এখানে বলা হয়নি।"
+      }
+    },
+    {
+      "id": "q10",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "বাবার এর পরে কোথায় যাওয়ার কথা আছে?",
+      "options": {
+        "a": "হাটে",
+        "b": "কাজে",
+        "c": "ঢাকায়",
+        "d": "গড়পারে"
+      },
+      "correctAnswer": "b",
+      "explanation": "খাওয়ার পর বাবা কাজে যাবে বলে উল্লেখ রয়েছে।",
+      "optionExplanations": {
+        "a": "দাদা ও মামা হাটে যায়, বাবা নয়।",
+        "b": "সঠিক! তার পরে কাজ আছে, বাবা কাজে যাবে।",
+        "c": "আশাদাদা ঢাকা থেকে এসেছে।",
+        "d": "আশাদাদার বাসা গড়পারে।"
+      }
+    },
+    {
+      "id": "q11",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "দাদা হাটে যাওয়ার সময় হাতে কত টাকা নেয়?",
+      "options": {
+        "a": "দুই টাকা",
+        "b": "তিন টাকা",
+        "c": "চার টাকা",
+        "d": "পাঁচ টাকা"
+      },
+      "correctAnswer": "c",
+      "explanation": "দাদা হাটে যাওয়ার সময় হাতে চার টাকা নেয়।",
+      "optionExplanations": {
+        "a": "দুই টাকার কথা বলা নেই।",
+        "b": "তিন টাকার কথা বলা নেই।",
+        "c": "সঠিক! দাদা হাটে যায় টাকা হাতে। চার টাকা।",
+        "d": "পাঁচ টাকার কথা বলা নেই।"
+      }
+    },
+    {
+      "id": "q12",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "মা বাজার থেকে কী কী আনতে বলেছেন?",
+      "options": {
+        "a": "চাল ও ডাল",
+        "b": "খাজা, গজা ও ছানা",
+        "c": "আখ ও জাম",
+        "d": "আটা ও শাক"
+      },
+      "correctAnswer": "b",
+      "explanation": "মা খাজা, গজা আর ছানা আনতে বলেছেন।",
+      "optionExplanations": {
+        "a": "চাল ও ডাল মামা নিয়ে আসে।",
+        "b": "সঠিক! মা বলে, খাজা চাই, গজা চাই, আর ছানা চাই।",
+        "c": "আখ ও জাম দাদা কেনে।",
+        "d": "আটা ও শাক মামা কেনে।"
+      }
+    },
+    {
+      "id": "q13",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "খাজা, গজা আর ছানা কে খাবে?",
+      "options": {
+        "a": "বাবা",
+        "b": "আশাদাদা",
+        "c": "কালা",
+        "d": "কাকা"
+      },
+      "correctAnswer": "b",
+      "explanation": "খাজা, গজা আর ছানা আশাদাদা খাবে।",
+      "optionExplanations": {
+        "a": "বাবা আখ ও জাম খাবে।",
+        "b": "সঠিক! আশাদাদা খাবে।",
+        "c": "কালা আশাদাদার ভাই, সে খাবে বলে আলাদাভাবে বলা নেই।",
+        "d": "কাকা আখ ও জাম খাবে।"
+      }
+    },
+    {
+      "id": "q14",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "আশাদাদা কোথা থেকে এসেছেন?",
+      "options": {
+        "a": "গড়পার",
+        "b": "ঢাকা",
+        "c": "কলকাতা",
+        "d": "মোতিবিল"
+      },
+      "correctAnswer": "b",
+      "explanation": "আশাদাদা ঢাকা থেকে এসেছেন।",
+      "optionExplanations": {
+        "a": "গড়পারে আশাদাদার বাসা।",
+        "b": "সঠিক! আশাদাদা আজ ঢাকা থেকে এল।",
+        "c": "কলকাতার কথা পাঠে নেই।",
+        "d": "মোতিবিল হলো কবিতার একটি বিলের নাম।"
+      }
+    },
+    {
+      "id": "q15",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "আশাদাদার বাসা কোথায়?",
+      "options": {
+        "a": "ঢাকায়",
+        "b": "গড়পারে",
+        "c": "মোতিবিলে",
+        "d": "গ্রামে"
+      },
+      "correctAnswer": "b",
+      "explanation": "আশাদাদার বর্তমান বাসা গড়পারে অবস্থিত।",
+      "optionExplanations": {
+        "a": "ঢাকা থেকে আশাদাদা এসেছেন।",
+        "b": "সঠিক! তার বাসা গড়পারে।",
+        "c": "মোতিবিলে বাসা থাকার কথা নেই।",
+        "d": "গ্রামের কথা এখানে উল্লেখ নেই।"
+      }
+    },
+    {
+      "id": "q16",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "আশাদাদার ভাইয়ের নাম কী?",
+      "options": {
+        "a": "কালা",
+        "b": "ধলা",
+        "c": "লালু",
+        "d": "ভুলু"
+      },
+      "correctAnswer": "a",
+      "explanation": "গল্প অনুযায়ী আশাদাদার ভাইয়ের নাম কালা।",
+      "optionExplanations": {
+        "a": "সঠিক! আশাদাদার ভাইয়ের নাম কালা।",
+        "b": "ধলা নামের উল্লেখ নেই।",
+        "c": "লালু নামের উল্লেখ নেই।",
+        "d": "ভুলু নামের উল্লেখ নেই।"
+      }
+    },
+    {
+      "id": "q17",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "আশাদাদা আর কালা কবে ঢাকা ফিরে যাবে?",
+      "options": {
+        "a": "আজ",
+        "b": "কাল",
+        "c": "পরশু",
+        "d": "এক মাস পর"
+      },
+      "correctAnswer": "b",
+      "explanation": "আশাদাদা ও কালা আগামীকাল (কাল) ঢাকা ফিরে যাবে।",
+      "optionExplanations": {
+        "a": "আজ তারা ঢাকা থেকে এসেছে।",
+        "b": "সঠিক! তারা কাল ঢাকা ফিরে যাবে।",
+        "c": "পরশুর কথা গল্পে বলা নেই।",
+        "d": "এক মাস পর ফিরে যাওয়ার কথা বলা নেই।"
+      }
+    },
+    {
+      "id": "q18",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কবিতাটিতে উল্লিখিত বিলটির নাম কী?",
+      "options": {
+        "a": "চলনবিল",
+        "b": "মোতিবিল",
+        "c": "রূপবিল",
+        "d": "তালবিল"
+      },
+      "correctAnswer": "b",
+      "explanation": "কবিতায় মোতিবিল নামের বিলটির কথা বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "চলনবিলের কথা কবিতায় নেই।",
+        "b": "সঠিক! বিলটির নাম মোতিবিল।",
+        "c": "রূপবিলের কথা কবিতায় নেই।",
+        "d": "তালবিলের কথা কবিতায় নেই।"
+      }
+    },
+    {
+      "id": "q19",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "মোতিবিলে কারা ভেসে ভেসে কোলাহল করে?",
+      "options": {
+        "a": "বকগুলি",
+        "b": "চিলগুলি",
+        "c": "হাঁসগুলি",
+        "d": "মাছগুলি"
+      },
+      "correctAnswer": "c",
+      "explanation": "মোতিবিলের জলে হাঁসগুলি ভেসে ভেসে কোলাহল করে।",
+      "optionExplanations": {
+        "a": "বক পাঁকে চেয়ে থাকে।",
+        "b": "চিল আকাশে উড়ে চলে যায়।",
+        "c": "সঠিক! হাঁসগুলি ভেসে ভেসে করে কোলাহল।",
+        "d": "মাছগুলি কোলাহল করার কথা বলা নেই।"
+      }
+    },
+    {
+      "id": "q20",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কে পাঁকে চেয়ে থাকে?",
+      "options": {
+        "a": "মাছরাঙা",
+        "b": "চিল",
+        "c": "বক",
+        "d": "হাঁস"
+      },
+      "correctAnswer": "c",
+      "explanation": "বক মোতিবিলের পাঁকের দিকে চেয়ে থাকে।",
+      "optionExplanations": {
+        "a": "মাছরাঙা ঝুপ করে জলে পড়ে।",
+        "b": "চিল আকাশে উড়ে চলে।",
+        "c": "সঠিক! পাঁকে চেয়ে থাকে বক।",
+        "d": "হাঁস জলে ভেসে কোলাহল করে।"
+      }
+    },
+    {
+      "id": "q21",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কে উড়ে চলে যায়?",
+      "options": {
+        "a": "বক",
+        "b": "চিল",
+        "c": "মাছরাঙা",
+        "d": "হাঁস"
+      },
+      "correctAnswer": "b",
+      "explanation": "চিল আকাশ দিয়ে উড়ে চলে যায়।",
+      "optionExplanations": {
+        "a": "বক পাঁকের দিকে চেয়ে থাকে।",
+        "b": "সঠিক! চিল উড়ে চলে।",
+        "c": "মাছরাঙা ঝুপ করে জলে এসে পড়ে।",
+        "d": "হাঁস জলে ভেসে থাকে।"
+      }
+    },
+    {
+      "id": "q22",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কে ঝুপ করে জলে এসে পড়ে?",
+      "options": {
+        "a": "মাছরাঙা",
+        "b": "চিল",
+        "c": "বক",
+        "d": "জেলে"
+      },
+      "correctAnswer": "a",
+      "explanation": "মাছ ধরার জন্য মাছরাঙা ঝুপ করে জলে এসে পড়ে।",
+      "optionExplanations": {
+        "a": "সঠিক! মাছরাঙা ঝুপ ক’রে পড়ে এসে জলে।",
+        "b": "চিল উড়ে চলে যায়।",
+        "c": "বক পাঁকে চেয়ে থাকে।",
+        "d": "জেলে বাঁশে বাঁধা জাল দিয়ে মাছ ধরে।"
+      }
+    },
+    {
+      "id": "q23",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "মোতিবিলের আশেপাশে জেগে থাকা ডাঙা কী দিয়ে ঢাকা?",
+      "options": {
+        "a": "জল দিয়ে",
+        "b": "ঘাস দিয়ে",
+        "c": "ধান দিয়ে",
+        "d": "শেওলা দিয়ে"
+      },
+      "correctAnswer": "b",
+      "explanation": "কবিতা অনুযায়ী ডাঙা ঘাস দিয়ে ঢাকা থাকে।",
+      "optionExplanations": {
+        "a": "ডাঙা জল দিয়ে ঢাকা থাকে না।",
+        "b": "সঠিক! ডাঙা জাগে ঘাস দিয়ে ঢাকা।",
+        "c": "ধান দিয়ে ক্ষেত ভরা থাকে।",
+        "d": "শেওলা জলে ভেসে যায়।"
+      }
+    },
+    {
+      "id": "q24",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "জলধারা কেমনভাবে চলে?",
+      "options": {
+        "a": "সোজা",
+        "b": "গোল হয়ে",
+        "c": "আঁকাবাঁকা",
+        "d": "দ্রুত"
+      },
+      "correctAnswer": "c",
+      "explanation": "জলধারাগুলি আঁকাবাঁকা পথে চলতে থাকে।",
+      "optionExplanations": {
+        "a": "সোজা পথে চলার কথা বলা নেই।",
+        "b": "গোল হয়ে চলার কথা বলা নেই।",
+        "c": "সঠিক! মাঝে মাঝে জলধারা চলে আঁকাবাঁকা।",
+        "d": "দ্রুত চলার কথা বলা নেই।"
+      }
+    },
+    {
+      "id": "q25",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ধানক্ষেতগুলি জলে কীরকম অবস্থায় থাকে?",
+      "options": {
+        "a": "সম্পূর্ণ ডোবা",
+        "b": "শুকনো",
+        "c": "আধো ডোবা",
+        "d": "পচে যাওয়া"
+      },
+      "correctAnswer": "c",
+      "explanation": "ধানক্ষেতগুলি জলে অর্ধেক (আধো) ডোবা অবস্থায় থাকে।",
+      "optionExplanations": {
+        "a": "সম্পূর্ণ ডুবে থাকার কথা বলা নেই।",
+        "b": "ক্ষেত শুকনো অবস্থায় নেই।",
+        "c": "সঠিক! কোথাও বা ধানক্ষেত জলে আধো ডোবা।",
+        "d": "ধানক্ষেত পচে যাওয়ার কথা বলা নেই।"
+      }
+    },
+    {
+      "id": "q26",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "আধো ডোবা ধানক্ষেতে কী পড়লে তার শোভা বাড়ে?",
+      "options": {
+        "a": "বৃষ্টি",
+        "b": "রোদ",
+        "c": "ছায়া",
+        "d": "শিশির"
+      },
+      "correctAnswer": "b",
+      "explanation": "ধানক্ষেতের উপর রোদ পড়লে তার অপরূপ শোভা দেখা যায়।",
+      "optionExplanations": {
+        "a": "বৃষ্টি পড়ার কথা কবিতায় বলা নেই।",
+        "b": "সঠিক! তারি ‘পরে রোদ পড়ে কিবা তার শোভা।",
+        "c": "ছায়া পড়ার কথা কবিতায় বলা নেই।",
+        "d": "শিশির পড়ার কথা কবিতায় বলা নেই।"
+      }
+    },
+    {
+      "id": "q27",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "চাষী কীসে চড়ে আসে?",
+      "options": {
+        "a": "নৌকায়",
+        "b": "ডিঙি চড়ে",
+        "c": "জাহাজে",
+        "d": "ভ্যালায়"
+      },
+      "correctAnswer": "b",
+      "explanation": "চাষী ডিঙি নৌকায় চড়ে আসে।",
+      "optionExplanations": {
+        "a": "সাধারণ নৌকার পরিবর্তে নির্দিষ্ট করে ডিঙির কথা বলা হয়েছে।",
+        "b": "সঠিক! ডিঙি চ’ড়ে আসে চাষী।",
+        "c": "জাহাজে চড়ার কথা বলা হয়নি।",
+        "d": "ভ্যালায় চড়ার কথা বলা হয়নি।"
+      }
+    },
+    {
+      "id": "q28",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "চাষী বেলা গেলে কী গান গেয়ে গ্রামে ফেরে?",
+      "options": {
+        "a": "ভাটিয়ালি",
+        "b": "বাউল",
+        "c": "সারিগান",
+        "d": "ভাওয়াইয়া"
+      },
+      "correctAnswer": "c",
+      "explanation": "বেলা শেষে কাজ সেরে চাষীরা সারিগান গাইতে গাইতে ফেরে।",
+      "optionExplanations": {
+        "a": "ভাটিয়ালি গানের উল্লেখ কবিতায় নেই।",
+        "b": "বাউল গানের উল্লেখ কবিতায় নেই।",
+        "c": "সঠিক! বেলা গেলে গাঁয়ে ফেরে গেয়ে সারিগান।",
+        "d": "ভাওয়াইয়া গানের উল্লেখ কবিতায় নেই।"
+      }
+    },
+    {
+      "id": "q29",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "রাখালের ছেলে কী নিয়ে পার হয়?",
+      "options": {
+        "a": "গরু",
+        "b": "ছাগল",
+        "c": "মোষ",
+        "d": "ভেড়া"
+      },
+      "correctAnswer": "c",
+      "explanation": "রাখালের ছেলে মোষ নিয়ে জল পার হয়।",
+      "optionExplanations": {
+        "a": "গরু নিয়ে পার হওয়ার কথা কবিতায় নেই।",
+        "b": "ছাগল নিয়ে পার হওয়ার কথা কবিতায় নেই।",
+        "c": "সঠিক! মোষ নিয়ে পার হয় রাখালের ছেলে।",
+        "d": "ভেড়া নিয়ে পার হওয়ার কথা কবিতায় নেই।"
+      }
+    },
+    {
+      "id": "q30",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ঘন শেওলার দল কোথায় ভেসে যায়?",
+      "options": {
+        "a": "আকাশে",
+        "b": "ডাঙায়",
+        "c": "জলে",
+        "d": "মেঘে"
+      },
+      "correctAnswer": "c",
+      "explanation": "জলের স্রোতে ঘন শেওলার দল ভেসে যায়।",
+      "optionExplanations": {
+        "a": "মেঘ আকাশের গায় ভেসে চলে।",
+        "b": "ডাঙা ঘাস দিয়ে ঢাকা থাকে।",
+        "c": "সঠিক! ঘন শেওলার দল জলে ভেসে যায়।",
+        "d": "মেঘে ভেসে যাওয়ার কথা বলা নেই।"
+      }
+    }
+  ]
+}

@@ -16,7 +16,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -112,6 +111,7 @@ export default function AIContentGeneratorPage() {
             const contentToStore = {
                 ...result,
                 difficulty: aiData.difficulty,
+                testType: aiData.contentType,
             };
 
             sessionStorage.setItem('aiGeneratedContent', JSON.stringify(contentToStore));
@@ -120,8 +120,17 @@ export default function AIContentGeneratorPage() {
                 title: 'Content Generated!',
                 description: `Redirecting you back to the form...`,
             });
+            
+            let redirectUrl = '/admin/add-content'; // Default for Mock Test
+            if (aiData.contentType === 'Practice Questions') {
+                redirectUrl = '/admin/add-practice-questions';
+            } else if (aiData.contentType === 'Exam') {
+                redirectUrl = '/admin/add-exam';
+            } else if (aiData.contentType === 'Kids Zone Quiz') {
+                redirectUrl = '/admin/kids-zone/add';
+            }
 
-            router.push('/admin/add-content');
+            router.push(redirectUrl);
     
         } catch (error) {
           toast({
@@ -254,8 +263,9 @@ export default function AIContentGeneratorPage() {
                                             <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                                             <SelectContent>
                                                 <SelectItem value="Mock Test">Mock Test</SelectItem>
-                                                <SelectItem value="Quiz">Quiz</SelectItem>
                                                 <SelectItem value="Practice Questions">Practice Questions</SelectItem>
+                                                <SelectItem value="Exam">Exam</SelectItem>
+                                                <SelectItem value="Kids Zone Quiz">Kids Zone Quiz</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
