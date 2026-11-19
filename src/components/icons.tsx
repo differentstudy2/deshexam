@@ -14,7 +14,7 @@ export const DeshExamLogo = () => (
     />
     <div className="font-extrabold text-2xl tracking-tighter flex items-center">
         <span>
-            <span className="text-[#FF9933]">DESH</span> <span className="text-[rgb(18,208,0)]">EXAM</span>
+            <span className="text-[#d4af37]">DESH</span> <span className="text-[#0f766e]">EXAM</span>
         </span>
     </div>
   </div>
