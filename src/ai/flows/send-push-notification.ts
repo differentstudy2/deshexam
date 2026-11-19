@@ -13,24 +13,30 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
 
-// Initialize Firebase Admin SDK with a unique name to avoid conflicts
+// Initialize Firebase Admin SDK with a unique name to avoid conflicts.
+// Guarded: with no GCP_SA_KEY (e.g. Vercel Preview builds), admin init is
+// skipped and `db` stays null instead of throwing at import time; the flow
+// fails gracefully only if it is actually invoked without credentials.
 const adminAppName = 'firebase-admin-app-deshexam';
-let adminApp: App;
+let adminApp: App | null = null;
 
 if (!getApps().some(app => app.name === adminAppName)) {
-    const serviceAccount = JSON.parse(process.env.GCP_SA_KEY || '{}');
-    if (serviceAccount.private_key) {
-        serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+    try {
+        const serviceAccount = JSON.parse(process.env.GCP_SA_KEY || '{}');
+        if (serviceAccount.private_key) {
+            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+            adminApp = initializeApp({
+                credential: cert(serviceAccount),
+            }, adminAppName);
+        }
+    } catch (e) {
+        console.warn('[firebase-admin] Admin init skipped — no valid GCP_SA_KEY.', e);
     }
-    
-    adminApp = initializeApp({
-        credential: cert(serviceAccount),
-    }, adminAppName);
 } else {
   adminApp = getApps().find(app => app.name === adminAppName)!;
 }
 
-const db = getFirestore(adminApp, "deshexam");
+const db = adminApp ? getFirestore(adminApp, "deshexam") : null;
 
 const PushNotificationInputSchema = z.object({
   title: z.string().describe('The title of the notification.'),
@@ -51,6 +57,9 @@ const sendPushNotificationFlow = ai.defineFlow(
     outputSchema: z.void(),
   },
   async ({ title, body, link, imageUrl }) => {
+    if (!db || !adminApp) {
+      throw new Error('Push notifications are unavailable: Firebase Admin is not configured (missing GCP_SA_KEY).');
+    }
     try {
       const tokensSnapshot = await db.collection('fcmTokens').get();
       if (tokensSnapshot.empty) {
@@ -73,7 +82,7 @@ const sendPushNotificationFlow = ai.defineFlow(
         },
         webpush: {
           fcm_options: {
-            link: link || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
+            link: link || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`,
           },
           notification: {
             icon: '/icon.png',

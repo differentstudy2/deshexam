@@ -86,7 +86,7 @@ export async function generateMetadata(props: PageProps, parent: ResolvingMetada
       openGraph: {
           title,
           description,
-          url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}`,
+          url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}`,
           images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
           type: 'website',
       },
@@ -142,25 +142,25 @@ export default async function TextbookQuizPage(props: PageProps) {
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/`
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Textbook Solutions",
-            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/textbook-solutions`
           },
           {
             "@type": "ListItem",
             "position": 3,
             "name": textbook.title,
-            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions/${textbook.id}`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/textbook-solutions/${textbook.id}`
           },
           {
             "@type": "ListItem",
             "position": 4,
             "name": cleanTitle,
-            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}`
           }
         ]
       }

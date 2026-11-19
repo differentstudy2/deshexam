@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'Top Schools, Colleges & Universities in India 2026 | DeshExam',
   description: 'Explore verified schools, colleges and universities across India. Compare courses, fees, admissions, facilities and reviews on DeshExam.',
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions`,
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions`,
   },
 };
 
@@ -33,34 +33,34 @@ export default async function InstitutionsDirectoryPage() {
     "@graph": [
       {
         "@type": "CollectionPage",
-        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/#webpage`,
-        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions`,
+        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions/#webpage`,
+        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions`,
         "name": "Institutions Directory in India",
         "description": "Explore verified schools, colleges and universities across India. Compare courses, fees, admissions, facilities and reviews on DeshExam.",
         "inLanguage": "en-US"
       },
       {
         "@type": "BreadcrumbList",
-        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/#breadcrumb`,
+        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions/#breadcrumb`,
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Institutions",
-            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions`
           }
         ]
       },
       // Only include ItemList if we have real institutions
       ...(featuredInstitutions.length > 0 ? [{
         "@type": "ItemList",
-        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions`,
+        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions`,
         "name": "Featured Institutions in India",
         "description": "Top Schools, Colleges & Universities in India",
         "numberOfItems": featuredInstitutions.length,
@@ -68,7 +68,7 @@ export default async function InstitutionsDirectoryPage() {
           "@type": "ListItem",
           "position": i + 1,
           "name": inst.title,
-          "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${inst.slug || inst.id}`
+          "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions/${inst.slug || inst.id}`
         }))
       }] : []),
       {

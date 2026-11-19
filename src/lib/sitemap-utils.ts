@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const baseUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`;
+const baseUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`;
 
 export function buildSitemapXml(routes: { url: string; lastModified: string; priority?: string; changefreq?: string }[]) {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

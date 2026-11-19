@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: 'DeshExam Blog – Preparation Tips & Updates',
   description: 'Read the latest educational updates, preparation strategies, and student success stories on the DeshExam Blog.',
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/blog`,
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/blog`,
   },
   robots: {
     index: true,

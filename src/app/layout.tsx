@@ -13,6 +13,12 @@ import { CookieConsent } from "@/components/layout/cookie-consent";
 import { notFound } from 'next/navigation';
 import { GoogleTranslateWidget } from '@/components/GoogleTranslateWidget';
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://deshexam.vercel.app"),
+};
+
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -57,7 +63,6 @@ export default async function RootLayout({
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-        <meta name="trustpilot-one-time-domain-verification-id" content="7f080357-aa3e-4ce3-b4a6-40484af64723"/>
       </head>
       <body className={cn("antialiased overscroll-none touch-manipulation", inter.variable, lexend.variable, hindSiliguri.variable)}>
           <FirebaseProvider>

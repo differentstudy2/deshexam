@@ -216,7 +216,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
 
   // QR Code State
   const [qrCodeEnabled, setQrCodeEnabled] = useState(true);
-  const [qrCodeValue, setQrCodeValue] = useState(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`);
+  const [qrCodeValue, setQrCodeValue] = useState(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`);
 
   // Question Format State
   const [paperColumns, setPaperColumns] = useState(2);
@@ -1735,7 +1735,7 @@ export default function QuestionPaperBuilder({ boardId, classId, textbookId, sub
                         {/* Left: QR Code */}
                         {qrCodeEnabled && (
                           <div className="absolute top-0 left-0 p-1.5 border border-black/10 bg-white shadow-sm print:shadow-none z-20">
-                            <QRCodeSVG value={qrCodeValue || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`} size={54} />
+                            <QRCodeSVG value={qrCodeValue || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`} size={54} />
                           </div>
                         )}
 

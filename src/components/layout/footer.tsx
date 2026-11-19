@@ -3,7 +3,6 @@
 
 import Link from "next/link";
 import { DeshExamLogo } from "@/components/icons";
-import { Github, Twitter, Linkedin } from "lucide-react";
 import { usePathname } from 'next/navigation';
 
 export function Footer() {
@@ -24,7 +23,7 @@ export function Footer() {
   return (
     <footer className="bg-[#0b1120] text-slate-300 font-body py-5">
       <div className="container max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 text-sm">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-6 text-sm">
           {/* PLATFORM */}
           <div className="space-y-4">
             <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-4">Platform</h4>
@@ -56,7 +55,21 @@ export function Footer() {
               <li><Link href="/audio" className="hover:text-white transition-colors">Audio Lessons</Link></li>
               <li><Link href="/documents" className="hover:text-white transition-colors">Documents & PDFs</Link></li>
               <li><Link href="/guide" className="hover:text-white transition-colors">Student Guide</Link></li>
-              <li><Link href="/skill" className="hover:text-white transition-colors">Skill Development</Link></li>
+            </ul>
+          </div>
+
+          {/* CLASSES */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-4">Classes</h4>
+            <ul className="space-y-3">
+              <li><Link href="/class/5" className="hover:text-white transition-colors">Class 5</Link></li>
+              <li><Link href="/class/6" className="hover:text-white transition-colors">Class 6</Link></li>
+              <li><Link href="/class/7" className="hover:text-white transition-colors">Class 7</Link></li>
+              <li><Link href="/class/8" className="hover:text-white transition-colors">Class 8</Link></li>
+              <li><Link href="/class/9" className="hover:text-white transition-colors">Class 9</Link></li>
+              <li><Link href="/class/10" className="hover:text-white transition-colors">Class 10</Link></li>
+              <li><Link href="/class/11" className="hover:text-white transition-colors">Class 11</Link></li>
+              <li><Link href="/class/12" className="hover:text-white transition-colors">Class 12</Link></li>
             </ul>
           </div>
 
@@ -66,7 +79,6 @@ export function Footer() {
             <ul className="space-y-3">
               <li><Link href="/academy" className="hover:text-white transition-colors">Academy</Link></li>
               <li><Link href="/classes" className="hover:text-white transition-colors">Live Classes</Link></li>
-              <li><Link href="/kids-zone" className="hover:text-white transition-colors">Kids Zone</Link></li>
               <li><Link href="/learn" className="hover:text-white transition-colors">Learn</Link></li>
               <li><Link href="/practice" className="hover:text-white transition-colors">Practice Area</Link></li>
             </ul>
@@ -88,11 +100,11 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-4">Legal</h4>
             <ul className="space-y-3">
-              <li><a href={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/privacy`} className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/terms`} className="hover:text-white transition-colors">Terms of Service</a></li>
-              <li><a href={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/refund-policy`} className="hover:text-white transition-colors">Refund Policy</a></li>
-              <li><a href={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cookie-policy`} className="hover:text-white transition-colors">Cookie Policy</a></li>
-              <li><a href={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/disclaimer`} className="hover:text-white transition-colors">Disclaimer</a></li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+              <li><Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link></li>
+              <li><Link href="/cookie-policy" className="hover:text-white transition-colors">Cookie Policy</Link></li>
+              <li><Link href="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
             </ul>
           </div>
         </div>
@@ -104,21 +116,10 @@ export function Footer() {
           <div className="text-slate-500 text-sm">
             &copy; {new Date().getFullYear()} DeshExam. All rights reserved.
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
-            <Link href="#" className="hover:text-white transition-colors">
-              <Twitter className="w-5 h-5" />
-              <span className="sr-only">Twitter</span>
-            </Link>
-            <Link href="#" className="hover:text-white transition-colors">
-              <Github className="w-5 h-5" />
-              <span className="sr-only">GitHub</span>
-            </Link>
-            <Link href="#" className="hover:text-white transition-colors">
-              <Linkedin className="w-5 h-5" />
-              <span className="sr-only">LinkedIn</span>
-            </Link>
-          </div>
         </div>
+        <p className="mt-4 text-center text-xs text-slate-500">
+          DeshExam is not affiliated with WBBSE or WBCHSE. / DeshExam WBBSE বা WBCHSE-এর সঙ্গে সংযুক্ত নয়।
+        </p>
       </div>
     </footer>
   );

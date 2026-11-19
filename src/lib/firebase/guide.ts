@@ -897,12 +897,14 @@ export const createGuideTopic = async (chapterId: string, title: string, author?
 };
 
 export const fetchGuideItems = async (collectionName: string): Promise<any[]> => {
+  if (!db) return [];
   const q = query(collection(db, collectionName), orderBy('updatedAt', 'desc'));
   const snap = await getDocs(q);
   return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
 export const getMediaItemBySlug = async (collectionName: string, slug: string): Promise<any> => {
+  if (!db) return null;
   const q = query(collection(db, collectionName), where('slug', '==', slug));
   const snap = await getDocs(q);
   if (!snap.empty) {
@@ -914,6 +916,7 @@ export const getMediaItemBySlug = async (collectionName: string, slug: string): 
 };
 
 export const getMediaItemById = async (collectionName: string, id: string): Promise<any> => {
+  if (!db) return null;
   const docRef = doc(db, collectionName, id);
   const snap = await getDoc(docRef);
   if (snap.exists()) {
@@ -928,6 +931,7 @@ export const updateMediaItemExtraData = async (collectionName: string, id: strin
 };
 
 export const getTopicById = async (id: string): Promise<any> => {
+  if (!db) return null;
   const docRef = doc(db, 'guide_topics', id);
   const snap = await getDoc(docRef);
   if (snap.exists()) {
@@ -938,6 +942,7 @@ export const getTopicById = async (id: string): Promise<any> => {
 
 export const getTopicFullHierarchy = async (topicId: string) => {
   let hierarchy: any = { topic: null, chapter: null, textbook: null, subject: null, class: null, board: null };
+  if (!db) return hierarchy;
 
   const topicSnap = await getDoc(doc(db, 'guide_topics', topicId));
   if (!topicSnap.exists()) return hierarchy;

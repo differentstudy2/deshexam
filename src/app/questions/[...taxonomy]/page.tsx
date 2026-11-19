@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ taxonomy:
         title: `Top ${titleBase} Questions | DeshExam`,
         description: `Practice ${titleBase} questions with answers and explanations on DeshExam.`,
         alternates: {
-            canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions/${taxonomy.join('/')}`
+            canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/questions/${taxonomy.join('/')}`
         }
     };
 }
@@ -66,11 +66,11 @@ export default async function TaxonomyFilterPage(props: { params: Promise<{ taxo
     const titleBase = taxonomy.map(t => t.toUpperCase().replace('-', ' ')).join(' ');
     
     const breadcrumbItems = [
-        { name: 'Home', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}` },
-        { name: 'Questions', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions` }
+        { name: 'Home', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}` },
+        { name: 'Questions', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/questions` }
     ];
     
-    let currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions`;
+    let currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/questions`;
     taxonomy.forEach(t => {
         currentUrl += `/${t}`;
         breadcrumbItems.push({ name: t.toUpperCase().replace('-', ' '), url: currentUrl });

@@ -12,16 +12,16 @@ export const metadata: Metadata = {
   description: 'Boost your exam preparation with interactive online quizzes, daily challenges, and mock tests for WBCS, PSC, SSC, TET, and WBP. Test your speed, earn points, and check your rank on the leaderboard.',
   keywords: 'online quiz, mcq test, mock test, wbcs preparation quiz, psc mcq, ssc quiz, west bengal govt job exam, free online test, daily quiz, deshexam quizzes, bengali quiz',
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quiz`,
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/quiz`,
   },
   openGraph: {
     title: 'Free Online Quizzes & MCQs for Govt Job Exams | DeshExam',
     description: 'Boost your exam preparation with interactive online quizzes, daily challenges, and mock tests. Test your speed, earn points, and check your rank.',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quiz`,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/quiz`,
     siteName: 'DeshExam',
     images: [
       {
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-image.jpg`,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: 'DeshExam Quizzes and Leaderboard',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Free Online Quizzes & MCQs for Govt Job Exams | DeshExam',
     description: 'Boost your exam preparation with interactive online quizzes, daily challenges, and mock tests. Test your speed, earn points, and check your rank.',
-    images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-image.jpg`],
+    images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/og-image.jpg`],
   },
   robots: {
     index: true,
@@ -81,13 +81,13 @@ export default async function QuizListingPage() {
       '@type': 'WebPage',
       name: 'Free Online Quizzes & MCQs for Govt Job Exams | DeshExam',
       description: 'Boost your exam preparation with interactive online quizzes, daily challenges, and mock tests for WBCS, PSC, SSC, TET, and WBP.',
-      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quiz`,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/quiz`,
       publisher: {
         '@type': 'Organization',
         name: 'DeshExam',
         logo: {
           '@type': 'ImageObject',
-          url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/favicon-bg.png`
+          url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/favicon-bg.png`
         }
       }
     },
@@ -99,13 +99,13 @@ export default async function QuizListingPage() {
           '@type': 'ListItem',
           position: 1,
           name: 'Home',
-          item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
+          item: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`
         },
         {
           '@type': 'ListItem',
           position: 2,
           name: 'Quizzes',
-          item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quiz`
+          item: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/quiz`
         }
       ]
     },
@@ -115,7 +115,7 @@ export default async function QuizListingPage() {
       itemListElement: publishedQuizzes.slice(0, 10).map((quiz, index) => ({
         '@type': 'ListItem',
         position: index + 1,
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/quiz/${quiz.slug}`
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/quiz/${quiz.slug}`
       }))
     }
   ];

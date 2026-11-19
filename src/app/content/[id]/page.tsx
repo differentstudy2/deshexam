@@ -85,19 +85,19 @@ export default async function TestPage(props: Props) {
           '@type': 'ListItem',
           'position': 1,
           'name': 'Home',
-          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/`
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/`
         },
         {
           '@type': 'ListItem',
           'position': 2,
           'name': primaryType || 'Content',
-          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${typeSlug}s`
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/${typeSlug}s`
         },
         {
           '@type': 'ListItem',
           'position': 3,
           'name': cleanTitle,
-          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/content/${test.id}`
+          'item': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/content/${test.id}`
         }
       ]
     }

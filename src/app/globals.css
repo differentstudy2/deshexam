@@ -29,6 +29,10 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    /* Brand tokens — one primary green, one gold accent (Phase 3) */
+    --brand-green: 158 3 61;
+    --brand-deep: 4 47 46;
+    --brand-gold: 212 175 55;
   }
 
   .dark {
@@ -62,9 +66,21 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-body);
+    font-family: var(--font-hind-siliguri), var(--font-inter), sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
     user-select: none;
     -webkit-user-select: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   h1,

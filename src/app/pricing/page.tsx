@@ -8,11 +8,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'DeshExam Pass Pro Pricing',
     description: 'Access 70,000+ mock tests with Pass Pro. Unlock AI analytics, previous year papers, and premium content.',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/pricing`,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/pricing`,
     type: 'website',
     images: [
       {
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og/pricing-banner.jpg`,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/og/pricing-banner.jpg`,
         width: 1200,
         height: 630,
         alt: 'DeshExam Pass Pro premium pricing plans for mock tests',
@@ -23,10 +23,10 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'DeshExam Pass Pro Pricing',
     description: 'Unlock premium learning with DeshExam Pass Pro. Access unlimited mock tests, previous year papers, and AI analytics.',
-    images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og/pricing-banner.jpg`],
+    images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/og/pricing-banner.jpg`],
   },
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/pricing`,
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/pricing`,
   },
   robots: {
     index: true,
@@ -48,7 +48,7 @@ const jsonLdProduct = {
     "price": "599",
     "priceCurrency": "INR",
     "availability": "https://schema.org/InStock",
-    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/pricing`,
+    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/pricing`,
     "priceValidUntil": "2027-12-31"
   },
   "aggregateRating": {
@@ -97,13 +97,13 @@ const jsonLdBreadcrumb = {
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
+      "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Pricing",
-      "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/pricing`
+      "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/pricing`
     }
   ]
 };
@@ -112,8 +112,8 @@ const jsonLdOrg = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "DeshExam",
-  "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
-  "logo": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`
+  "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`,
+  "logo": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/logo.png`
 };
 
 export default function PricingPage() {

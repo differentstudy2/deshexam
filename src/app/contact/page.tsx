@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: 'Contact DeshExam Support | Help, Feedback & Assistance',
   description: 'Contact DeshExam support for help with mock tests, subscriptions, payments, technical issues, feedback, and student assistance.',
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/contact`,
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/contact`,
   },
   robots: {
     index: true,
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Contact DeshExam Support',
     description: 'Get help with subscriptions, mock tests and support.',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/contact`,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/contact`,
     images: [
       {
         url: '/contact-og-banner.jpg',
@@ -43,8 +43,8 @@ const jsonLdOrg = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "DeshExam",
-  "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
-  "logo": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`,
+  "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`,
+  "logo": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/logo.png`,
   "contactPoint": {
     "@type": "ContactPoint",
     "telephone": "+916294006590",

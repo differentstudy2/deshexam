@@ -70,11 +70,11 @@ export async function generateMetadata({ params }: { params: Promise<{ segments?
     ...metadata,
     alternates: {
       ...metadata.alternates,
-      canonical: metadata.alternates?.canonical || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/guide/${requestedPath}`,
+      canonical: metadata.alternates?.canonical || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/guide/${requestedPath}`,
       languages: {
-        'en': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/en/guide/${requestedPath}`,
-        'bn': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/bn/guide/${requestedPath}`,
-        'x-default': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/en/guide/${requestedPath}`
+        'en': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/en/guide/${requestedPath}`,
+        'bn': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/bn/guide/${requestedPath}`,
+        'x-default': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/en/guide/${requestedPath}`
       }
     }
   };
@@ -156,7 +156,7 @@ export default async function GuidePage({ params }: { params: Promise<{ segments
   const courseSchema = getCourseSchema(
     node.title || 'Academy Guide',
     node.seo?.customDescription || `Study materials and guide for ${node.title}`,
-    `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/guide/${requestedPath}`
+    `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/guide/${requestedPath}`
   );
 
   // Fetch subjects for sidebar

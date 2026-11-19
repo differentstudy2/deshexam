@@ -27,7 +27,7 @@ export async function generateMetadata(
     openGraph: {
       title: `${formattedBoard} ${formattedClass} Solutions | DeshExam`,
       description: `Step-by-step textbook solutions for ${formattedBoard} ${formattedClass} students. Download and read online.`,
-      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/solutions/${boardParam}/${classSlug}`,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/solutions/${boardParam}/${classSlug}`,
       siteName: 'DeshExam',
       images: [
         {

@@ -15,11 +15,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'DeshExam Mock Tests',
     description: 'Practice free mock tests online. Improve your ranking with AI analytics and real exam UI.',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/mock-tests`,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/mock-tests`,
     type: 'website',
     images: [
       {
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og/mock-tests.jpg`,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/og/mock-tests.jpg`,
         width: 1200,
         height: 630,
         alt: 'General awareness mock test card',
@@ -30,10 +30,10 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'DeshExam Mock Tests – Free Online Practice Tests',
     description: 'Practice free online mock tests on DeshExam. Improve speed, accuracy, and rank.',
-    images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og/mock-tests.jpg`],
+    images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/og/mock-tests.jpg`],
   },
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/mock-tests`,
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/mock-tests`,
   },
   robots: {
     index: true,
@@ -46,7 +46,7 @@ const jsonLdCollection = {
   "@type": "CollectionPage",
   "name": "DeshExam Mock Tests",
   "description": "Online mock tests for students preparing for school boards and competitive exams.",
-  "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/mock-tests`
+  "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/mock-tests`
 };
 
 const jsonLdBreadcrumb = {
@@ -57,13 +57,13 @@ const jsonLdBreadcrumb = {
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
+      "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Mock Tests",
-      "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/mock-tests`
+      "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/mock-tests`
     }
   ]
 };
@@ -127,8 +127,8 @@ const jsonLdOrg = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "DeshExam",
-  "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
-  "logo": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`
+  "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`,
+  "logo": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/logo.png`
 };
 
 const jsonLdSoftwareApp = {

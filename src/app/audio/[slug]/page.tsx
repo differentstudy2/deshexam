@@ -88,7 +88,7 @@ export default async function AudioSinglePage({ params }: { params: Promise<{ sl
       name: 'DeshExam',
       logo: {
         '@type': 'ImageObject',
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png` // Replace with actual logo URL
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/logo.png` // Replace with actual logo URL
       }
     }
   };

@@ -1135,7 +1135,7 @@ export default function InstitutionEditPage() {
                     <Input 
                       id="canonicalUrl" 
                       type="url"
-                      placeholder={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institution/...`}
+                      placeholder={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institution/...`}
                       value={formData.seoAdvanced?.canonicalUrl || ''} 
                       onChange={(e) => setFormData(prev => ({ ...prev, seoAdvanced: { ...prev.seoAdvanced, canonicalUrl: e.target.value } as any }))} 
                     />

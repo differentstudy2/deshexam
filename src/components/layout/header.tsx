@@ -41,24 +41,20 @@ const mainNavLinks: NavLinkType[] = [
     label: "Learn",
     icon: <BookOpen className="h-5 w-5" />,
     subItems: [
-      { href: "/academy", label: "All Boards", icon: <Library className="h-4 w-4" /> },
-      { href: "/academy/wbbpe", label: "WBBPE", icon: <BookOpen className="h-4 w-4" /> },
       { href: "/academy/wbbse", label: "WBBSE", icon: <BookOpen className="h-4 w-4" /> },
       { href: "/academy/wbchse", label: "WBCHSE", icon: <BookOpen className="h-4 w-4" /> },
-      { href: "/academy/cbse", label: "CBSE", icon: <BookOpen className="h-4 w-4" /> },
-      { href: "/academy/icse", label: "ICSE", icon: <BookOpen className="h-4 w-4" /> },
+      { href: "/class/5", label: "All Classes", icon: <Library className="h-4 w-4" /> },
     ]
   },
-  { href: "/book", label: "Book", icon: <Library className="h-5 w-5" /> },
+  { href: "/course", label: "Courses", icon: <BookOpen className="h-5 w-5" /> },
+  { href: "/book", label: "Books/Notes", icon: <Library className="h-5 w-5" /> },
   {
     label: "Solutions",
     icon: <ClipboardList className="h-5 w-5" />,
     subItems: [
-      { href: "/solutions/wbbpe", label: "WBBPE Solutions", icon: <Book className="h-4 w-4" /> },
+      { href: "/textbook-solutions", label: "Textbook Solutions", icon: <Book className="h-4 w-4" /> },
       { href: "/solutions/wbbse", label: "WBBSE Solutions", icon: <Book className="h-4 w-4" /> },
       { href: "/solutions/wbchse", label: "WBCHSE Solutions", icon: <Book className="h-4 w-4" /> },
-      { href: "/solutions/cbse", label: "CBSE Solutions", icon: <Book className="h-4 w-4" /> },
-      { href: "/solutions/icse", label: "ICSE Solutions", icon: <Book className="h-4 w-4" /> },
     ]
   },
   {
@@ -74,10 +70,10 @@ const mainNavLinks: NavLinkType[] = [
     label: "Test & Practice",
     icon: <Award className="h-5 w-5" />,
     subItems: [
-      { href: "/exams", label: "Exams", icon: <Award className="h-4 w-4" /> },
       { href: "/mock-tests", label: "Mock Test", icon: <FileText className="h-4 w-4" /> },
       { href: "/quiz", label: "Quiz", icon: <Sparkles className="h-4 w-4" /> },
       { href: "/practice", label: "Practice", icon: <Activity className="h-4 w-4" /> },
+      { href: "/previous-year-papers", label: "Previous Year Papers", icon: <FileText className="h-4 w-4" /> },
     ]
   },
   { href: "/pricing", label: "Pricing", icon: <ShoppingCart className="h-5 w-5" /> },

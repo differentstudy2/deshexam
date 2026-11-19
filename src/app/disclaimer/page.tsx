@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Disclaimer | DeshExam',
     description: 'Read the legal disclaimer for DeshExam. Understand the limitations of liability, accuracy of educational content, and third-party links on our platform.',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/disclaimer`,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/disclaimer`,
     siteName: 'DeshExam',
     locale: 'en_US',
     type: 'website',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     description: 'Read the legal disclaimer for DeshExam. Understand the limitations of liability, accuracy of educational content, and third-party links on our platform.',
   },
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/disclaimer`,
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/disclaimer`,
   }
 };
 

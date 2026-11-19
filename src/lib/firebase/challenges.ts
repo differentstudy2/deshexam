@@ -100,6 +100,7 @@ export async function createChallenge(
 }
 
 export async function getChallenge(id: string): Promise<Challenge | null> {
+  if (!db) return null;
   const docRef = doc(db, CHALLENGES_COLLECTION, id);
   const snap = await getDoc(docRef);
   if (!snap.exists()) return null;
@@ -107,6 +108,7 @@ export async function getChallenge(id: string): Promise<Challenge | null> {
 }
 
 export async function getUserChallenges(userId: string) {
+  if (!db) return [];
   const colRef = collection(db, CHALLENGES_COLLECTION);
   
   // We need two queries because Firestore doesn't support logical OR efficiently without composite indexes
