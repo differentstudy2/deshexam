@@ -243,25 +243,30 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
       {/* Hero Section */}
-      <section className="relative w-full bg-[#0f172a] pt-24 pb-32 overflow-hidden">
-        {/* Animated Indian Flag Wave Background */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#FF9933]/15 via-white/5 to-[#12D000]/15 bg-[length:200%_200%] animate-gradient-x"></div>
+      <section className="relative w-full bg-gradient-to-b from-[#042f2e] via-[#0b3b39] to-[#042f2e] pt-20 md:pt-24 pb-28 md:pb-32 overflow-hidden">
+        {/* Premium gold spotlight */}
+        <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(212,175,55,0.22),transparent_70%)]"></div>
+        <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_50%_40%_at_50%_100%,rgba(45,212,191,0.18),transparent_70%)]"></div>
         
         {/* Floating Tricolor Clouds/Shapes for Wave Effect */}
-        <div className="absolute -top-20 -left-20 w-[400px] h-[400px] bg-[#FF9933]/20 rounded-full blur-[100px] animate-pulse pointer-events-none"></div>
+        <div className="absolute -top-20 -left-20 w-[400px] h-[400px] bg-[#d4af37]/20 rounded-full blur-[100px] animate-pulse pointer-events-none"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[200px] bg-white/5 rounded-[100%] blur-[80px] pointer-events-none"></div>
-        <div className="absolute -bottom-20 -right-20 w-[400px] h-[400px] bg-[#12D000]/20 rounded-full blur-[100px] animate-pulse pointer-events-none" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute -bottom-20 -right-20 w-[400px] h-[400px] bg-[#2dd4bf]/20 rounded-full blur-[100px] animate-pulse pointer-events-none" style={{ animationDelay: '2s' }}></div>
         
         <div className="container relative z-10 px-4 mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter uppercase mb-4 flex justify-center items-center">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter uppercase mb-4 flex justify-center items-center">
             <span className="drop-shadow-lg">
-                <span className="text-[#FF9933]">DESH</span> <span className="text-[rgb(18,208,0)]">EXAM</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-[#d4af37] to-amber-400">DESH</span> <span className="text-white">EXAM</span>
             </span>
           </h1>
-          <p className="text-lg md:text-xl text-[#00a651] mb-12">The Largest Online Learning Platform in India</p>
+          <p className="text-base sm:text-lg md:text-xl text-amber-200/90 font-medium mb-8">The Largest Online Learning Platform in India</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12">
+            <Link href="/mock-tests" className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-[#d4af37] px-8 py-3.5 text-sm font-bold text-[#042f2e] shadow-lg shadow-amber-500/25 hover:shadow-xl hover:-translate-y-0.5 transition-all min-h-[48px]">Get Started</Link>
+            <Link href="/mock-tests" className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border border-amber-300/40 bg-white/5 backdrop-blur px-8 py-3.5 text-sm font-bold text-amber-100 hover:bg-white/10 transition-all min-h-[48px]">Explore Mock Tests</Link>
+          </div>
           
           <div className="flex flex-wrap justify-center gap-6 md:gap-10 mt-12 relative z-10">
-            <div className="flex items-center gap-4 text-white bg-white/10 backdrop-blur-lg border border-white/20 px-6 py-4 rounded-3xl hover:bg-white/20 hover:-translate-y-2 transition-all duration-300 shadow-2xl">
+            <div className="flex items-center gap-4 text-white bg-white/10 backdrop-blur-lg border border-amber-200/25 px-6 py-4 rounded-3xl w-full max-w-sm sm:max-w-none sm:w-auto hover:bg-white/20 hover:-translate-y-2 transition-all duration-300 shadow-2xl">
               <div className="bg-gradient-to-br from-green-400 to-[#00a651] p-4 rounded-full shadow-lg border border-white/20">
                 <FileQuestion className="w-7 h-7 text-white drop-shadow-sm" />
               </div>
@@ -271,8 +276,8 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="flex items-center gap-4 text-white bg-white/10 backdrop-blur-lg border border-white/20 px-6 py-4 rounded-3xl hover:bg-white/20 hover:-translate-y-2 transition-all duration-300 shadow-2xl">
-              <div className="bg-gradient-to-br from-[#FF9933] to-orange-500 p-4 rounded-full shadow-lg border border-white/20">
+            <div className="flex items-center gap-4 text-white bg-white/10 backdrop-blur-lg border border-amber-200/25 px-6 py-4 rounded-3xl w-full max-w-sm sm:max-w-none sm:w-auto hover:bg-white/20 hover:-translate-y-2 transition-all duration-300 shadow-2xl">
+              <div className="bg-gradient-to-br from-amber-300 to-[#d4af37] p-4 rounded-full shadow-lg border border-white/20">
                 <Users className="w-7 h-7 text-white drop-shadow-sm" />
               </div>
               <div className="text-left">
@@ -281,8 +286,8 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="flex items-center gap-4 text-white bg-white/10 backdrop-blur-lg border border-white/20 px-6 py-4 rounded-3xl hover:bg-white/20 hover:-translate-y-2 transition-all duration-300 shadow-2xl">
-              <div className="bg-gradient-to-br from-blue-400 to-blue-600 p-4 rounded-full shadow-lg border border-white/20">
+            <div className="flex items-center gap-4 text-white bg-white/10 backdrop-blur-lg border border-amber-200/25 px-6 py-4 rounded-3xl w-full max-w-sm sm:max-w-none sm:w-auto hover:bg-white/20 hover:-translate-y-2 transition-all duration-300 shadow-2xl">
+              <div className="bg-gradient-to-br from-teal-400 to-[#0f766e] p-4 rounded-full shadow-lg border border-white/20">
                 <BookOpen className="w-7 h-7 text-white drop-shadow-sm" />
               </div>
               <div className="text-left">
@@ -304,7 +309,8 @@ export default function Home() {
       {/* Smart Features */}
       <section className="py-12 md:py-20 container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-[#00a651] inline-block border-b-2 border-[#00a651] pb-2">Smart Features</h2>
+          <p className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 dark:text-amber-400 mb-2">DeshExam</p>
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white inline-block border-b-2 border-[#d4af37] pb-2">Smart Features</h2>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -330,7 +336,8 @@ export default function Home() {
       <section className="py-12 bg-white dark:bg-transparent border-y border-gray-100 dark:border-slate-800">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-[#00a651] mb-6">Package Price</h2>
+            <p className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 dark:text-amber-400 mb-2">Pricing</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6">Package Price</h2>
             <Tabs defaultValue="monthly" className="w-[200px] mx-auto">
               <TabsList className="grid w-full grid-cols-2 rounded-full border border-gray-200 dark:border-slate-700 p-1 bg-white dark:bg-slate-800 h-auto">
                 <TabsTrigger value="monthly" className="rounded-full py-2 data-[state=active]:bg-[#00a651] data-[state=active]:text-white">Monthly</TabsTrigger>
@@ -356,7 +363,7 @@ export default function Home() {
                     <span className="text-gray-900 dark:text-white">50₹</span>
                   </td>
                   <td className="px-6 py-4">
-                    <Button size="sm" className="bg-[#00a651] hover:bg-green-700">Purchase</Button>
+                    <Button size="sm" className="bg-[#00a651] hover:bg-green-700 min-h-[40px] px-5">Purchase</Button>
                   </td>
                 </tr>
                 <tr className="border-b dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700/50">
@@ -366,7 +373,7 @@ export default function Home() {
                     <span className="text-gray-900 dark:text-white">100₹</span>
                   </td>
                   <td className="px-6 py-4">
-                    <Button size="sm" className="bg-[#00a651] hover:bg-green-700">Purchase</Button>
+                    <Button size="sm" className="bg-[#00a651] hover:bg-green-700 min-h-[40px] px-5">Purchase</Button>
                   </td>
                 </tr>
                 <tr className="bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700/50">
@@ -376,7 +383,7 @@ export default function Home() {
                     <span className="text-gray-900 dark:text-white">200₹</span>
                   </td>
                   <td className="px-6 py-4">
-                    <Button size="sm" className="bg-[#00a651] hover:bg-green-700">Purchase</Button>
+                    <Button size="sm" className="bg-[#00a651] hover:bg-green-700 min-h-[40px] px-5">Purchase</Button>
                   </td>
                 </tr>
               </tbody>
@@ -392,8 +399,8 @@ export default function Home() {
       <section className="py-12 md:py-20 container mx-auto px-4 max-w-6xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-[#00a651] flex items-center gap-2">
-              <Target className="w-8 h-8" /> Mock Tests & Quizzes
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+              <Target className="w-8 h-8 text-[#d4af37]" /> Mock Tests & Quizzes
             </h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Assess your preparation with realistic model tests</p>
           </div>
@@ -406,7 +413,7 @@ export default function Home() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {mockTestsData.map((test, idx) => (
-            <Card key={idx} className="group overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 relative">
+            <Card key={idx} className="group overflow-hidden rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 relative shadow-sm">
               <div className="absolute top-3 right-3 z-10">
                  <Badge className={`${test.difficulty === 'Hard' ? 'bg-red-500 hover:bg-red-600' : 'bg-orange-500 hover:bg-orange-600'} text-[10px] border-none px-2 shadow-md`}>
                    {test.difficulty}
@@ -433,7 +440,7 @@ export default function Home() {
 
                 <div className="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-slate-700">
                   <span className="font-bold text-xl text-[#00a651]">{test.price}</span>
-                  <Button size="sm" className="bg-[#00a651] hover:bg-green-700 shadow-md hover:shadow-lg transition-all text-xs h-8 px-4 rounded-full">Enroll Now</Button>
+                  <Button size="sm" className="bg-[#00a651] hover:bg-green-700 shadow-md hover:shadow-lg transition-all text-xs h-10 px-5 rounded-full min-h-[40px]">Enroll Now</Button>
                 </div>
               </CardContent>
             </Card>
@@ -449,7 +456,7 @@ export default function Home() {
         <div className="container mx-auto px-4 max-w-6xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-[#00a651]">Trending Courses</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">Trending Courses</h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Explore our most popular courses</p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -464,11 +471,11 @@ export default function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {trendingCourses.map((course, idx) => (
-            <Card key={idx} className="group overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 relative">
+            <Card key={idx} className="group overflow-hidden rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 relative shadow-sm">
               <div className="relative h-40 w-full overflow-hidden">
                 <Image src={course.image} alt={course.title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <Badge className="absolute top-3 right-3 bg-pink-500 hover:bg-pink-600 border-none text-[10px] px-2 shadow-md">Best Seller</Badge>
+                <Badge className="absolute top-3 right-3 bg-[#d4af37] hover:bg-amber-400 text-[#042f2e] border-none text-[10px] font-bold px-2 shadow-md">Best Seller</Badge>
               </div>
               <CardContent className="p-5">
                 <h3 className="font-bold text-gray-800 dark:text-gray-100 line-clamp-2 mb-3 min-h-[2.75rem] leading-snug">{course.title}</h3>
@@ -491,7 +498,7 @@ export default function Home() {
 
                 <div className="flex justify-between items-center">
                   <span className="font-extrabold text-lg text-[#00a651]">{course.price}</span>
-                  <Button size="sm" variant="outline" className="text-xs h-8 px-4 border-[#00a651] text-[#00a651] hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full transition-colors">Details</Button>
+                  <Button size="sm" variant="outline" className="text-xs h-10 px-5 border-[#00a651] text-[#00a651] hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full transition-colors min-h-[40px]">Details</Button>
                 </div>
               </CardContent>
             </Card>
@@ -508,8 +515,8 @@ export default function Home() {
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
             <div>
-              <h2 className="text-3xl font-bold text-[#00a651] flex items-center gap-2">
-                <BookMarked className="w-8 h-8" /> Book Collection
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+                <BookMarked className="w-8 h-8 text-[#d4af37]" /> Book Collection
               </h2>
               <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Collect your necessary exam preparation books</p>
             </div>
@@ -525,7 +532,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {bookCollection.map((book, idx) => (
-              <Card key={idx} className="group overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 relative">
+              <Card key={idx} className="group overflow-hidden rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 relative shadow-sm">
                 <div className="relative h-60 w-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-800 dark:to-slate-900 p-6 flex items-center justify-center overflow-hidden">
                   <div className="absolute inset-0 bg-[#00a651]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="relative w-full h-full shadow-[0_10px_30px_rgba(0,0,0,0.15)] rounded-md overflow-hidden group-hover:scale-105 transition-transform duration-500">
@@ -552,7 +559,7 @@ export default function Home() {
                       <span className="line-through text-gray-400 text-[10px] decoration-red-500">{book.oldPrice}</span>
                       <span className="font-extrabold text-[#00a651] text-lg leading-none">{book.price}</span>
                     </div>
-                    <Button size="sm" variant="outline" className="text-xs h-8 px-4 border-[#00a651] text-[#00a651] hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full transition-colors">Details</Button>
+                    <Button size="sm" variant="outline" className="text-xs h-10 px-5 border-[#00a651] text-[#00a651] hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full transition-colors min-h-[40px]">Details</Button>
                   </div>
                 </CardContent>
               </Card>
