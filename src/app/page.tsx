@@ -150,7 +150,7 @@ const mockTestsData = [
     difficulty: "Hard",
     enrolled: "15k+",
     price: "₹ 100",
-    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&q=80"
+    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=500&q=80"
   }
 ];
 
