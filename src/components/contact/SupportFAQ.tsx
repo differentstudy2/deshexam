@@ -48,7 +48,7 @@ export function SupportFAQ() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
         <Accordion type="single" collapsible className="w-full space-y-4">
           {faqs1.map((faq, index) => (
-            <AccordionItem key={`col1-${index}`} value={`col1-${index}`} className="border border-white/10 rounded-lg px-4 bg-white/[0.04] shadow-sm data-[state=open]:border-[#d4af37]/50 transition-colors">
+            <AccordionItem key={`col1-${index}`} value={`col1-${index}`} className="border border-white/10 rounded-lg px-4 bg-[#0a1626] shadow-sm data-[state=open]:border-[#d4af37]/50 transition-colors">
               <AccordionTrigger className="text-left font-semibold text-white hover:no-underline py-4 text-sm hover:text-[#4ade80] transition-colors">
                   {faq.question}
               </AccordionTrigger>
@@ -61,7 +61,7 @@ export function SupportFAQ() {
 
         <Accordion type="single" collapsible className="w-full space-y-4">
           {faqs2.map((faq, index) => (
-            <AccordionItem key={`col2-${index}`} value={`col2-${index}`} className="border border-white/10 rounded-lg px-4 bg-white/[0.04] shadow-sm data-[state=open]:border-[#d4af37]/50 transition-colors">
+            <AccordionItem key={`col2-${index}`} value={`col2-${index}`} className="border border-white/10 rounded-lg px-4 bg-[#0a1626] shadow-sm data-[state=open]:border-[#d4af37]/50 transition-colors">
               <AccordionTrigger className="text-left font-semibold text-white hover:no-underline py-4 text-sm hover:text-[#4ade80] transition-colors">
                   {faq.question}
               </AccordionTrigger>

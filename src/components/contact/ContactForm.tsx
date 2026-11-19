@@ -65,8 +65,10 @@ export function ContactForm() {
         }
     };
 
-    const inputClasses = "w-full bg-white/[0.05] border border-white/15 rounded-md px-10 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors h-10";
-    const labelClasses = "text-xs font-semibold text-slate-200 mb-1 block";
+    // Solid dark input bg (not translucent white): readable whatever wraps
+    // the form, and labels are near-white for contrast on dark.
+    const inputClasses = "w-full bg-[#0d1b2e] border border-white/15 rounded-md px-10 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors h-10";
+    const labelClasses = "text-xs font-semibold text-slate-100 mb-1 block";
     const iconClasses = "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400";
 
   return (
@@ -125,14 +127,14 @@ export function ContactForm() {
                             <FormLabel className={labelClasses}>Category <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger className="w-full h-10 bg-white/[0.05] border border-white/15 rounded-md px-3 text-sm text-white focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors">
+                                    <SelectTrigger className="w-full h-10 bg-[#0d1b2e] border border-white/15 rounded-md px-3 text-sm text-white focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors">
                                         <SelectValue placeholder="Select Category" />
                                     </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Technical Issue">Technical Issue</SelectItem>
-                                        <SelectItem value="Payment Issue">Payment Issue</SelectItem>
-                                        <SelectItem value="Subscription">Subscription</SelectItem>
-                                        <SelectItem value="Other">Other</SelectItem>
+                                    <SelectContent className="bg-[#0a1626] text-white border-white/10">
+                                        <SelectItem value="Technical Issue" className="text-slate-200 focus:bg-white/10 focus:text-white">Technical Issue</SelectItem>
+                                        <SelectItem value="Payment Issue" className="text-slate-200 focus:bg-white/10 focus:text-white">Payment Issue</SelectItem>
+                                        <SelectItem value="Subscription" className="text-slate-200 focus:bg-white/10 focus:text-white">Subscription</SelectItem>
+                                        <SelectItem value="Other" className="text-slate-200 focus:bg-white/10 focus:text-white">Other</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </FormControl>
@@ -146,7 +148,7 @@ export function ContactForm() {
                         <FormLabel className={labelClasses}>Subject</FormLabel>
                         <FormControl>
                             <div className="relative">
-                                <input {...field} className="w-full bg-white/[0.05] border border-white/15 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors h-10" />
+                                <input {...field} className="w-full bg-[#0d1b2e] border border-white/15 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors h-10" />
                             </div>
                         </FormControl>
                         <FormMessage className="text-xs" />
@@ -157,7 +159,7 @@ export function ContactForm() {
                     <FormItem>
                         <FormLabel className={labelClasses}>Message</FormLabel>
                         <FormControl>
-                            <textarea {...field} className="w-full bg-white/[0.05] border border-white/15 rounded-md px-3 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors min-h-[120px] resize-y" />
+                            <textarea {...field} className="w-full bg-[#0d1b2e] border border-white/15 rounded-md px-3 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors min-h-[120px] resize-y" />
                         </FormControl>
                         <FormMessage className="text-xs" />
                     </FormItem>
@@ -167,7 +169,7 @@ export function ContactForm() {
                     <FormItem>
                         <FormLabel className={labelClasses}>Attachment upload</FormLabel>
                         <FormControl>
-                            <div className="relative flex items-center w-max bg-white/[0.05] border border-white/15 rounded-md px-4 py-2 hover:bg-white/10 transition-colors cursor-pointer text-sm font-medium text-slate-300">
+                            <div className="relative flex items-center w-max bg-[#0d1b2e] border border-white/15 rounded-md px-4 py-2 hover:bg-white/10 transition-colors cursor-pointer text-sm font-medium text-slate-300">
                                 <UploadCloud className="h-4 w-4 mr-2" />
                                 <span>{value ? (value as FileList)[0]?.name || 'File selected' : 'Upload file'}</span>
                                 <input 

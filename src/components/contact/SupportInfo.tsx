@@ -1,11 +1,12 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
 import { Youtube, Twitter, Linkedin, Facebook } from 'lucide-react';
 
 export function SupportInfo() {
+  // Plain div below (not shadcn Card): Card's theme bg-card renders white
+  // in light mode, which made the white headings unreadable.
   return (
-    <Card className="p-6 border-white/10 shadow-sm bg-white/[0.04] h-full flex flex-col rounded-xl">
+    <div className="p-6 border border-white/10 shadow-sm bg-[#0a1626] h-full flex flex-col rounded-xl">
         <h3 className="text-lg font-bold text-white mb-6">Support Info</h3>
         
         <div className="space-y-6 flex-grow">
@@ -48,6 +49,6 @@ export function SupportInfo() {
                 <Facebook className="w-4 h-4" />
             </a>
         </div>
-    </Card>
+    </div>
   );
 }

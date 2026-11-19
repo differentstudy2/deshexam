@@ -1,6 +1,5 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
 import { Mail, MessageCircle, PhoneCall } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -46,7 +45,9 @@ export function ContactMethods() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {methods.map((method, idx) => (
-        <Card key={idx} className="p-6 h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-white/[0.04] border border-white/10 shadow-sm flex flex-col items-start rounded-xl">
+        // Plain div, not shadcn Card: Card's theme bg-card renders white in
+        // light mode, which made the white headings unreadable.
+        <div key={idx} className="p-6 h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-[#0a1626] border border-white/10 shadow-sm flex flex-col items-start rounded-xl">
           <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${method.bg} ${method.color}`}>
             <method.icon className="w-6 h-6" strokeWidth={2} />
           </div>
@@ -57,7 +58,7 @@ export function ContactMethods() {
           <Button asChild className={`w-full ${method.btnColor} text-white rounded-md h-10 font-semibold shadow-sm`}>
             <a href={method.link}>{method.btnText}</a>
           </Button>
-        </Card>
+        </div>
       ))}
     </div>
   );
