@@ -66,13 +66,16 @@ export function ContactForm() {
     };
 
     // Solid dark input bg (not translucent white): readable whatever wraps
-    // the form, and labels are near-white for contrast on dark.
+    // the form, and labels are white for contrast on dark.
     const inputClasses = "w-full bg-[#0d1b2e] border border-white/15 rounded-md px-10 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors h-10";
-    const labelClasses = "text-xs font-semibold text-slate-100 mb-1 block";
+    const labelClasses = "text-xs font-semibold text-white mb-1 block";
     const iconClasses = "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400";
 
   return (
-    <div className="w-full">
+    // Self-contained dark card: the form carries its own solid dark
+    // background (class + inline style) so its white labels stay readable
+    // even if the wrapping card's generated CSS is stale/cached.
+    <div className="w-full rounded-2xl bg-[#0a1626]" style={{ backgroundColor: '#0a1626' }}>
         <div className="mb-8">
             <h2 className="text-2xl font-extrabold text-white mb-1">Send Us a Message</h2>
             <p className="text-slate-300 text-sm">Fill out the form and our team will contact you soon.</p>

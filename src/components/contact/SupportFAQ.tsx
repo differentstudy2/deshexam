@@ -41,8 +41,11 @@ export function SupportFAQ() {
     }
   ];
 
+  // Self-contained dark panel (class + inline style): the white "Frequently
+  // Asked Questions" heading must sit on solid dark even if the surrounding
+  // page background renders light (e.g. stale/cached CSS).
   return (
-    <div className="w-full">
+    <div className="w-full rounded-2xl border border-white/10 bg-[#0a1626] p-6 md:p-8" style={{ backgroundColor: '#0a1626' }}>
       <h2 className="text-2xl font-extrabold text-white mb-8">Frequently Asked Questions</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
