@@ -1,12 +1,12 @@
 import { Card } from "@/components/ui/card";
-import { FileText, BrainCircuit, GraduationCap, CalendarDays, FolderOpen, Database, Sparkles } from "lucide-react";
+import { FileText, BrainCircuit, GraduationCap, CalendarDays, FolderOpen, Database, Sparkles, School } from "lucide-react";
 import Link from "next/link";
 
 export function WhatWeOffer() {
   const offers = [
     {
       title: "Mock Tests",
-      description: "State-of-the-art exam simulation with detailed analytics and all-India ranking.",
+      description: "State-of-the-art exam simulation with detailed analytics and chapter-wise ranking.",
       icon: FileText,
       bg: "bg-gradient-to-br from-[#16A34A] to-[#15803d]",
       link: "/mock-tests"
@@ -20,14 +20,14 @@ export function WhatWeOffer() {
     },
     {
       title: "Courses",
-      description: "Comprehensive video lectures and study materials from top educators.",
+      description: "Comprehensive video lectures and study materials from the DeshExam Faculty.",
       icon: GraduationCap,
       bg: "bg-gradient-to-br from-[#d946ef] to-[#c026d3]",
       link: "#"
     },
     {
       title: "Exams",
-      description: "Information and preparation hubs for all major competitive exams.",
+      description: "Information and preparation hubs for West Bengal Board exams — Madhyamik and Higher Secondary.",
       icon: CalendarDays,
       bg: "bg-gradient-to-br from-[#f97316] to-[#ea580c]",
       link: "/exams"
@@ -63,13 +63,13 @@ export function WhatWeOffer() {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="section-dark py-20">
       <div className="container max-w-[1400px] mx-auto px-6">
         
         <div className="text-center mb-16">
-            <h2 className="text-sm font-bold text-[#64748B] uppercase tracking-widest mb-4">Section 3</h2>
-            <h3 className="text-4xl font-extrabold text-[#0F172A] mb-4">What DeshExam Offers</h3>
-            <p className="text-lg text-[#64748B] max-w-2xl mx-auto">
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Section 3</h2>
+            <h3 className="text-4xl font-extrabold text-white mb-4">What DeshExam Offers</h3>
+            <p className="text-lg text-slate-300 max-w-2xl mx-auto">
                 Discover a wide range of tools designed to accelerate your learning and boost your exam scores.
             </p>
         </div>
@@ -99,6 +99,3 @@ export function WhatWeOffer() {
     </section>
   );
 }
-
-// Ensure School is imported since I used it.
-import { School } from "lucide-react";

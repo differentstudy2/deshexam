@@ -86,7 +86,7 @@ export function AdminLoadingScreen() {
         {/* Logo */}
         <div className="flex items-center gap-2 mb-10">
           <div className="relative w-8 h-8 flex items-center justify-center animate-pulse">
-             <Image src="/image/logo.png" alt="DeshExam Logo" fill className="object-contain" />
+             <Image src="/image/logo.webp" alt="DeshExam Logo" fill className="object-contain" />
           </div>
           <span className="text-xl font-bold tracking-tight text-slate-900">DeshExam</span>
         </div>

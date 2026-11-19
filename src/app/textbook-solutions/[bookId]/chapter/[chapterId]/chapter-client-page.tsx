@@ -222,7 +222,7 @@ export default function ChapterClientPage() {
             {/* Textbook Info Header */}
             <div className="p-4 pt-5 border-b text-center flex flex-col items-center shrink-0">
                 <div className="w-24 h-32 relative mb-3 shadow-md rounded overflow-hidden">
-                    <Image src={textbook?.featureImage || '/image/logo.png'} alt="Cover" fill className="object-cover" />
+                    <Image src={textbook?.featureImage || '/image/logo.webp'} alt="Cover" fill className="object-cover" />
                 </div>
                 <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{textbook?.subject}</p>
                 <h3 className="font-bold text-lg leading-tight mt-1 px-2 line-clamp-3 text-balance">{textbook?.title}</h3>

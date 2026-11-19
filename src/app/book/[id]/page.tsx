@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Heart, ArrowLeft, Star, Share2, BookOpen, Layers, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function BookDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
@@ -87,10 +88,12 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                 <div className="absolute inset-0 bg-gradient-to-tr from-green-50 to-transparent dark:from-green-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 <div className="relative w-full max-w-sm aspect-[3/4] rounded-lg shadow-2xl overflow-hidden transform group-hover:scale-105 transition-transform duration-500 shadow-slate-300 dark:shadow-slate-950/50">
-                  <img 
-                    src={product.coverImage || '/placeholder.png'} 
+                  <Image
+                    src={product.coverImage || '/placeholder.png'}
                     alt={product.title}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 384px"
+                    className="object-cover"
                   />
                   {product.discount > 0 && (
                     <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1.5 rounded-md shadow-lg shadow-red-500/30">

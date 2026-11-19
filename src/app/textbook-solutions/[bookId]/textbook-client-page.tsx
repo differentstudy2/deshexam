@@ -386,7 +386,7 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                             <Card key={chapter.id} className="flex flex-col">
                                 <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="block relative bg-gray-100 dark:bg-gray-800 rounded-t-lg max-h-48 h-48">
                                     <Image
-                                        src={chapter.featureImage || '/image/logo.png'}
+                                        src={chapter.featureImage || '/image/logo.webp'}
                                         alt={chapter.title}
                                         fill
                                         className="object-contain p-2"

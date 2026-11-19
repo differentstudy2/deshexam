@@ -497,7 +497,7 @@ export default function TopicClientPage() {
                              <header className="relative p-8 md:p-12 text-center md:text-left min-h-[250px] flex items-center justify-center md:justify-start bg-slate-900 text-white rounded-lg overflow-hidden">
                                 <div className="absolute inset-0 z-0">
                                     <Image 
-                                        src={activeTopic?.featureImage || activeChapter?.featureImage || '/image/logo.png'}
+                                        src={activeTopic?.featureImage || activeChapter?.featureImage || '/image/logo.webp'}
                                         alt={activeTopic?.title || 'Topic background'}
                                         fill
                                         className="object-cover opacity-20"
@@ -574,7 +574,7 @@ export default function TopicClientPage() {
                                                          {resourceView === 'grid' && (
                                                             <div className="relative aspect-video w-full bg-secondary rounded-t-lg overflow-hidden flex items-center justify-center">
                                                                 <Image 
-                                                                    src={res.featureImage || '/image/logo.png'} 
+                                                                    src={res.featureImage || '/image/logo.webp'} 
                                                                     alt={res.title} 
                                                                     fill 
                                                                     className="object-cover" 
