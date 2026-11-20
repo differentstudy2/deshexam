@@ -113,28 +113,6 @@ export function MockTestsFooter() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-slate-900 rounded-[10px] p-6 text-center border border-slate-200 dark:border-slate-800 shadow-sm">
-            <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-1">70,000+</h3>
-            <p className="text-sm font-medium text-slate-500">Mock Tests</p>
-          </div>
-          <div className="bg-gradient-to-br from-indigo-50/50 to-blue-100/50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-[10px] p-6 text-center border border-indigo-100 dark:border-indigo-800/30 shadow-sm">
-            <h3 className="text-3xl font-extrabold text-indigo-900 dark:text-indigo-100 mb-1">50K+</h3>
-            <p className="text-sm font-medium text-indigo-600/70 dark:text-indigo-300/70">Students</p>
-          </div>
-          <div className="bg-gradient-to-br from-amber-50/50 to-orange-100/50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-[10px] p-6 text-center border border-amber-100 dark:border-amber-800/30 shadow-sm">
-            <h3 className="text-3xl font-extrabold text-amber-900 dark:text-amber-100 mb-1">4.8/5</h3>
-            <p className="text-sm font-medium text-amber-600/70 dark:text-amber-300/70">Rating</p>
-          </div>
-          <div className="bg-gradient-to-br from-emerald-50/50 to-green-100/50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-[10px] p-6 text-center border border-emerald-100 dark:border-emerald-800/30 shadow-sm">
-            <h3 className="text-3xl font-extrabold text-emerald-900 dark:text-emerald-100 mb-1">120K+</h3>
-            <p className="text-sm font-medium text-emerald-600/70 dark:text-emerald-300/70">Attempts Daily</p>
-          </div>
-        </div>
-      </section>
-
       {/* FAQs Section */}
       <section className="max-w-4xl">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mb-6">Mock Test FAQs</h2>

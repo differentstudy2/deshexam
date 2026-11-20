@@ -67,7 +67,7 @@ const jsonLdFAQ = {
       "name": "DeshExam-এর প্ল্যানগুলোর দাম কত?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Basic ₹৫০/মাস, Plus ₹১০০/মাস ও Pro ₹২০০/মাস। প্ল্যানের মেয়াদ কেনার সময় পেমেন্টের আগে দেখানো হয়।"
+        "text": "Basic ₹৫০/মাস, Plus ₹১০০/মাস ও Pro ₹২০০/মাস। প্রতিটি প্ল্যান ১ মাসের জন্য — প্রতি মাসে নবায়ন হয়।"
       }
     },
     {
@@ -147,13 +147,13 @@ for (const p of PLAN_FEATURES) {
 
 function ComparisonTable() {
   return (
-    <section className="relative overflow-hidden bg-[#020617] py-12 text-white md:py-16">
+    <section id="compare" className="relative overflow-hidden bg-[#020617] py-12 text-white md:py-16">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute -top-24 left-1/4 h-72 w-72 rounded-full bg-blue-600/25 blur-3xl" />
         <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-amber-500/10 blur-3xl" />
       </div>
       <div className="container relative mx-auto max-w-6xl px-4">
-        <p className="text-center text-sm font-bold tracking-wide text-amber-300">প্ল্যান তুলনা করুন</p>
+        <p className="text-center text-[15px] font-bold tracking-wide text-amber-300">প্ল্যান তুলনা করুন</p>
         <h2 className="mt-2 text-center text-2xl font-extrabold md:text-4xl">কোন প্ল্যানে কী কী পাবেন</h2>
         <p className="mx-auto mt-3 max-w-xl text-center text-base text-slate-300">
           তিনটি প্ল্যানের পাশাপাশি তুলনা — দাম ও সুবিধা দেখে আপনার জন্য সঠিক প্ল্যান বেছে নিন।
@@ -166,9 +166,10 @@ function ComparisonTable() {
               <tr className="border-b border-white/10">
                 <th className="min-w-[220px] p-4 text-base font-bold text-slate-200">সুবিধা</th>
                 {PLAN_FEATURES.map((p) => (
-                  <th key={p.id} className="p-4 text-center">
+                  <th key={p.id} className={`p-4 text-center ${'popular' in p && p.popular ? 'bg-amber-400/[0.08]' : ''}`}>
                     <span className="block text-lg font-extrabold text-white">{p.name}</span>
                     <span className="mt-1 block text-2xl font-extrabold text-amber-300">₹{toBn(p.price)}<span className="text-sm font-semibold text-slate-300">/মাস</span></span>
+                    <span className="mt-1 block text-sm font-semibold text-slate-300">আগের দাম <span className="text-slate-400 line-through">₹{toBn(p.oldPrice)}</span></span>
                     {'popular' in p && p.popular ? (
                       <span className="mt-2 inline-block rounded-full bg-amber-400 px-3 py-0.5 text-xs font-bold text-[#042f2e]">সবচেয়ে জনপ্রিয়</span>
                     ) : null}
@@ -181,7 +182,7 @@ function ComparisonTable() {
                 <tr key={f} className="border-b border-white/5 last:border-0">
                   <td className="p-4 text-base text-slate-200">{f}</td>
                   {PLAN_FEATURES.map((p) => (
-                    <td key={p.id} className="p-4 text-center text-xl" aria-label={p.allFeatures.includes(f) ? 'আছে' : 'নেই'}>
+                    <td key={p.id} className={`p-4 text-center text-xl ${'popular' in p && p.popular ? 'bg-amber-400/[0.08]' : ''}`} aria-label={p.allFeatures.includes(f) ? 'আছে' : 'নেই'}>
                       {p.allFeatures.includes(f) ? (
                         <span className="text-emerald-400">✓</span>
                       ) : (
@@ -212,10 +213,13 @@ function ComparisonTable() {
                 </span>
               ) : null}
               <h3 className="text-xl font-extrabold text-white">{p.name}</h3>
-              <p className="mt-2 flex items-baseline gap-2">
+              <p className="mt-2">
+                <span className="text-sm font-semibold text-slate-300">আগের দাম&nbsp;</span>
                 <span className="text-sm text-slate-400 line-through">₹{toBn(p.oldPrice)}</span>
+              </p>
+              <p className="mt-1 flex items-baseline gap-2">
                 <span className="text-4xl font-extrabold text-white">₹{toBn(p.price)}</span>
-                <span className="text-sm text-slate-400">/মাস</span>
+                <span className="text-sm text-slate-300">/মাস</span>
               </p>
               <ul className="mt-5 space-y-2">
                 {ALL_FEATURES.map((f) => (
@@ -225,13 +229,13 @@ function ComparisonTable() {
                     ) : (
                       <span className="text-slate-600">—</span>
                     )}
-                    <span className={p.allFeatures.includes(f) ? '' : 'text-slate-500 line-through'}>{f}</span>
+                    <span className={p.allFeatures.includes(f) ? '' : 'text-slate-400 line-through'}>{f}</span>
                   </li>
                 ))}
               </ul>
               <Link
-                href="/pricing"
-                className={`mt-6 flex min-h-[48px] items-center justify-center rounded-full text-base font-bold ${
+                href={`/pricing?plan=${p.id}#plans`}
+                className={`mt-6 flex min-h-[48px] items-center justify-center rounded-full text-base font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400 focus-visible:outline-offset-2 ${
                   'popular' in p && p.popular ? 'bg-amber-400 text-[#042f2e]' : 'bg-emerald-600 text-white'
                 }`}
               >

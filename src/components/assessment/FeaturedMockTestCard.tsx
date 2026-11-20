@@ -82,14 +82,6 @@ export function FeaturedMockTestCard({ mockTest, baseHref }: FeaturedMockTestCar
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             <span>{formattedAttempts} Attempts</span>
           </div>
-          <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 font-medium">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            <div className="flex items-center">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <svg key={star} xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill={star <= 4 ? "#eab308" : "none"} stroke={star <= 4 ? "#eab308" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={star <= 4 ? "" : "text-slate-300 dark:text-slate-600"}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Action Buttons */}

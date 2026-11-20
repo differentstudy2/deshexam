@@ -5,7 +5,8 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { AppProviders } from "./providers";
 import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
 import { AuthDialog } from "@/components/feature/auth-dialog";
-import { Inter, Lexend, Hind_Siliguri, Noto_Serif_Bengali } from 'next/font/google';
+import { Inter, Lexend, Noto_Serif_Bengali } from 'next/font/google';
+import localFont from 'next/font/local';
 import { FirebaseProvider } from "@/hooks/use-firebase";
 import Script from 'next/script';
 import { ConditionalHeader, ConditionalFooter } from "@/components/layout/ConditionalLayout";
@@ -30,10 +31,19 @@ const lexend = Lexend({
   weight: ['400', '700'],
 });
 
-const hindSiliguri = Hind_Siliguri({
-  subsets: ['bengali'],
+// Hind Siliguri self-hosted from google/fonts (ofl/hindsiliguri) — the exact
+// upstream files, converted to woff2 (Latin + Bengali + ₹ kept). No build-time
+// Google Fonts fetch, so builds never fail on the font loader.
+const hindSiliguri = localFont({
+  src: [
+    { path: '../../public/fonts/HindSiliguri-Light.woff2', weight: '300', style: 'normal' },
+    { path: '../../public/fonts/HindSiliguri-Regular.woff2', weight: '400', style: 'normal' },
+    { path: '../../public/fonts/HindSiliguri-Medium.woff2', weight: '500', style: 'normal' },
+    { path: '../../public/fonts/HindSiliguri-SemiBold.woff2', weight: '600', style: 'normal' },
+    { path: '../../public/fonts/HindSiliguri-Bold.woff2', weight: '700', style: 'normal' },
+  ],
   variable: '--font-hind-siliguri',
-  weight: ['400', '600', '700'],
+  display: 'swap',
 });
 
 // Headings: Noto Serif Bengali (premium serif for Bengali headlines);

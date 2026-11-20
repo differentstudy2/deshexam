@@ -32,11 +32,13 @@ export function Thumbnail({
   subject,
   title,
   type,
+  showTitle = true,
 }: {
   classNo: number;
   subject: string;
   title: string;
   type: string;
+  showTitle?: boolean;
 }) {
   const bg = hueFor(subject);
   return (
@@ -50,17 +52,23 @@ export function Thumbnail({
         aria-hidden
         className="absolute -right-6 -top-6 h-24 w-24 rounded-full border-[10px] border-[#d4af37]/30"
       />
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/80 via-black/50 to-transparent"
+      />
       <div className="relative flex items-center gap-2">
-        <span className="rounded-full bg-[#d4af37] px-2.5 py-1 text-xs font-bold text-[#042f2e]">
+        <span className="rounded-full bg-[#d4af37] px-2.5 py-1 text-[15px] font-bold text-[#042f2e]">
           ক্লাস {toBn(classNo)}
         </span>
-        <span className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold backdrop-blur">
+        <span className="rounded-full bg-white/15 px-2.5 py-1 text-[15px] font-semibold backdrop-blur">
           {type}
         </span>
       </div>
       <div className="relative">
-        <p className="text-xs font-semibold uppercase tracking-wider text-amber-200/90">{subject}</p>
-        <p className="mt-1 line-clamp-2 text-base font-bold leading-snug">{title}</p>
+        <p className="text-[15px] font-semibold uppercase tracking-wider text-amber-100">{subject}</p>
+        {showTitle ? (
+          <p className="mt-1 line-clamp-2 text-base font-bold leading-snug">{title}</p>
+        ) : null}
       </div>
     </div>
   );
@@ -74,7 +82,7 @@ export function SectionHeader({
   linkLabel,
   tone = "light",
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   subtitle?: string;
   href?: string;
@@ -84,15 +92,17 @@ export function SectionHeader({
   const dark = tone === "dark";
   return (
     <div className="mb-8 text-center md:mb-10">
-      <p
-        className={`mb-2 text-xs font-bold uppercase tracking-[0.2em] ${
-          dark ? "text-amber-400" : "text-brand-golddark dark:text-amber-400"
-        }`}
-      >
-        {eyebrow}
-      </p>
+      {eyebrow ? (
+        <p
+          className={`mb-2 text-[15px] font-bold uppercase tracking-[0.2em] ${
+            dark ? "text-amber-400" : "text-brand-golddark dark:text-amber-400"
+          }`}
+        >
+          {eyebrow}
+        </p>
+      ) : null}
       <h2
-        className={`text-2xl font-extrabold tracking-tight md:text-4xl ${
+        className={`text-2xl font-bold tracking-tight md:text-4xl ${
           dark ? "text-white" : "text-slate-900 dark:text-white"
         }`}
       >
@@ -102,7 +112,7 @@ export function SectionHeader({
       {subtitle ? (
         <p
           className={`mx-auto mt-3 max-w-2xl text-base ${
-            dark ? "text-slate-300" : "text-slate-600 dark:text-slate-400"
+            dark ? "text-slate-300" : "text-slate-600 dark:text-slate-300"
           }`}
         >
           {subtitle}
@@ -144,7 +154,7 @@ export function PriceTag({
   return (
     <span className="flex items-baseline gap-2">
       {oldPrice ? (
-        <span className={`text-sm line-through ${dark ? "text-slate-400" : "text-slate-500 dark:text-slate-400"}`}>
+        <span className={`text-sm line-through ${dark ? "text-slate-300" : "text-slate-600 dark:text-slate-300"}`}>
           <span className="sr-only">আগের দাম </span>₹{oldPrice}
         </span>
       ) : null}
@@ -181,7 +191,7 @@ export function EmptyState({
       </p>
       <p
         className={`mx-auto mt-2 max-w-md text-base ${
-          tone === "dark" ? "text-slate-300" : "text-slate-600 dark:text-slate-400"
+          tone === "dark" ? "text-slate-300" : "text-slate-600 dark:text-slate-300"
         }`}
       >
         {body}

@@ -76,75 +76,58 @@ export const mockTests: MockTest[] = [
 ];
 
 export const pricingData = {
+    // Benefits use the real PLANS feature lists (src/lib/wb-board.ts) —
+    // no invented counts. Basic/Plus/Pro are monthly plans.
     benefits: [
-        { id: "b1", name: "70,000+ Mock Test", pro: true, pass: true },
-        { id: "b2", name: "Unlimited Pro Live Test", pro: true, pass: false },
-        { id: "b3", name: "Unlimited Practice Pro Questions", pro: true, pass: false },
-        { id: "b4", name: "17,000+ Previous Year Papers", pro: true, pass: false },
-        { id: "b5", name: "Unlimited Re-Attempt mode for All Tests", pro: true, pass: false },
+        { id: "b1", name: "অধ্যায়ভিত্তিক MCQ অনুশীলন", basic: true, plus: true, pro: true },
+        { id: "b2", name: "আগের বছরের প্রশ্নপত্র", basic: true, plus: true, pro: true },
+        { id: "b3", name: "বিনামূল্যের ডেমো টেস্ট", basic: true, plus: true, pro: true },
+        { id: "b4", name: "মক টেস্ট ও সাজেশন", basic: false, plus: true, pro: true },
+        { id: "b5", name: "অধ্যায়ভিত্তিক নোট", basic: false, plus: true, pro: true },
+        { id: "b6", name: "ফলাফল বিশ্লেষণ", basic: false, plus: true, pro: true },
+        { id: "b7", name: "ভিডিও ক্লাস", basic: false, plus: false, pro: true },
+        { id: "b8", name: "লাইভ ক্লাস", basic: false, plus: false, pro: true },
+        { id: "b9", name: "সব বিষয় ও সব ক্লাস", basic: false, plus: false, pro: true },
     ],
-    plans: {
-        pro: [
-             { id: "pro_monthly", name: "Monthly Pass Pro", validity: "31 Days", originalPrice: 1199, price: 599, discount: null, bestseller: false },
-             { id: "pro_yearly", name: "Yearly Pass Pro", validity: "365 Days", originalPrice: 1799, price: 649, discount: 64, bestseller: true },
-             { id: "pro_18months", name: "18 Months Pass Pro", validity: "548 Days", originalPrice: 1999, price: 799, discount: 60, bestseller: false },
-        ],
-        pass: [
-            { id: "pass_monthly", name: "Monthly Pass", validity: "31 Days", originalPrice: 599, price: 299, discount: 50, bestseller: false },
-            { id: "pass_yearly", name: "Yearly Pass", validity: "365 Days", originalPrice: 999, price: 349, discount: 65, bestseller: true },
-            { id: "pass_18months", name: "18 Months Pass", validity: "548 Days", originalPrice: 1299, price: 499, discount: 62, bestseller: false },
-        ]
-    }
+    plans: [
+        { id: "basic", name: "Basic", validity: "1 মাস", originalPrice: 100, price: 50, discount: 50, bestseller: false },
+        { id: "plus", name: "Plus", validity: "1 মাস", originalPrice: 250, price: 100, discount: 60, bestseller: true },
+        { id: "pro", name: "Pro", validity: "1 মাস", originalPrice: 400, price: 200, discount: 50, bestseller: false },
+    ]
 }
 
 export const faqData = [
-    { 
-        question: "What is DeshExam Pass Pro?", 
-        answer: "DeshExam Pass Pro is a premium subscription that gives you access to a vast library of mock tests, previous year papers, and live tests to help you prepare for various competitive exams." 
-    },
-    { 
-        question: "When will my Pass Pro expire? Will I be able to access the Test Series after my Pass Pro expires?", 
-        answer: "Your Pass Pro subscription expires based on the validity period of the plan you choose (e.g., 31 days for Monthly plan). After expiry, you will lose access to the premium content. You can renew your subscription to continue." 
-    },
-    { 
-        question: "Will all of my enrolled Test Series be available during the DeshExam Pass Pro validity period?", 
-        answer: "Yes, all Test Series included in the Pass Pro plan will be available to you throughout your subscription's validity period. You can attempt them multiple times to improve your score." 
-    },
-    { 
-        question: "How can I renew my DeshExam Pass Pro?", 
-        answer: "You can renew your Pass Pro subscription directly from the pricing page. Simply select your desired plan and proceed to payment. Your new validity period will be added to your account." 
-    },
-    { 
-        question: "I do not have online payment activated. Can I use any other mode for payment?", 
-        answer: "We support a variety of payment methods, including credit/debit cards, net banking, and UPI. Please check the payment page for all available options. If you face any issues, our support team is ready to help." 
+    {
+        question: "DeshExam-এর প্ল্যানগুলো কী?",
+        answer: "তিনটি মাসিক প্ল্যান আছে — Basic ₹৫০/মাস, Plus ₹১০০/মাস ও Pro ₹২০০/মাস। সব প্ল্যান ক্লাস ৫–১২, WBBSE ও WBCHSE প্রস্তুতির জন্য।"
     },
     {
-        question: "Can I use my DeshExam Pass Pro on multiple devices?",
-        answer: "Yes, you can log into your account from multiple devices, including your laptop, tablet, or smartphone. However, simultaneous test attempts on multiple devices are not permitted for security reasons."
+        question: "প্ল্যানের মেয়াদ কতদিন?",
+        answer: "প্রতিটি প্ল্যান ১ মাসের জন্য। মেয়াদ শেষ হলে আবার কিনে নবায়ন করতে পারবেন।"
     },
     {
-        question: "Is there any refund policy if I am not satisfied with the Pass?",
-        answer: "Currently, we do not offer refunds once the Pass Pro is purchased and activated, as it grants immediate access to premium digital content. We highly recommend trying out our free mock tests before making a purchase."
+        question: "Basic, Plus ও Pro-এর মধ্যে পার্থক্য কী?",
+        answer: "Basic-এ অধ্যায়ভিত্তিক MCQ, আগের বছরের প্রশ্নপত্র ও ফ্রি ডেমো টেস্ট আছে। Plus-এ তার সঙ্গে মক টেস্ট, সাজেশন, নোট ও ফলাফল বিশ্লেষণ যোগ হয়। Pro-এ সব সুবিধার সঙ্গে ভিডিও ক্লাস ও লাইভ ক্লাস আছে।"
     },
     {
-        question: "Are the mock tests and previous year papers available in multiple languages?",
-        answer: "Yes, a significant portion of our test library is available in both English and Bengali. You can choose your preferred language at the start of most tests."
+        question: "পেমেন্ট কীভাবে করব?",
+        answer: "UPI, কার্ড ও নেট ব্যাংকিংয়ে পেমেন্ট করা যায়। পেমেন্টের আগে প্ল্যান, দাম ও মেয়াদ দেখে নিশ্চিত হয়ে নিন।"
     },
     {
-        question: "What is the exact difference between DeshExam Pass and Pass Pro?",
-        answer: "DeshExam Pass gives you access to our basic library of 70,000+ mock tests. Pass Pro unlocks everything: unlimited Pro Live Tests, 17,000+ Previous Year Papers, expert curated Pro Practice Questions, and unlimited re-attempts for all tests."
+        question: "কুপন কোড কীভাবে ব্যবহার করব?",
+        answer: "প্ল্যান বেছে নেওয়ার পর কুপন কোডের ঘরে কোড লিখে Apply চাপুন। বৈধ কোড হলে ছাড় মোট দাম থেকে বাদ যাবে।"
     },
     {
-        question: "What happens if my internet disconnects in the middle of a live test?",
-        answer: "Don't worry! Your progress is automatically saved in real-time. If you lose connection, you can resume the test from exactly where you left off once your internet is restored, provided the test window is still active."
+        question: "রিফান্ড কি পাওয়া যায়?",
+        answer: "ডিজিটাল কনটেন্ট কেনার পর অ্যাক্সেস পেলে সাধারণত রিফান্ড হয় না। বিস্তারিত জানতে Refund Policy পাতাটি দেখুন।"
     },
     {
-        question: "How can I get discount coupons for the subscription?",
-        answer: "We frequently share discount coupons on our official Telegram channel, Facebook page, and via email newsletters. Keep an eye out during festive seasons for special 'Bestseller' discounts automatically applied to our yearly plans."
+        question: "একটি প্ল্যান কি একাধিক ডিভাইসে ব্যবহার করা যায়?",
+        answer: "হ্যাঁ, আপনার অ্যাকাউন্ট দিয়ে মোবাইল, ট্যাবলেট ও কম্পিউটারে লগইন করতে পারবেন।"
     },
     {
-        question: "How can I contact support if I face technical issues?",
-        answer: "You can reach our 24/7 support team by clicking the 'Help' icon in your dashboard, emailing support@deshexam.com, or calling our toll-free student helpline. We typically respond within 2 hours."
+        question: "সাহায্য দরকার হলে কোথায় যোগাযোগ করব?",
+        answer: "ইমেইল করুন support@deshexam.com-এ অথবা +91 62940 06590 নম্বরে যোগাযোগ করুন।"
     }
 ];
 

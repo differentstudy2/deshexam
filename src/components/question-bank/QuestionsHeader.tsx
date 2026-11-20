@@ -39,21 +39,6 @@ export default function QuestionsHeader() {
           </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-4 py-2">
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-full text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm border border-white/40 dark:border-slate-700/50">
-            <span className="flex h-2 w-2 rounded-full bg-blue-500"></span>
-            <strong className="font-bold text-slate-900 dark:text-white">1M+</strong> Questions Solved
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-full text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm border border-white/40 dark:border-slate-700/50">
-            <span className="flex h-2 w-2 rounded-full bg-indigo-500"></span>
-            <strong className="font-bold text-slate-900 dark:text-white">500+</strong> Subjects
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-full text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm border border-white/40 dark:border-slate-700/50">
-            <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
-            <strong className="font-bold text-slate-900 dark:text-white">100K+</strong> Learners
-          </div>
-        </div>
-
         <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto pt-4">
           <div className="flex items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-full shadow-lg border border-slate-200/60 dark:border-slate-700/60 p-2 pl-6 transition-all hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
             <Search className="h-5 w-5 text-slate-400 dark:text-slate-500 mr-3 flex-shrink-0" />

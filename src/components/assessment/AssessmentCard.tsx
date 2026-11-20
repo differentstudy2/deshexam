@@ -133,14 +133,18 @@ export function AssessmentCard({ assessment, type, href, taxonomyString }: Asses
               </span>
             </div>
           )}
-          <div className="flex items-center justify-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-emerald-100 dark:border-emerald-800/50">
-            <UsersRound className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{(!assessment.attemptCount || assessment.attemptCount < 1000) ? '75K+' : assessment.attemptCount.toLocaleString()}</span>
-          </div>
-          <div className="flex items-center justify-center gap-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-amber-100 dark:border-amber-800/50">
-            <Star className="w-3.5 h-3.5 shrink-0 fill-amber-500 text-amber-500" />
-            <span className="truncate">{assessment.reviewStats?.averageRating ? assessment.reviewStats.averageRating.toFixed(1) : '4.8'}</span>
-          </div>
+          {typeof assessment.attemptCount === 'number' && assessment.attemptCount > 0 && (
+            <div className="flex items-center justify-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-emerald-100 dark:border-emerald-800/50">
+              <UsersRound className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{assessment.attemptCount >= 1000 ? `${(assessment.attemptCount / 1000).toFixed(1).replace(/\.0$/, '')}K` : assessment.attemptCount.toLocaleString()}</span>
+            </div>
+          )}
+          {typeof assessment.reviewStats?.averageRating === 'number' && (
+            <div className="flex items-center justify-center gap-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 px-2.5 py-1.5 rounded-md font-medium text-xs border border-amber-100 dark:border-amber-800/50">
+              <Star className="w-3.5 h-3.5 shrink-0 fill-amber-500 text-amber-500" />
+              <span className="truncate">{assessment.reviewStats.averageRating.toFixed(1)}</span>
+            </div>
+          )}
         </div>
 
         {/* Verification Badges */}
