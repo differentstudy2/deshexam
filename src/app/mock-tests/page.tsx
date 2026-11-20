@@ -162,11 +162,6 @@ const jsonLdSoftwareApp = {
     "@type": "Offer",
     "price": "0",
     "priceCurrency": "INR"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "ratingCount": "120000"
   }
 };
 
@@ -343,16 +338,13 @@ export default async function MockTestsListingPage({
         subjects={subjects}
         collectionName="mockTests"
         type="Mock Test"
-        heroBadgeText="70,000+ Mock Tests Available"
+        heroBadgeText={`${combinedMockTests.length} Mock Tests Available`}
         heroTitle={<>Online Mock Tests for <br className="hidden lg:block" /> Smarter Exam Preparation</>}
         heroDescription="Practice exam-style mock tests, improve speed, accuracy, and boost rank with AI-powered analytics."
         primaryButtonText="Start Free Test"
         baseHref="/mock-tests"
         stats={{
-          total: "70,000+",
-          attempts: "120K+",
-          rating: "4.8",
-          successRate: "92%"
+          total: String(combinedMockTests.length),
         }}
       />
 
@@ -384,7 +376,7 @@ export default async function MockTestsListingPage({
             <section className="bg-indigo-50 dark:bg-indigo-950/30 p-8 rounded-2xl my-10 border border-indigo-100 dark:border-indigo-900/50 text-center">
                 <h3 className="text-2xl font-bold text-indigo-900 dark:text-indigo-100 mb-4">Unlock Unlimited Mock Tests with Pass Pro</h3>
                 <p className="text-indigo-700 dark:text-indigo-300 mb-6 max-w-2xl mx-auto">
-                    Why stop at free tests? Get the ultimate edge with DeshExam Pass Pro. Access 70,000+ premium mock tests, advanced AI analytics, and priority doubt solving.
+                    Why stop at free tests? Get the ultimate edge with DeshExam Pass Pro. Access premium mock tests, advanced AI analytics, and priority doubt solving.
                 </p>
                 <Link href="/pricing" className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl transition-colors shadow-md">
                     Explore Premium Plans
@@ -424,7 +416,7 @@ export default async function MockTestsListingPage({
                 <div className="space-y-6">
                     <div>
                         <h4 className="font-bold text-slate-900 dark:text-white">Are mock tests free?</h4>
-                        <p className="mt-1">We offer a robust selection of free mock tests for all users. For unlimited access to our entire 70,000+ test library, a premium subscription is required.</p>
+                        <p className="mt-1">We offer a robust selection of free mock tests for all users. For unlimited access to our entire test library, a premium subscription is required.</p>
                     </div>
                     <div>
                         <h4 className="font-bold text-slate-900 dark:text-white">Can I retake tests?</h4>

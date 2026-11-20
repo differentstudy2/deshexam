@@ -24,9 +24,9 @@ export interface AssessmentClientProps {
   baseHref: string;
   stats: {
     total: string;
-    attempts: string;
-    rating: string;
-    successRate: string;
+    attempts?: string;
+    rating?: string;
+    successRate?: string;
   };
   boards?: any[];
   classes?: any[];
@@ -152,7 +152,6 @@ export function AssessmentClient({
 
               {/* Trust Checks */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 sm:gap-x-6 gap-y-2 sm:gap-y-3 text-[13px] sm:text-sm font-medium text-blue-100/90 px-4 sm:px-0">
-                <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#16A34A]" /> 50K+ Students</div>
                 <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#16A34A]" /> Live Rankings</div>
                 <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#16A34A]" /> AI Analytics</div>
                 <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#16A34A]" /> Instant Results</div>
@@ -167,18 +166,24 @@ export function AssessmentClient({
                     <span className="text-blue-100 text-lg font-medium">{type}s:</span>
                     <span className="text-white text-2xl font-bold">{stats.total}</span>
                   </div>
-                  <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                    <span className="text-blue-100 text-lg font-medium">Daily Attempts:</span>
-                    <span className="text-white text-2xl font-bold">{stats.attempts}</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                    <span className="text-blue-100 text-lg font-medium">Avg Rating:</span>
-                    <span className="text-white text-2xl font-bold">{stats.rating}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-blue-100 text-lg font-medium">Success Rate:</span>
-                    <span className="text-white text-2xl font-bold">{stats.successRate}</span>
-                  </div>
+                  {stats.attempts && (
+                    <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                      <span className="text-blue-100 text-lg font-medium">Daily Attempts:</span>
+                      <span className="text-white text-2xl font-bold">{stats.attempts}</span>
+                    </div>
+                  )}
+                  {stats.rating && (
+                    <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                      <span className="text-blue-100 text-lg font-medium">Avg Rating:</span>
+                      <span className="text-white text-2xl font-bold">{stats.rating}</span>
+                    </div>
+                  )}
+                  {stats.successRate && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-blue-100 text-lg font-medium">Success Rate:</span>
+                      <span className="text-white text-2xl font-bold">{stats.successRate}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
