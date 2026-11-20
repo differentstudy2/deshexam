@@ -103,7 +103,7 @@ export default function Home() {
         <SectionHeader tone="dark"
           eyebrow="ক্লাস বেছে নিন"
           title="আপনার ক্লাস কোনটি?"
-          subtitle="ক্লাস বেছে নিলে সেই ক্লাসের বিষয়, মক টেস্ট, নোট ও আগের বছরের প্রশ্নপত্র দেখতে পাবেন।"
+          subtitle="আপনার বোর্ড ও ক্লাস নির্বাচন করে প্রস্তুতি শুরু করুন। সঠিক প্রস্তুতি, সফল ভবিষ্যৎ।"
         />
         <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-white/[0.05] p-8 text-center text-slate-300">ক্লাস লোড হচ্ছে…</div>}>
           <ClassPicker />
