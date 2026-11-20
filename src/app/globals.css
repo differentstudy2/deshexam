@@ -49,7 +49,7 @@
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted-foreground: 215 20% 75%;
     --accent: 217 33% 17%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 63% 31%;
@@ -396,8 +396,10 @@
     gap: 0.5rem;
   }
 
+  /* Readability: never shrink body text on phones — 0.8rem (12.8px) was
+     making footer links and card text hard to read on small screens. */
   .text-base {
-    font-size: 0.8rem;
+    font-size: 1rem;
     line-height: 1.5rem;
   }
 
@@ -875,4 +877,17 @@ textarea,
   .bg-red-50 {
     background-color: #fef2f2 !important;
   }
+}
+
+/* Readability: Bengali conjuncts and vowel signs close up at 800 weight,
+   so cap heading weight at 700 (bold) site-wide. Unlayered on purpose so
+   it beats the font-extrabold utility. Brand/logo text is not a heading
+   and is untouched. */
+h1.font-extrabold,
+h2.font-extrabold,
+h3.font-extrabold,
+h4.font-extrabold,
+h5.font-extrabold,
+h6.font-extrabold {
+  font-weight: 700;
 }

@@ -236,7 +236,7 @@ export default async function MockTestsListingPage({
       <section id="wb-mock-tests" className="scroll-mt-20 bg-[#040d1a] py-12 text-slate-100 md:py-16">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="mb-6">
-            <p className="text-xs font-bold tracking-wide text-amber-300">WBBSE · WBCHSE · ক্লাস ৫–১২</p>
+            <p className="text-[15px] font-bold tracking-wide text-amber-300">WBBSE · WBCHSE · ক্লাস ৫–১২</p>
             <h2 className="mt-1 font-headline text-2xl font-extrabold text-white md:text-3xl">
               পশ্চিমবঙ্গ বোর্ড — নমুনা মক টেস্ট
             </h2>
@@ -272,7 +272,7 @@ export default async function MockTestsListingPage({
             )}
           </div>
 
-          <p className="mt-6 text-sm text-slate-400">
+          <p className="mt-6 text-sm text-slate-300">
             {toBn(wbFiltered.length)}টি নমুনা টেস্ট পাওয়া গেছে
             {wbClass !== undefined ? ` · ${classLabel(wbClass)}` : ''}
             {wbSubject ? ` · ${wbSubject}` : ''}
@@ -281,7 +281,7 @@ export default async function MockTestsListingPage({
           {wbPageItems.length === 0 ? (
             <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.05] p-10 text-center">
               <p className="text-lg font-bold text-white">কোনো নমুনা টেস্ট পাওয়া যায়নি</p>
-              <p className="mt-2 text-sm text-slate-400">ফিল্টার বদলে আবার দেখুন।</p>
+              <p className="mt-2 text-sm text-slate-300">ফিল্টার বদলে আবার দেখুন।</p>
               <Link href="/mock-tests#wb-mock-tests" className="mt-4 inline-flex min-h-[44px] items-center rounded-full bg-amber-400 px-6 text-sm font-bold text-[#042f2e]">সব টেস্ট দেখুন</Link>
             </div>
           ) : (
@@ -289,14 +289,14 @@ export default async function MockTestsListingPage({
               {wbPageItems.map((t) => (
                 <article key={t.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] transition-all hover:-translate-y-1 hover:border-amber-300/40 hover:shadow-lg">
                   <div className="bg-[linear-gradient(135deg,#0b3b39,#042f2e)] p-5">
-                    <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-xs font-bold text-amber-200">নমুনা · মক টেস্ট</span>
+                    <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[15px] font-bold text-amber-200">নমুনা · মক টেস্ট</span>
                     <h3 className="mt-3 min-h-[3rem] font-headline text-lg font-bold leading-snug text-white">{t.title}</h3>
                   </div>
                   <div className="p-5">
                     <p className="text-sm text-slate-300">
                       {classLabel(t.class)} · {t.subject} · {t.medium === 'bn' ? 'বাংলা মাধ্যম' : 'English Medium'}
                     </p>
-                    <p className="mt-1 text-sm text-slate-400">
+                    <p className="mt-1 text-sm text-slate-300">
                       {toBn(t.questions ?? 0)}টি প্রশ্ন · {toBn(t.minutes ?? 0)} মিনিট · {t.difficulty ?? ''}
                     </p>
                     <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">

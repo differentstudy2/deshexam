@@ -23,38 +23,38 @@ export function Footer() {
   return (
     <footer className="section-dark-blue text-slate-300 font-body py-5">
       <div className="container max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-6 text-sm">
-          {/* PLATFORM */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-6 text-base">
+          {/* প্ল্যাটফর্ম */}
           <div className="space-y-4">
-            <h4 className="font-headline font-semibold text-[#d4af37] tracking-wider text-xs uppercase mb-4">Platform</h4>
+            <h4 className="font-headline font-semibold text-[#d4af37] tracking-wider text-sm uppercase mb-4">প্ল্যাটফর্ম</h4>
             <ul className="space-y-3">
-              <li><Link href="/e-question-builder" className="hover:text-[#d4af37] transition-colors">E-Question Builder</Link></li>
-              <li><Link href="/mock-tests" className="hover:text-[#d4af37] transition-colors">Mock Tests</Link></li>
-              <li><Link href="/quizzes" className="hover:text-[#d4af37] transition-colors">Quizzes</Link></li>
-              <li><Link href="/assessment" className="hover:text-[#d4af37] transition-colors">Assessment</Link></li>
-              <li><Link href="/leaderboard" className="hover:text-[#d4af37] transition-colors">Leaderboard</Link></li>
+              <li><Link href="/e-question-builder" className="hover:text-[#d4af37] transition-colors">ই-প্রশ্ন তৈরি</Link></li>
+              <li><Link href="/mock-tests" className="hover:text-[#d4af37] transition-colors">মক টেস্ট</Link></li>
+              <li><Link href="/quizzes" className="hover:text-[#d4af37] transition-colors">কুইজ</Link></li>
+              <li><Link href="/assessment" className="hover:text-[#d4af37] transition-colors">মূল্যায়ন</Link></li>
+              <li><Link href="/leaderboard" className="hover:text-[#d4af37] transition-colors">লিডারবোর্ড</Link></li>
             </ul>
           </div>
 
-          {/* STUDY MATERIALS */}
+          {/* পড়ার উপকরণ */}
           <div className="space-y-4">
-            <h4 className="font-headline font-semibold text-[#d4af37] tracking-wider text-xs uppercase mb-4">Study Materials</h4>
+            <h4 className="font-headline font-semibold text-[#d4af37] tracking-wider text-sm uppercase mb-4">পড়ার উপকরণ</h4>
             <ul className="space-y-3">
-              <li><Link href="/questions" className="hover:text-[#d4af37] transition-colors">Question Bank</Link></li>
-              <li><Link href="/previous-year-papers" className="hover:text-[#d4af37] transition-colors">Previous Papers</Link></li>
-              <li><Link href="/course" className="hover:text-[#d4af37] transition-colors">Courses</Link></li>
-              <li><Link href="/textbook-solutions" className="hover:text-[#d4af37] transition-colors">Textbook Solutions</Link></li>
+              <li><Link href="/questions" className="hover:text-[#d4af37] transition-colors">প্রশ্ন ব্যাংক</Link></li>
+              <li><Link href="/previous-year-papers" className="hover:text-[#d4af37] transition-colors">আগের বছরের প্রশ্নপত্র</Link></li>
+              <li><Link href="/course" className="hover:text-[#d4af37] transition-colors">কোর্স</Link></li>
+              <li><Link href="/textbook-solutions" className="hover:text-[#d4af37] transition-colors">পাঠ্যবইয়ের সমাধান</Link></li>
             </ul>
           </div>
 
-          {/* RESOURCES */}
+          {/* রিসোর্স */}
           <div className="space-y-4">
-            <h4 className="font-headline font-semibold text-[#d4af37] tracking-wider text-xs uppercase mb-4">Resources</h4>
+            <h4 className="font-headline font-semibold text-[#d4af37] tracking-wider text-sm uppercase mb-4">রিসোর্স</h4>
             <ul className="space-y-3">
-              <li><Link href="/videos" className="hover:text-[#d4af37] transition-colors">Video Lessons</Link></li>
-              <li><Link href="/audio" className="hover:text-[#d4af37] transition-colors">Audio Lessons</Link></li>
-              <li><Link href="/documents" className="hover:text-[#d4af37] transition-colors">Documents & PDFs</Link></li>
-              <li><Link href="/guide" className="hover:text-[#d4af37] transition-colors">Student Guide</Link></li>
+              <li><Link href="/videos" className="hover:text-[#d4af37] transition-colors">ভিডিও ক্লাস</Link></li>
+              <li><Link href="/audio" className="hover:text-[#d4af37] transition-colors">অডিও ক্লাস</Link></li>
+              <li><Link href="/documents" className="hover:text-[#d4af37] transition-colors">ডকুমেন্ট ও PDF</Link></li>
+              <li><Link href="/guide" className="hover:text-[#d4af37] transition-colors">শিক্ষার্থী গাইড</Link></li>
             </ul>
           </div>
 
@@ -73,38 +73,38 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* PROGRAMS */}
+          {/* প্রোগ্রাম */}
           <div className="space-y-4">
-            <h4 className="font-headline font-semibold text-[#d4af37] tracking-wider text-xs uppercase mb-4">Programs</h4>
+            <h4 className="font-headline font-semibold text-[#d4af37] tracking-wider text-sm uppercase mb-4">প্রোগ্রাম</h4>
             <ul className="space-y-3">
-              <li><Link href="/academy" className="hover:text-[#d4af37] transition-colors">Academy</Link></li>
-              <li><Link href="/classes" className="hover:text-[#d4af37] transition-colors">Live Classes</Link></li>
-              <li><Link href="/learn" className="hover:text-[#d4af37] transition-colors">Learn</Link></li>
-              <li><Link href="/practice" className="hover:text-[#d4af37] transition-colors">Practice Area</Link></li>
+              <li><Link href="/academy" className="hover:text-[#d4af37] transition-colors">অ্যাকাডেমি</Link></li>
+              <li><Link href="/classes" className="hover:text-[#d4af37] transition-colors">লাইভ ক্লাস</Link></li>
+              <li><Link href="/learn" className="hover:text-[#d4af37] transition-colors">শিখুন</Link></li>
+              <li><Link href="/practice" className="hover:text-[#d4af37] transition-colors">অনুশীলন</Link></li>
             </ul>
           </div>
 
-          {/* COMPANY */}
+          {/* কোম্পানি */}
           <div className="space-y-4">
-            <h4 className="font-headline font-semibold text-[#d4af37] tracking-wider text-xs uppercase mb-4">Company</h4>
+            <h4 className="font-headline font-semibold text-[#d4af37] tracking-wider text-sm uppercase mb-4">কোম্পানি</h4>
             <ul className="space-y-3">
-              <li><Link href="/about" className="hover:text-[#d4af37] transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-[#d4af37] transition-colors">Contact Us</Link></li>
-              <li><Link href="/pricing" className="hover:text-[#d4af37] transition-colors">Pricing</Link></li>
-              <li><Link href="/features" className="hover:text-[#d4af37] transition-colors">Features</Link></li>
-              <li><Link href="/faqs" className="hover:text-[#d4af37] transition-colors">FAQ</Link></li>
+              <li><Link href="/about" className="hover:text-[#d4af37] transition-colors">আমাদের সম্পর্কে</Link></li>
+              <li><Link href="/contact" className="hover:text-[#d4af37] transition-colors">যোগাযোগ</Link></li>
+              <li><Link href="/pricing" className="hover:text-[#d4af37] transition-colors">মূল্য</Link></li>
+              <li><Link href="/features" className="hover:text-[#d4af37] transition-colors">সুবিধা</Link></li>
+              <li><Link href="/faqs" className="hover:text-[#d4af37] transition-colors">জিজ্ঞাসা</Link></li>
             </ul>
           </div>
 
-          {/* LEGAL */}
+          {/* আইনি */}
           <div className="space-y-4">
-            <h4 className="font-headline font-semibold text-[#d4af37] tracking-wider text-xs uppercase mb-4">Legal</h4>
+            <h4 className="font-headline font-semibold text-[#d4af37] tracking-wider text-sm uppercase mb-4">আইনি</h4>
             <ul className="space-y-3">
-              <li><Link href="/privacy" className="hover:text-[#d4af37] transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-[#d4af37] transition-colors">Terms of Service</Link></li>
-              <li><Link href="/refund-policy" className="hover:text-[#d4af37] transition-colors">Refund Policy</Link></li>
-              <li><Link href="/cookie-policy" className="hover:text-[#d4af37] transition-colors">Cookie Policy</Link></li>
-              <li><Link href="/disclaimer" className="hover:text-[#d4af37] transition-colors">Disclaimer</Link></li>
+              <li><Link href="/privacy" className="hover:text-[#d4af37] transition-colors">গোপনীয়তা নীতি</Link></li>
+              <li><Link href="/terms" className="hover:text-[#d4af37] transition-colors">শর্তাবলী</Link></li>
+              <li><Link href="/refund-policy" className="hover:text-[#d4af37] transition-colors">রিফান্ড নীতি</Link></li>
+              <li><Link href="/cookie-policy" className="hover:text-[#d4af37] transition-colors">কুকি নীতি</Link></li>
+              <li><Link href="/disclaimer" className="hover:text-[#d4af37] transition-colors">দাবিত্যাগ</Link></li>
             </ul>
           </div>
         </div>
@@ -113,11 +113,11 @@ export function Footer() {
           <div className="flex items-center">
             <DeshExamLogo />
           </div>
-          <div className="text-slate-400 text-sm">
+          <div className="text-slate-300 text-sm">
             &copy; {new Date().getFullYear()} DeshExam. All rights reserved.
           </div>
         </div>
-        <p className="mt-4 text-center text-xs text-slate-400">
+        <p className="mt-4 text-center text-sm text-slate-300">
           DeshExam is not affiliated with WBBSE or WBCHSE. / DeshExam WBBSE বা WBCHSE-এর সঙ্গে সংযুক্ত নয়।
         </p>
       </div>

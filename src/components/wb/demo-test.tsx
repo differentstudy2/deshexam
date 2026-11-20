@@ -15,8 +15,8 @@ function formatTime(s: number) {
 export function DemoTest({ tone = "light" }: { tone?: "light" | "dark" }) {
   const dark = tone === "dark";
   const tTitle = dark ? "text-white" : "text-slate-900 dark:text-white";
-  const tBody = dark ? "text-slate-300" : "text-slate-600 dark:text-slate-400";
-  const tMuted = dark ? "text-slate-400" : "text-slate-500 dark:text-slate-400";
+  const tBody = dark ? "text-slate-300" : "text-slate-600 dark:text-slate-300";
+  const tMuted = dark ? "text-slate-300" : "text-slate-600 dark:text-slate-300";
   const [started, setStarted] = useState(false);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
@@ -76,8 +76,8 @@ export function DemoTest({ tone = "light" }: { tone?: "light" | "dark" }) {
       }`}
     >
       <div className="mb-4 flex items-center justify-between gap-3">
-        <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
-          নমুনা টেস্ট · লগইন লাগবে না
+        <span className="rounded-full bg-amber-100 px-3 py-1 text-[15px] font-bold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+          ফ্রি ডেমো টেস্ট · লগইন লাগবে না
         </span>
         {started && !done ? (
           <span className={`text-base font-bold ${tTitle}`} aria-live="polite">
@@ -88,9 +88,9 @@ export function DemoTest({ tone = "light" }: { tone?: "light" | "dark" }) {
 
       {!started ? (
         <div className="text-center">
-          <h3 className={`text-xl font-extrabold ${tTitle}`}>৫টি নমুনা প্রশ্ন, ৫ মিনিট</h3>
+          <h3 className={`text-xl font-bold ${tTitle}`}>৫টি ডেমো প্রশ্ন, ৫ মিনিট</h3>
           <p className={`mt-2 text-base ${tBody}`}>
-            ক্লাস ৫–১২-এর নমুনা প্রশ্ন দিয়ে দেখে নিন — উত্তর দিলেই সঙ্গে সঙ্গে ফলাফল পাবেন।
+            ক্লাস ৫–১২-এর ডেমো প্রশ্ন দিয়ে দেখে নিন — উত্তর দিলেই সঙ্গে সঙ্গে ফলাফল পাবেন।
           </p>
           <button
             type="button"
@@ -103,7 +103,7 @@ export function DemoTest({ tone = "light" }: { tone?: "light" | "dark" }) {
       ) : done ? (
         <div className="text-center" aria-live="polite">
           <p
-            className={`text-sm font-bold uppercase tracking-wider ${
+            className={`text-base font-bold uppercase tracking-wider ${
               dark ? "text-amber-400" : "text-brand-golddark dark:text-amber-400"
             }`}
           >
@@ -123,7 +123,7 @@ export function DemoTest({ tone = "light" }: { tone?: "light" | "dark" }) {
             {DEMO_QUESTIONS.map((item, i) => (
               <div
                 key={i}
-                className={`rounded-xl border p-3 text-sm ${
+                className={`rounded-xl border p-3 text-base ${
                   dark ? "border-white/10 bg-white/[0.03]" : "border-slate-200 dark:border-slate-700"
                 }`}
               >
@@ -156,7 +156,7 @@ export function DemoTest({ tone = "light" }: { tone?: "light" | "dark" }) {
         </div>
       ) : (
         <div>
-          <p className={`text-sm font-semibold ${tMuted}`}>
+          <p className={`text-base font-semibold ${tMuted}`}>
             প্রশ্ন {toBn(idx + 1)} / {toBn(DEMO_QUESTIONS.length)} · {q.subject}
           </p>
           <h3 className={`mt-2 text-lg font-bold leading-relaxed md:text-xl ${tTitle}`}>{q.q}</h3>
@@ -180,18 +180,8 @@ export function DemoTest({ tone = "light" }: { tone?: "light" | "dark" }) {
                         : isPicked
                           ? "border-red-500 bg-red-50 text-red-900 dark:bg-red-950/40 dark:text-red-200"
                           : dark
-                          ? "border-white/10 text-slate-400"
-                          : dark
-                          ? "border-white/10 text-slate-400"
-                          : dark
-                          ? "border-white/10 text-slate-400"
-                          : dark
-                          ? "border-white/10 text-slate-400"
-                          : dark
-                          ? "border-white/10 text-slate-400"
-                          : dark
-                          ? "border-white/10 text-slate-400"
-                          : "border-slate-200 text-slate-500 dark:border-slate-700 dark:text-slate-400"
+                            ? "border-white/10 text-slate-300"
+                            : "border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300"
                   }`}
                 >
                   <span
@@ -211,7 +201,7 @@ export function DemoTest({ tone = "light" }: { tone?: "light" | "dark" }) {
           {picked !== null ? (
             <div className="mt-4">
               <p
-                className={`rounded-xl p-3 text-sm ${
+                className={`rounded-xl p-3 text-base ${
                   dark ? "bg-white/[0.06] text-slate-300" : "bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
                 }`}
               >

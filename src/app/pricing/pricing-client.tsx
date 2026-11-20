@@ -164,7 +164,7 @@ export default function PricingClientPage() {
             <div className="container mx-auto max-w-6xl px-4 py-12 md:py-20">
                 <div className="flex flex-col items-center gap-10 md:flex-row md:justify-between">
                     <div className="flex-1 text-center md:text-left">
-                        <p className="mb-3 inline-block rounded-full border border-amber-300/40 bg-white/10 px-3 py-1 text-xs font-bold tracking-wide text-amber-200">
+                        <p className="mb-3 inline-block rounded-full border border-amber-300/40 bg-white/10 px-3 py-1 text-[15px] font-semibold tracking-wide text-amber-200">
                             ক্লাস ৫–১২ · WBBSE ও WBCHSE
                         </p>
                         <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
@@ -182,7 +182,7 @@ export default function PricingClientPage() {
                                 { icon: <ShieldCheck className="h-3.5 w-3.5" />, label: 'নিরাপদ পেমেন্ট' },
                                 { icon: <Zap className="h-3.5 w-3.5" />, label: 'সঙ্গে সঙ্গে অ্যাক্সেস' },
                             ].map((chip) => (
-                                <span key={chip.label} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 backdrop-blur-sm sm:text-sm">
+                                <span key={chip.label} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-semibold text-slate-200 backdrop-blur-sm">
                                     {chip.icon}
                                     {chip.label}
                                 </span>
@@ -228,7 +228,7 @@ export default function PricingClientPage() {
         {/* ============ PLAN SELECTOR ============ */}
         <section id="plans" className="section-dark scroll-mt-20 py-12 md:py-16">
             <div className="container mx-auto max-w-6xl px-4">
-                <p className="text-center text-sm font-bold tracking-wide text-amber-300">মাসিক প্ল্যান</p>
+                <p className="text-center text-[15px] font-bold tracking-wide text-amber-300">মাসিক প্ল্যান</p>
                 <h2 className="mt-2 text-center text-2xl font-extrabold text-white md:text-4xl">প্ল্যান বেছে নিন</h2>
                 <p className="mx-auto mt-3 max-w-xl text-center text-base text-slate-300">
                     তিনটি মাসিক প্ল্যান — প্রতি মাসে নবায়ন হয়। দাম ও সুবিধা দেখে বেছে নিন।
@@ -272,7 +272,7 @@ export default function PricingClientPage() {
                                 <div className="flex items-start justify-between gap-3">
                                     <div>
                                         <h3 className="text-xl font-extrabold text-white">{plan.name}</h3>
-                                        <p className="mt-1 text-sm text-slate-400">মেয়াদ {plan.validity} · প্রতি মাসে নবায়ন হয়</p>
+                                        <p className="mt-1 text-sm text-slate-300">মেয়াদ {plan.validity} · প্রতি মাসে নবায়ন হয়</p>
                                     </div>
                                     <span
                                         aria-hidden="true"
@@ -285,10 +285,13 @@ export default function PricingClientPage() {
                                     </span>
                                 </div>
 
-                                <p className="mt-5 flex items-baseline gap-2">
+                                <p className="mt-5">
+                                    <span className="text-sm font-semibold text-slate-300">আগের দাম&nbsp;</span>
                                     <span className="text-sm text-slate-400 line-through">₹{plan.originalPrice}</span>
+                                </p>
+                                <p className="mt-1 flex items-baseline gap-2">
                                     <span className="text-5xl font-extrabold text-white">₹{plan.price}</span>
-                                    <span className="text-sm font-semibold text-slate-400">/মাস</span>
+                                    <span className="text-sm font-semibold text-slate-300">/মাস</span>
                                 </p>
                                 {plan.discount ? (
                                     <p className="mt-1 text-sm font-bold text-emerald-400">{plan.discount}% ছাড়</p>
@@ -302,9 +305,9 @@ export default function PricingClientPage() {
                                                 {included ? (
                                                     <Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" strokeWidth={2.5} aria-hidden="true" />
                                                 ) : (
-                                                    <X className="mt-0.5 h-5 w-5 shrink-0 text-slate-600" strokeWidth={2.5} aria-hidden="true" />
+                                                    <X className="mt-0.5 h-5 w-5 shrink-0 text-slate-500" strokeWidth={2.5} aria-hidden="true" />
                                                 )}
-                                                <span className={included ? "text-slate-200" : "text-slate-500 line-through"}>{benefit.name}</span>
+                                                <span className={included ? "text-slate-200" : "text-slate-400 line-through"}>{benefit.name}</span>
                                             </li>
                                         );
                                     })}
@@ -335,7 +338,7 @@ export default function PricingClientPage() {
                     {/* LEFT: features included + what you get */}
                     <div className="space-y-8">
                         <div>
-                            <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-400">
+                            <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-300">
                                 {selectedPlan?.name} প্ল্যানে যা যা পাবেন
                             </h3>
                             <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
@@ -352,14 +355,14 @@ export default function PricingClientPage() {
                                         >
                                             <span className={cn(
                                                 "text-sm font-medium leading-tight",
-                                                isIncluded ? "text-slate-200" : "text-slate-500 line-through"
+                                                isIncluded ? "text-slate-200" : "text-slate-400 line-through"
                                             )}>
                                                 {benefit.name}
                                             </span>
                                             {isIncluded ? (
                                                 <Check className="h-4 w-4 shrink-0 text-emerald-400" strokeWidth={2.5} aria-hidden="true" />
                                             ) : (
-                                                <X className="h-4 w-4 shrink-0 text-slate-600" strokeWidth={2.5} aria-hidden="true" />
+                                                <X className="h-4 w-4 shrink-0 text-slate-500" strokeWidth={2.5} aria-hidden="true" />
                                             )}
                                         </div>
                                     );
@@ -368,7 +371,7 @@ export default function PricingClientPage() {
                         </div>
 
                         <div>
-                            <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-400">আরও যা পাবেন</h3>
+                            <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-300">আরও যা পাবেন</h3>
                             <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
                                 {whyMustHave.map((item, index) => {
                                     const isLast = index === whyMustHave.length - 1;
@@ -404,7 +407,7 @@ export default function PricingClientPage() {
                                         </div>
                                         <button
                                             onClick={removeCoupon}
-                                            className="min-h-[44px] px-2 text-xs font-bold text-slate-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
+                                            className="min-h-[44px] px-2 text-xs font-bold text-slate-300 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
                                         >
                                             Remove
                                         </button>
@@ -414,7 +417,7 @@ export default function PricingClientPage() {
                                         <Input
                                             placeholder="কুপন কোড লিখুন"
                                             aria-label="কুপন কোড"
-                                            className="h-11 border-none bg-transparent px-0 text-sm font-medium text-white placeholder:text-slate-500 shadow-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                                            className="h-11 border-none bg-transparent px-0 text-sm font-medium text-white placeholder:text-slate-400 shadow-none focus-visible:ring-2 focus-visible:ring-amber-400"
                                             value={couponCode}
                                             onChange={(e) => setCouponCode(e.target.value)}
                                         />
@@ -460,11 +463,11 @@ export default function PricingClientPage() {
                                 >
                                     {isProcessingPayment ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> Processing...</> : 'পেমেন্ট করুন'}
                                 </Button>
-                                <p className="mt-3 text-center text-xs leading-relaxed text-slate-400">
+                                <p className="mt-3 text-center text-sm leading-relaxed text-slate-300">
                                     UPI · কার্ড · নেট ব্যাংকিং — পেমেন্টের আগে প্ল্যান, দাম ও মেয়াদ দেখে নিন।
                                 </p>
                                 <div className="mt-3 flex items-center justify-center gap-1.5 opacity-80">
-                                    <span className="text-xs font-semibold text-slate-400">Secured by</span>
+                                    <span className="text-xs font-semibold text-slate-300">Secured by</span>
                                     <span className="text-xs font-extrabold tracking-tight text-white">Razorpay</span>
                                 </div>
                             </div>
@@ -499,7 +502,7 @@ export default function PricingClientPage() {
         {/* ============ FAQ ============ */}
         <section className="section-dark py-12 md:py-16">
             <div className="container mx-auto max-w-4xl px-4">
-                <p className="text-center text-sm font-bold tracking-wide text-amber-300">জিজ্ঞাসা</p>
+                <p className="text-center text-[15px] font-bold tracking-wide text-amber-300">জিজ্ঞাসা</p>
                 <h2 className="mt-2 text-center text-2xl font-extrabold text-white md:text-4xl">সচরাচর জিজ্ঞাসা</h2>
                 <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] px-4">
                     <Accordion type="single" collapsible className="w-full">
@@ -508,7 +511,7 @@ export default function PricingClientPage() {
                                 <AccordionTrigger className="min-h-[48px] py-4 text-left text-base font-semibold text-white hover:no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400">
                                     {faq.question}
                                 </AccordionTrigger>
-                                <AccordionContent className="pb-4 text-sm leading-relaxed text-slate-300">
+                                <AccordionContent className="pb-4 text-base leading-relaxed text-slate-300">
                                     {faq.answer}
                                 </AccordionContent>
                             </AccordionItem>

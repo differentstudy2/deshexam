@@ -183,8 +183,8 @@ export default async function CoursePage({
                     {classLabel(c.class)} · {c.subject} ·{" "}
                     {c.medium === "bn" ? "বাংলা মাধ্যম" : "English Medium"}
                   </p>
-                  <p className="mt-1 text-sm text-slate-400">
-                    শিক্ষক: DeshExam Faculty · {toBn(c.lessons ?? 0)}টি পাঠ
+                  <p className="mt-1 text-sm text-slate-300">
+                    {toBn(c.lessons ?? 0)}টি পাঠ
                   </p>
                   <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
                     <span className="text-lg font-extrabold text-white">

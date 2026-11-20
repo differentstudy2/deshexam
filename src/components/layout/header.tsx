@@ -38,45 +38,45 @@ type NavLinkType = {
 
 const mainNavLinks: NavLinkType[] = [
   {
-    label: "Learn",
+    label: "শিখুন",
     icon: <BookOpen className="h-5 w-5" />,
     subItems: [
       { href: "/academy/wbbse", label: "WBBSE", icon: <BookOpen className="h-4 w-4" /> },
       { href: "/academy/wbchse", label: "WBCHSE", icon: <BookOpen className="h-4 w-4" /> },
-      { href: "/class/5", label: "All Classes", icon: <Library className="h-4 w-4" /> },
+      { href: "/class/5", label: "সব ক্লাস", icon: <Library className="h-4 w-4" /> },
     ]
   },
-  { href: "/course", label: "Courses", icon: <BookOpen className="h-5 w-5" /> },
-  { href: "/book", label: "Books/Notes", icon: <Library className="h-5 w-5" /> },
+  { href: "/course", label: "কোর্স", icon: <BookOpen className="h-5 w-5" /> },
+  { href: "/book", label: "বই ও নোট", icon: <Library className="h-5 w-5" /> },
   {
-    label: "Solutions",
+    label: "সমাধান",
     icon: <ClipboardList className="h-5 w-5" />,
     subItems: [
-      { href: "/textbook-solutions", label: "Textbook Solutions", icon: <Book className="h-4 w-4" /> },
-      { href: "/solutions/wbbse", label: "WBBSE Solutions", icon: <Book className="h-4 w-4" /> },
-      { href: "/solutions/wbchse", label: "WBCHSE Solutions", icon: <Book className="h-4 w-4" /> },
+      { href: "/textbook-solutions", label: "পাঠ্যবইয়ের সমাধান", icon: <Book className="h-4 w-4" /> },
+      { href: "/solutions/wbbse", label: "WBBSE সমাধান", icon: <Book className="h-4 w-4" /> },
+      { href: "/solutions/wbchse", label: "WBCHSE সমাধান", icon: <Book className="h-4 w-4" /> },
     ]
   },
   {
-    label: "Media",
+    label: "ভিডিও ও অডিও",
     icon: <Play className="h-5 w-5" />,
     subItems: [
-      { href: "/videos", label: "Videos", icon: <Zap className="h-4 w-4" /> },
-      { href: "/audios", label: "Audios", icon: <Headphones className="h-4 w-4" /> },
-      { href: "/documents", label: "Documents", icon: <FileText className="h-4 w-4" /> },
+      { href: "/videos", label: "ভিডিও", icon: <Zap className="h-4 w-4" /> },
+      { href: "/audios", label: "অডিও", icon: <Headphones className="h-4 w-4" /> },
+      { href: "/documents", label: "ডকুমেন্ট", icon: <FileText className="h-4 w-4" /> },
     ]
   },
   {
-    label: "Test & Practice",
+    label: "টেস্ট ও অনুশীলন",
     icon: <Award className="h-5 w-5" />,
     subItems: [
-      { href: "/mock-tests", label: "Mock Test", icon: <FileText className="h-4 w-4" /> },
-      { href: "/quiz", label: "Quiz", icon: <Sparkles className="h-4 w-4" /> },
-      { href: "/practice", label: "Practice", icon: <Activity className="h-4 w-4" /> },
-      { href: "/previous-year-papers", label: "Previous Year Papers", icon: <FileText className="h-4 w-4" /> },
+      { href: "/mock-tests", label: "মক টেস্ট", icon: <FileText className="h-4 w-4" /> },
+      { href: "/quiz", label: "কুইজ", icon: <Sparkles className="h-4 w-4" /> },
+      { href: "/practice", label: "অনুশীলন", icon: <Activity className="h-4 w-4" /> },
+      { href: "/previous-year-papers", label: "আগের বছরের প্রশ্নপত্র", icon: <FileText className="h-4 w-4" /> },
     ]
   },
-  { href: "/pricing", label: "Pricing", icon: <ShoppingCart className="h-5 w-5" /> },
+  { href: "/pricing", label: "মূল্য", icon: <ShoppingCart className="h-5 w-5" /> },
 ];
 
 const dashboardNavGroups = [
@@ -293,20 +293,20 @@ export const NotificationBell = () => {
           </div>
         )}
         {notificationPermissionStatus === 'denied' && (
-          <div className="p-2 mx-2 mb-2 bg-red-500/10 text-red-300 text-[10px] rounded text-center">
+          <div className="p-2 mx-2 mb-2 bg-red-500/10 text-red-300 text-xs rounded text-center">
             Push notifications blocked by browser.
           </div>
         )}
 
         <ScrollArea className="h-80">
           {notifications.length === 0 ? (
-            <div className="p-4 text-center text-sm text-slate-400">No notifications yet.</div>
+            <div className="p-4 text-center text-sm text-slate-300">No notifications yet.</div>
           ) : (
             <div className="flex flex-col gap-1 p-1">
               {notifications.map((notif, i) => (
                 <div key={notif.id || i} className={`p-3 text-sm rounded-md flex flex-col gap-1 ${!notif.read ? 'bg-amber-500/10 border-l-2 border-[#d4af37]' : 'hover:bg-white/5'}`}>
                   <div className="font-semibold text-white">{notif.title}</div>
-                  <div className="text-slate-400 text-xs">{notif.desc}</div>
+                  <div className="text-slate-300 text-xs">{notif.desc}</div>
                 </div>
               ))}
             </div>
@@ -521,7 +521,7 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
               <div key={idx} className="space-y-2">
                 <button
                   onClick={() => toggleGroup(group.title)}
-                  className="w-full flex items-center justify-between px-3 py-1 text-[13px] font-bold text-slate-400 hover:text-[#d4af37] transition-colors uppercase tracking-[0.2em] group-data-[collapsible=icon]:hidden focus:outline-none"
+                  className="w-full flex items-center justify-between px-3 py-1 text-[13px] font-bold text-slate-300 hover:text-[#d4af37] transition-colors uppercase tracking-[0.2em] group-data-[collapsible=icon]:hidden focus:outline-none"
                 >
                   <span>{group.title}</span>
                   {isOpen ? <ChevronDown className="w-4 h-4 opacity-70" /> : <ChevronRight className="w-4 h-4 opacity-70" />}
@@ -539,11 +539,11 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                               "justify-start w-full h-9 px-3 py-1.5 text-sm rounded-lg transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 border",
                               isActive
                                 ? "bg-white/10 text-[#d4af37] font-semibold shadow-sm border-[#d4af37]/30 hover:bg-white/10"
-                                : "bg-transparent text-slate-400 border-transparent hover:bg-white/5 hover:text-white font-medium"
+                                : "bg-transparent text-slate-300 border-transparent hover:bg-white/5 hover:text-white font-medium"
                             )}
                           >
                             <Link href={item.href} onClick={onLinkClick}>
-                              <span className={cn("transition-colors flex-shrink-0 drop-shadow-sm", isActive ? "text-[#d4af37]" : "text-slate-500 group-hover:text-slate-300", "group-data-[collapsible=icon]:mx-auto")}>
+                              <span className={cn("transition-colors flex-shrink-0 drop-shadow-sm", isActive ? "text-[#d4af37]" : "text-slate-400 group-hover:text-slate-300", "group-data-[collapsible=icon]:mx-auto")}>
                                 {React.cloneElement(item.icon as React.ReactElement, { className: "w-4 h-4" })}
                               </span>
                               <span className="ml-3 group-data-[collapsible=icon]:hidden whitespace-nowrap tracking-wide">{item.label}</span>
@@ -562,10 +562,10 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
             <Button
               asChild
               variant="ghost"
-              className="justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-lg border border-transparent bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+              className="justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-lg border border-transparent bg-transparent hover:bg-white/5 text-slate-300 hover:text-white transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
             >
               <Link href="/dashboard" onClick={onLinkClick}>
-                <LayoutGrid className="h-4 w-4 text-slate-400 dark:text-slate-500 flex-shrink-0 group-data-[collapsible=icon]:mx-auto" />
+                <LayoutGrid className="h-4 w-4 text-slate-300 dark:text-slate-400 flex-shrink-0 group-data-[collapsible=icon]:mx-auto" />
                 <span className="ml-3 group-data-[collapsible=icon]:hidden whitespace-nowrap tracking-wide">Exit Admin</span>
               </Link>
             </Button>
@@ -626,8 +626,8 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
                     className="flex justify-between items-center px-4 mb-2 cursor-pointer group group-data-[collapsible=icon]:hidden"
                     onClick={() => setOpenGroups(prev => ({ ...prev, [group.title]: !prev[group.title] }))}
                   >
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 group-hover:text-slate-300 transition-colors whitespace-nowrap truncate">{group.title}</h4>
-                    {isOpen ? <ChevronDown className="w-3.5 h-3.5 flex-shrink-0 text-slate-500 group-hover:text-slate-300 transition-colors" /> : <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-slate-500 group-hover:text-slate-300 transition-colors" />}
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-300 group-hover:text-slate-300 transition-colors whitespace-nowrap truncate">{group.title}</h4>
+                    {isOpen ? <ChevronDown className="w-3.5 h-3.5 flex-shrink-0 text-slate-400 group-hover:text-slate-300 transition-colors" /> : <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-slate-400 group-hover:text-slate-300 transition-colors" />}
                   </div>
                 )}
                 <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'} group-data-[collapsible=icon]:max-h-none group-data-[collapsible=icon]:opacity-100`}>
@@ -641,11 +641,11 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
                             "justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
                             pathname === item.href
                               ? "bg-white/10 text-white font-semibold"
-                              : "text-slate-400 hover:bg-white/5 hover:text-white"
+                              : "text-slate-300 hover:bg-white/5 hover:text-white"
                           )}
                         >
                           <Link href={item.href} onClick={onLinkClick}>
-                            <span className={cn("flex-shrink-0", pathname === item.href ? "text-[#d4af37]" : "text-slate-500", "group-data-[collapsible=icon]:mx-auto")}>{item.icon}</span>
+                            <span className={cn("flex-shrink-0", pathname === item.href ? "text-[#d4af37]" : "text-slate-400", "group-data-[collapsible=icon]:mx-auto")}>{item.icon}</span>
                             <span className="ml-3 group-data-[collapsible=icon]:hidden whitespace-nowrap">{item.label}</span>
                           </Link>
                         </Button>
@@ -664,11 +664,11 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
                 variant="ghost"
                 className={cn(
                   "justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
-                  "text-slate-400 hover:bg-white/5 hover:text-white"
+                  "text-slate-300 hover:bg-white/5 hover:text-white"
                 )}
               >
                 <Link href="/admin" onClick={onLinkClick}>
-                  <ShieldCheck className="h-4 w-4 flex-shrink-0 text-slate-500 group-data-[collapsible=icon]:mx-auto" />
+                  <ShieldCheck className="h-4 w-4 flex-shrink-0 text-slate-400 group-data-[collapsible=icon]:mx-auto" />
                   <span className="ml-3 group-data-[collapsible=icon]:hidden whitespace-nowrap">Admin Dashboard</span>
                 </Link>
               </Button>
@@ -680,7 +680,7 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
         <Button variant="outline" className="w-full group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:px-0 justify-between group-data-[collapsible=icon]:justify-center rounded-full bg-white/5 shadow-sm border-white/10 text-slate-200 h-10" asChild>
           <Link href="/pricing">
             <span className="group-data-[collapsible=icon]:hidden whitespace-nowrap">Upgrade Plan</span>
-            <ChevronRight className="h-4 w-4 text-slate-400 flex-shrink-0 group-data-[collapsible=icon]:hidden" />
+            <ChevronRight className="h-4 w-4 text-slate-300 flex-shrink-0 group-data-[collapsible=icon]:hidden" />
             <Sparkles className="h-4 w-4 text-amber-500 flex-shrink-0 hidden group-data-[collapsible=icon]:block" />
           </Link>
         </Button>
@@ -693,10 +693,10 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
             </Avatar>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden overflow-hidden">
               <span className="text-sm font-bold text-white leading-tight truncate">{user?.displayName || "User"}</span>
-              <span className="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">Free Plan</span>
+              <span className="text-xs text-slate-300 leading-tight mt-0.5 truncate">Free Plan</span>
             </div>
           </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50 group-data-[collapsible=icon]:hidden" onClick={logOut}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50 group-data-[collapsible=icon]:hidden" onClick={logOut}>
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
@@ -769,7 +769,7 @@ export function Header() {
         <MainNav isScrolled={isScrolled} />
 
         <div className="flex flex-1 items-center justify-end space-x-2 md:space-x-4">
-          <Button asChild size="icon" variant="outline" className="hidden md:flex h-9 w-9 rounded-full bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 text-amber-700 dark:text-amber-400 border-amber-300/50 dark:border-amber-700/50 hover:bg-amber-50 shadow-sm" title="Premium Upgrade">
+          <Button asChild size="icon" variant="outline" className="hidden md:flex h-9 w-9 rounded-full bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 text-amber-700 dark:text-amber-400 border-amber-300/50 dark:border-amber-700/50 hover:bg-amber-50 shadow-sm" title="প্রিমিয়াম আপগ্রেড">
             <Link href="/pricing">
               <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             </Link>

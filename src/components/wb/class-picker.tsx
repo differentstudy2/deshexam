@@ -56,7 +56,7 @@ export function ClassPicker() {
           ))}
         </div>
         {lastClass ? (
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-300">
             শেষবার আপনি <strong className="text-white">ক্লাস {toBn(lastClass)}</strong> দেখছিলেন —{" "}
             <Link href={`/class/${lastClass}?medium=${medium}`} className="font-bold text-emerald-400 hover:underline">
               যেখানে থেমেছিলেন, সেখান থেকে শুরু করুন →
@@ -72,22 +72,22 @@ export function ClassPicker() {
             onClick={() => window.localStorage.setItem(CLASS_KEY, String(n))}
             className="group flex min-h-[96px] flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-center shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-gold hover:shadow-md"
           >
-            <span className="text-2xl font-extrabold text-white group-hover:text-emerald-400 md:text-3xl">
+            <span className="text-2xl font-bold text-white group-hover:text-emerald-400 md:text-3xl">
               ক্লাস {toBn(n)}
             </span>
             <span className="mt-1 text-sm font-semibold text-slate-300">
               {boardForClass(n) === "WBBSE" ? "WBBSE" : "WBCHSE"}
             </span>
             {n === 10 ? (
-              <span className="mt-2 rounded-full bg-brand-gold/20 px-2.5 py-0.5 text-xs font-bold text-brand-golddark dark:text-amber-400">মাধ্যমিক</span>
+              <span className="mt-2 rounded-full bg-brand-gold/20 px-2.5 py-0.5 text-[15px] font-bold text-brand-golddark dark:text-amber-400">মাধ্যমিক</span>
             ) : null}
             {n === 12 ? (
-              <span className="mt-2 rounded-full bg-brand-gold/20 px-2.5 py-0.5 text-xs font-bold text-brand-golddark dark:text-amber-400">উচ্চমাধ্যমিক</span>
+              <span className="mt-2 rounded-full bg-brand-gold/20 px-2.5 py-0.5 text-[15px] font-bold text-brand-golddark dark:text-amber-400">উচ্চমাধ্যমিক</span>
             ) : null}
           </Link>
         ))}
       </div>
-      <p className="mt-4 text-center text-sm text-slate-400">
+      <p className="mt-4 text-center text-sm text-slate-300">
         ক্লাস ৫–১০: WBBSE (মাধ্যমিক) · ক্লাস ১১–১২: WBCHSE (উচ্চমাধ্যমিক)
       </p>
     </div>
