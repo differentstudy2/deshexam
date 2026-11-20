@@ -1567,7 +1567,7 @@ export default function PresentationOverlay({
   const [isRecordingPaused, setIsRecordingPaused] = useState(false);
   const [recordingQuality, setRecordingQuality] = useState<
     "standard" | "high" | "ultra" | "4k"
-  >("4k");
+  >("high");
 
   // --- Webcam PIP State ---
   const [isWebcamActive, setIsWebcamActive] = useState(false);
@@ -1644,10 +1644,10 @@ export default function PresentationOverlay({
     // Start recording
     try {
       // Configure Quality Constraints
-      let frameRate = 60;
+      let frameRate = 30;
       let width = 1920;
       let height = 1080;
-      let bitsPerSecond = 15000000; // 15 Mbps for crisp 1080p on YouTube
+      let bitsPerSecond = 10000000; // 10 Mbps — plenty for mostly-static slides, keeps text sharp
 
       if (recordingQuality === "standard") {
         frameRate = 30;
@@ -1678,6 +1678,17 @@ export default function PresentationOverlay({
         // Allow the user to select the current tab (Chrome hides it by default)
         selfBrowserSurface: "include",
       } as any);
+
+      // Keep text sharp: tell the encoder to preserve fine detail / text
+      // edges instead of smoothing them away at low bitrates.
+      try {
+        const capTrack = displayStream.getVideoTracks()[0];
+        if (capTrack && "contentHint" in capTrack) {
+          (capTrack as any).contentHint = "detail";
+        }
+      } catch (e) {
+        console.warn("Could not set contentHint on capture track", e);
+      }
 
       // 2. Get Microphone Audio
       let micStream: MediaStream | null = null;
@@ -1788,6 +1799,13 @@ export default function PresentationOverlay({
 
             canvasStream = canvas.captureStream(frameRate || 60);
             videoTrackToUse = canvasStream.getVideoTracks()[0];
+            try {
+              if ("contentHint" in videoTrackToUse) {
+                (videoTrackToUse as any).contentHint = "detail";
+              }
+            } catch (e) {
+              console.warn("Could not set contentHint on upscaler track", e);
+            }
 
             // Rebuild final stream with the upscaled video track
             const audioTracks = finalStream.getAudioTracks();
@@ -8615,7 +8633,7 @@ export default function PresentationOverlay({
                       className="text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none focus:border-indigo-500 dark:text-gray-200"
                     >
                       <option value="standard">Standard (720p / 30fps)</option>
-                      <option value="high">High (1080p / 60fps)</option>
+                      <option value="high">High (1080p / 30fps)</option>
                       <option value="ultra">Ultra (1440p / 60fps)</option>
                       <option value="4k">4K (2160p / 60fps)</option>
                     </select>
