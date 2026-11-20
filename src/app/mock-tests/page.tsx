@@ -374,9 +374,9 @@ export default async function MockTestsListingPage({
             </section>
 
             <section className="bg-indigo-50 dark:bg-indigo-950/30 p-8 rounded-2xl my-10 border border-indigo-100 dark:border-indigo-900/50 text-center">
-                <h3 className="text-2xl font-bold text-indigo-900 dark:text-indigo-100 mb-4">Unlock Unlimited Mock Tests with Pass Pro</h3>
+                <h3 className="text-2xl font-bold text-indigo-900 dark:text-indigo-100 mb-4">Unlock Unlimited Mock Tests with Pro</h3>
                 <p className="text-indigo-700 dark:text-indigo-300 mb-6 max-w-2xl mx-auto">
-                    Why stop at free tests? Get the ultimate edge with DeshExam Pass Pro. Access premium mock tests, advanced AI analytics, and priority doubt solving.
+                    Why stop at free tests? Get the ultimate edge with DeshExam Pro (₹200/month). Access premium mock tests, advanced AI analytics, and priority doubt solving.
                 </p>
                 <Link href="/pricing" className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl transition-colors shadow-md">
                     Explore Premium Plans
