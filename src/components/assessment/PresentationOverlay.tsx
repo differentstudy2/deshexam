@@ -2249,6 +2249,66 @@ export default function PresentationOverlay({
     });
   }
 
+  // End-screen (outro) live stats — computed from the session score only.
+  // Nothing here is invented: correct/wrong/skipped come from the attempt,
+  // accuracy and percentages are derived from them, and the rank comes from
+  // the real leaderboard (null when the attempt is not in the top 10).
+  const outroTotal = questions.length;
+  const outroCorrect = sessionScore.correct;
+  const outroWrong = sessionScore.wrong;
+  const outroSkipped = Math.max(0, outroTotal - outroCorrect - outroWrong);
+  const outroAccuracy =
+    outroTotal > 0 ? Math.round((outroCorrect / outroTotal) * 100) : 0;
+  const outroMarksTotal = totalMarks ?? outroTotal;
+  const outroNum = (n: number) =>
+    uiLang === "bn" ? toBanglaNumber(n) : `${n}`;
+  const outroPct = (n: number) =>
+    outroTotal > 0 ? Math.round((n / outroTotal) * 100) : 0;
+  const outroVerdict =
+    outroAccuracy >= 80 ? "great" : outroAccuracy >= 50 ? "good" : "keep";
+  const OUTRO_R = 54;
+  const OUTRO_C = 2 * Math.PI * OUTRO_R;
+  const outroSegC =
+    outroTotal > 0 ? (outroCorrect / outroTotal) * OUTRO_C : 0;
+  const outroSegW =
+    outroTotal > 0 ? (outroWrong / outroTotal) * OUTRO_C : 0;
+  const outroSegS =
+    outroTotal > 0 ? (outroSkipped / outroTotal) * OUTRO_C : 0;
+  const outroRank =
+    user && leaderboardData.length > 0
+      ? (() => {
+          const i = leaderboardData.findIndex(
+            (e: any) => e.userId === user.uid,
+          );
+          return i >= 0 ? i + 1 : null;
+        })()
+      : null;
+  const outroTips: string[] = [];
+  if (outroWrong > 0)
+    outroTips.push(
+      uiLang === "bn"
+        ? "ভুল হওয়া প্রশ্নগুলোর ব্যাখ্যা আবার পড়ুন।"
+        : "Review the explanations of the questions you got wrong.",
+    );
+  if (outroSkipped > 0)
+    outroTips.push(
+      uiLang === "bn"
+        ? "এড়িয়ে যাওয়া প্রশ্নগুলো আবার চেষ্টা করুন।"
+        : "Try the questions you skipped.",
+    );
+  if (outroAccuracy >= 80)
+    outroTips.push(
+      uiLang === "bn"
+        ? "দারুণ! পরের মক টেস্টের প্রস্তুতি নিন।"
+        : "Great! Get ready for the next mock test.",
+    );
+  if (outroTips.length === 0)
+    outroTips.push(
+      uiLang === "bn"
+        ? "সব প্রশ্নের উত্তর দেওয়া হয়েছে — দারুণ!"
+        : "Every question answered — great!",
+    );
+
   const handleThemeChange = (theme: typeof bgTheme) => {
     setBgTheme(theme);
     setQBgColor("bg-white dark:bg-gray-800");
@@ -2815,6 +2875,21 @@ export default function PresentationOverlay({
       console.error,
     );
   }, [user, sessionScore, classLine, questions.length]);
+
+  // On reaching the outro, save this attempt (logged-in users only) and
+  // load the real leaderboard so the end screen can show the user's rank.
+  useEffect(() => {
+    if (presentationStage !== "outro") return;
+    let cancelled = false;
+    (async () => {
+      await saveFinalScore().catch(() => {});
+      if (cancelled) return;
+      await fetchLeaderboard(`presentation_${classLine.substring(0, 40)}`);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [presentationStage, classLine, saveFinalScore, fetchLeaderboard]);
 
   const finalizeText = useCallback(() => {
     if (!textInput || !textInput.text.trim()) {
@@ -3669,6 +3744,18 @@ export default function PresentationOverlay({
       onClose();
     }
   }, [onClose]);
+
+  // Retake the test from the end screen — clears the score and starts over
+  // from the launch screen.
+  const retakePresentation = useCallback(() => {
+    answeredSlidesRef.current.clear();
+    setSessionScore({ correct: 0, wrong: 0, skipped: 0 });
+    setSelectedOption(null);
+    setCurrentSlide(0);
+    setStep(0);
+    setTimerSeconds(0);
+    setPresentationStage("intro");
+  }, []);
 
   const nextStep = useCallback(() => {
     if (presentationStage === "intro") {
@@ -5384,21 +5471,298 @@ export default function PresentationOverlay({
                   )}
 
                   {presentationStage === "outro" && (
-                    <div className="w-full flex-1 h-full min-h-[70vh] overflow-y-auto px-4 py-8 flex flex-col text-center animate-in fade-in zoom-in duration-500">
-                      <div className="m-auto flex flex-col items-center justify-center gap-4 sm:gap-5">
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight text-white drop-shadow-xl tracking-wide">
-                          {uiLang === "bn" ? "কুইজ সমাপ্ত!" : "Quiz Completed!"}
-                        </h1>
-                        <div className="text-6xl md:text-7xl my-2 animate-bounce drop-shadow-2xl">🏆</div>
-                        <p className="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-200 max-w-2xl leading-relaxed">
-                          {uiLang === "bn" ? "অংশগ্রহণের জন্য ধন্যবাদ। ভিডিওটি ভালো লাগলে লাইক ও সাবস্ক্রাইব করতে ভুলবেন না!" : "Thank you for participating! Don't forget to like and subscribe."}
-                        </p>
-                        <button
-                          onClick={closePresentation}
-                          className="mt-4 sm:mt-6 px-8 sm:px-10 py-3.5 sm:py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-xl sm:text-2xl rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.5)] hover:scale-105 active:scale-95 transition-all border-4 border-white/20"
-                        >
-                          {uiLang === "bn" ? "ফিরে যান" : "Finish & Exit"}
-                        </button>
+                    <div className="w-full flex-1 h-full min-h-[70vh] overflow-y-auto px-3 sm:px-5 py-6 flex flex-col animate-in fade-in zoom-in duration-500">
+                      <div className="m-auto w-full max-w-5xl flex flex-col gap-4 sm:gap-5">
+                        {/* Completion badge */}
+                        <div className="flex justify-center">
+                          <span className="inline-flex items-center gap-2 rounded-full border-2 border-amber-400/70 bg-amber-400/10 px-4 sm:px-5 py-1.5 text-base sm:text-lg font-bold text-amber-300">
+                            ✓{" "}
+                            {uiLang === "bn"
+                              ? "মক টেস্ট সম্পূর্ণ হলো"
+                              : "Mock Test Completed!"}
+                          </span>
+                        </div>
+
+                        {/* Result grid */}
+                        <div className="grid gap-4 lg:grid-cols-[1.05fr_0.9fr_1.05fr]">
+                          {/* Left — আপনার ফলাফল */}
+                          <div className="rounded-3xl border border-white/15 bg-[#0a1a3a]/80 p-4 sm:p-5 text-left shadow-2xl">
+                            <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-black text-amber-300">
+                              📊{" "}
+                              {uiLang === "bn" ? "আপনার ফলাফল" : "Your Result"}
+                            </h2>
+                            <div className="mt-4 space-y-3 text-base sm:text-lg font-bold">
+                              <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-500 text-base text-white">
+                                  ✓
+                                </span>
+                                <span className="text-slate-200">
+                                  {uiLang === "bn" ? "সঠিক উত্তর" : "Correct"}
+                                </span>
+                                <span className="ml-auto text-2xl font-black text-green-400">
+                                  {outroNum(outroCorrect)}
+                                </span>
+                                <span className="text-slate-400">
+                                  ({outroNum(outroPct(outroCorrect))}%)
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-500 text-base text-white">
+                                  ✗
+                                </span>
+                                <span className="text-slate-200">
+                                  {uiLang === "bn" ? "ভুল উত্তর" : "Wrong"}
+                                </span>
+                                <span className="ml-auto text-2xl font-black text-red-400">
+                                  {outroNum(outroWrong)}
+                                </span>
+                                <span className="text-slate-400">
+                                  ({outroNum(outroPct(outroWrong))}%)
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-500 text-base text-white">
+                                  −
+                                </span>
+                                <span className="text-slate-200">
+                                  {uiLang === "bn"
+                                    ? "এড়িয়ে গেছেন"
+                                    : "Skipped"}
+                                </span>
+                                <span className="ml-auto text-2xl font-black text-slate-300">
+                                  {outroNum(outroSkipped)}
+                                </span>
+                                <span className="text-slate-400">
+                                  ({outroNum(outroPct(outroSkipped))}%)
+                                </span>
+                              </div>
+                            </div>
+                            <div className="mt-4 flex items-center gap-3 border-t border-white/10 pt-4">
+                              <span className="text-2xl">🏆</span>
+                              <span className="font-bold text-slate-200">
+                                {uiLang === "bn" ? "মোট নম্বর" : "Total Score"}
+                              </span>
+                              <span className="ml-auto text-3xl font-black text-amber-300">
+                                {outroNum(outroCorrect)} /{" "}
+                                {outroNum(outroMarksTotal)}
+                              </span>
+                            </div>
+                            <div className="mt-4">
+                              <div className="flex items-center justify-between font-bold">
+                                <span className="text-slate-200">
+                                  🎯{" "}
+                                  {uiLang === "bn"
+                                    ? "সঠিকতার হার"
+                                    : "Accuracy"}
+                                </span>
+                                <span className="text-2xl font-black text-amber-300">
+                                  {outroNum(outroAccuracy)}%
+                                </span>
+                              </div>
+                              <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/10">
+                                <div
+                                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 transition-all"
+                                  style={{ width: `${outroAccuracy}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Centre — trophy + ribbon + rank */}
+                          <div className="order-first flex flex-col items-center justify-center gap-3 rounded-3xl border border-amber-400/30 bg-gradient-to-b from-[#0a1a3a]/60 to-transparent p-4 text-center sm:p-5 lg:order-none">
+                            <div className="animate-bounce text-7xl drop-shadow-2xl sm:text-8xl">
+                              🏆
+                            </div>
+                            <div className="mt-1 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 px-5 py-2 text-2xl font-black text-[#3a2500] shadow-[0_8px_25px_rgba(245,197,24,.45)] sm:px-6 sm:text-3xl">
+                              {outroVerdict === "great"
+                                ? uiLang === "bn"
+                                  ? "দারুণ করেছেন!"
+                                  : "Excellent!"
+                                : outroVerdict === "good"
+                                  ? uiLang === "bn"
+                                    ? "ভালো করেছেন!"
+                                    : "Well Done!"
+                                  : uiLang === "bn"
+                                    ? "চেষ্টা চালিয়ে যান!"
+                                    : "Keep Trying!"}
+                            </div>
+                            <p className="text-lg font-bold text-slate-200 sm:text-xl">
+                              {outroVerdict === "great"
+                                ? uiLang === "bn"
+                                  ? "আপনি সত্যিই অসাধারণ!"
+                                  : "You are truly amazing!"
+                                : outroVerdict === "good"
+                                  ? uiLang === "bn"
+                                    ? "আরেকটু চেষ্টা করলেই হবে!"
+                                    : "Almost there — keep going!"
+                                  : uiLang === "bn"
+                                    ? "ভুলগুলো দেখে আবার চেষ্টা করুন।"
+                                    : "Review your mistakes and try again."}
+                            </p>
+                            {outroRank !== null && (
+                              <div className="mt-1 w-full rounded-2xl border border-amber-400/50 bg-[#0a1a3a]/80 px-4 py-3">
+                                <p className="text-base font-bold text-amber-200">
+                                  👑{" "}
+                                  {uiLang === "bn"
+                                    ? "আপনার অবস্থান"
+                                    : "Your Rank"}
+                                </p>
+                                <p className="text-3xl font-black text-amber-300">
+                                  Top {outroNum(outroRank)}-এ
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Right — বিশ্লেষণ + কী শিখলেন */}
+                          <div className="rounded-3xl border border-white/15 bg-[#0a1a3a]/80 p-4 text-left shadow-2xl sm:p-5">
+                            <h2 className="flex items-center gap-2 text-xl font-black text-amber-300 sm:text-2xl">
+                              📊{" "}
+                              {uiLang === "bn"
+                                ? "ফলাফলের বিশ্লেষণ"
+                                : "Result Analysis"}
+                            </h2>
+                            <div className="mt-4 flex items-center gap-4">
+                              <div className="relative h-28 w-28 shrink-0">
+                                <svg
+                                  viewBox="0 0 128 128"
+                                  className="h-28 w-28 -rotate-90"
+                                >
+                                  <circle
+                                    cx="64"
+                                    cy="64"
+                                    r="54"
+                                    fill="none"
+                                    stroke="rgba(255,255,255,.12)"
+                                    strokeWidth="14"
+                                  />
+                                  <circle
+                                    cx="64"
+                                    cy="64"
+                                    r="54"
+                                    fill="none"
+                                    stroke="#22c55e"
+                                    strokeWidth="14"
+                                    strokeDasharray={`${outroSegC} ${OUTRO_C - outroSegC}`}
+                                    strokeDashoffset="0"
+                                  />
+                                  <circle
+                                    cx="64"
+                                    cy="64"
+                                    r="54"
+                                    fill="none"
+                                    stroke="#ef4444"
+                                    strokeWidth="14"
+                                    strokeDasharray={`${outroSegW} ${OUTRO_C - outroSegW}`}
+                                    strokeDashoffset={-outroSegC}
+                                  />
+                                  <circle
+                                    cx="64"
+                                    cy="64"
+                                    r="54"
+                                    fill="none"
+                                    stroke="#94a3b8"
+                                    strokeWidth="14"
+                                    strokeDasharray={`${outroSegS} ${OUTRO_C - outroSegS}`}
+                                    strokeDashoffset={-(outroSegC + outroSegW)}
+                                  />
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center text-2xl font-black text-white">
+                                  {outroNum(outroAccuracy)}%
+                                </div>
+                              </div>
+                              <div className="flex-1 space-y-2 text-base font-bold sm:text-lg">
+                                <p className="flex items-center gap-2">
+                                  <span className="h-3.5 w-3.5 shrink-0 rounded-full bg-green-500" />
+                                  {uiLang === "bn" ? "সঠিক" : "Correct"}
+                                  <span className="ml-auto text-slate-300">
+                                    {outroNum(outroPct(outroCorrect))}%
+                                  </span>
+                                </p>
+                                <p className="flex items-center gap-2">
+                                  <span className="h-3.5 w-3.5 shrink-0 rounded-full bg-red-500" />
+                                  {uiLang === "bn" ? "ভুল" : "Wrong"}
+                                  <span className="ml-auto text-slate-300">
+                                    {outroNum(outroPct(outroWrong))}%
+                                  </span>
+                                </p>
+                                <p className="flex items-center gap-2">
+                                  <span className="h-3.5 w-3.5 shrink-0 rounded-full bg-slate-400" />
+                                  {uiLang === "bn" ? "এড়িয়ে" : "Skipped"}
+                                  <span className="ml-auto text-slate-300">
+                                    {outroNum(outroPct(outroSkipped))}%
+                                  </span>
+                                </p>
+                              </div>
+                            </div>
+                            <p className="mt-2 text-center text-sm font-semibold text-slate-400">
+                              {uiLang === "bn" ? "সঠিকতার হার" : "Accuracy rate"}
+                            </p>
+                            <div className="mt-4 border-t border-white/10 pt-4">
+                              <h3 className="flex items-center gap-2 text-lg font-black text-amber-300">
+                                💡{" "}
+                                {uiLang === "bn"
+                                  ? "কী শিখলেন?"
+                                  : "What to learn?"}
+                              </h3>
+                              <ul className="mt-2 space-y-2">
+                                {outroTips.map((tip, i) => (
+                                  <li
+                                    key={i}
+                                    className="flex items-start gap-2 text-base font-semibold text-slate-200"
+                                  >
+                                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-500 text-xs text-white">
+                                      ✓
+                                    </span>
+                                    {tip}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="flex flex-wrap items-center justify-center gap-3">
+                          <button
+                            onClick={retakePresentation}
+                            className="rounded-full border-2 border-white/30 bg-white/10 px-5 py-3 text-lg font-black text-white transition-transform hover:scale-105 active:scale-95 sm:px-6 sm:text-xl"
+                          >
+                            ↻{" "}
+                            {uiLang === "bn"
+                              ? "পুনরায় পরীক্ষা দিন"
+                              : "Retake Test"}
+                          </button>
+                          <a
+                            href="/presentation"
+                            className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 px-5 py-3 text-lg font-black text-[#3a2500] shadow-[0_8px_25px_rgba(245,197,24,.45)] transition-transform hover:scale-105 active:scale-95 sm:px-6 sm:text-xl"
+                          >
+                            ▶{" "}
+                            {uiLang === "bn"
+                              ? "আরও মক টেস্ট দেখুন"
+                              : "More Mock Tests"}
+                          </a>
+                          <span className="rounded-full bg-gradient-to-r from-red-600 to-red-500 px-5 py-3 text-lg font-black text-white shadow-[0_8px_25px_rgba(220,38,38,.45)] sm:px-6 sm:text-xl">
+                            ▶ Subscribe • DeshExam
+                          </span>
+                        </div>
+
+                        {/* Footer strip */}
+                        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 border-t border-amber-400/40 pt-4 text-center">
+                          <span className="text-base font-bold text-amber-200 sm:text-lg">
+                            ❝{" "}
+                            {uiLang === "bn"
+                              ? "চেষ্টা চালিয়ে যান, সাফল্য একদিন আসবেই!"
+                              : "Keep trying — success will come one day!"}{" "}
+                            ❞
+                          </span>
+                          <a
+                            href="https://deshexam.vercel.app/"
+                            className="text-base font-bold text-slate-300 hover:text-white"
+                          >
+                            🌐 deshexam.vercel.app
+                          </a>
+                        </div>
                       </div>
                     </div>
                   )}
