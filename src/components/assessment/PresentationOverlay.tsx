@@ -1236,6 +1236,11 @@ interface PresentationOverlayProps {
   onClose?: () => void;
   isPremiumUser?: boolean;
   testLanguage?: string;
+  /** Live exam facts for the launch screen — rows render only when provided. */
+  durationMin?: number;
+  totalMarks?: number;
+  negativeMarking?: number;
+  typeLabel?: string;
 }
 
 const SevenSegmentDigit = ({
@@ -1995,6 +2000,10 @@ export default function PresentationOverlay({
   onClose,
   isPremiumUser,
   testLanguage,
+  durationMin,
+  totalMarks,
+  negativeMarking,
+  typeLabel,
 }: PresentationOverlayProps) {
   const { user, userProfile } = useAuth();
   const [fetchedIsAdmin, setFetchedIsAdmin] = useState(false);
@@ -2794,6 +2803,43 @@ export default function PresentationOverlay({
       displayTitle = taxonomyString;
       displayTaxonomy = "";
     }
+  }
+
+  // Launch-screen info rows — live data only; a row renders only when its
+  // value was actually passed in (never invented from the launch file).
+  const launchInfoRows: { icon: string; label: string; value: string }[] = [];
+  if (questions.length > 0) {
+    launchInfoRows.push({
+      icon: "❓",
+      label: uiLang === "bn" ? "মোট প্রশ্ন" : "Total Questions",
+      value: uiLang === "bn" ? `${toBanglaNumber(questions.length)}টি` : `${questions.length}`,
+    });
+  }
+  if (durationMin) {
+    launchInfoRows.push({
+      icon: "⏱️",
+      label: uiLang === "bn" ? "সময়" : "Duration",
+      value: uiLang === "bn" ? `${toBanglaNumber(durationMin)} মিনিট` : `${durationMin} min`,
+    });
+  }
+  if (negativeMarking !== undefined && negativeMarking !== null) {
+    launchInfoRows.push({
+      icon: "⛔",
+      label: uiLang === "bn" ? "নেগেটিভ মার্কিং" : "Negative Marking",
+      value:
+        negativeMarking === 0
+          ? uiLang === "bn"
+            ? "নেই"
+            : "None"
+          : `−${uiLang === "bn" ? toBanglaNumber(negativeMarking) : negativeMarking}`,
+    });
+  }
+  if (totalMarks) {
+    launchInfoRows.push({
+      icon: "📶",
+      label: uiLang === "bn" ? "মোট নম্বর" : "Total Marks",
+      value: uiLang === "bn" ? toBanglaNumber(totalMarks) : `${totalMarks}`,
+    });
   }
 
   const handleThemeChange = (theme: typeof bgTheme) => {
@@ -5807,24 +5853,124 @@ export default function PresentationOverlay({
                   className="w-full flex flex-col items-center flex-1 md:gap-0 gap-0"
                 >
                   {presentationStage === "intro" && (
-                    <div className="w-full flex flex-col items-center justify-center flex-1 h-full min-h-[70vh] gap-6 text-center animate-in fade-in zoom-in duration-500">
-                      <h1 className={`text-4xl md:text-6xl lg:text-8xl font-black ${isDarkMode ? "text-white" : "text-slate-800"} drop-shadow-xl uppercase tracking-wider`}>
-                        {displayTitle || (uiLang === "bn" ? "সাধারণ জ্ঞান কুইজ" : "General Knowledge Quiz")}
-                      </h1>
-                      {displayTaxonomy && (
-                        <h2 className="text-xl md:text-3xl lg:text-4xl font-extrabold text-blue-500 dark:text-blue-400 drop-shadow-md max-w-4xl">
-                          {displayTaxonomy}
-                        </h2>
-                      )}
-                      <p className="text-lg md:text-2xl text-slate-600 dark:text-slate-300 max-w-2xl mt-4 font-semibold">
-                        {uiLang === "bn" ? "আজকের কুইজে আপনাকে স্বাগতম! প্রস্তুত হলে শুরু করুন।" : "Welcome to today's quiz! Get ready to test your knowledge."}
-                      </p>
-                      <button
-                        onClick={nextStep}
-                        className="mt-8 px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-2xl md:text-3xl rounded-full shadow-[0_10px_30px_rgba(59,130,246,0.6)] hover:scale-105 active:scale-95 transition-all border-4 border-white/20"
+                    <div className="w-full flex flex-col items-center justify-center flex-1 h-full min-h-[70vh] px-2 py-4">
+                      <style>{`
+                        .lx-stage { background: radial-gradient(circle at 50% 40%, #16449c 0%, #0a2257 50%, #071535 100%); }
+                        .lx-pill { background: linear-gradient(#ffe27a, #f2a900); color: #1a1200; }
+                        .lx-panel { background: rgba(13,35,85,.75); border: 2px solid rgba(80,130,255,.4); }
+                        @keyframes lx-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+                        @keyframes lx-in { from { opacity: 0; } to { opacity: 1; } }
+                        @keyframes lx-pop { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
+                        .lx-a-up { animation: lx-up .6s ease both; }
+                        .lx-a-in { animation: lx-in .6s ease both; }
+                        .lx-a-pop { animation: lx-pop .5s cubic-bezier(.34,1.56,.64,1) both; }
+                        @media (prefers-reduced-motion: reduce) {
+                          .lx-a-up, .lx-a-in, .lx-a-pop { animation: none; }
+                        }
+                      `}</style>
+                      {/* Launch screen — same design as the supplied DeshExam launch screen, live data only */}
+                      <div
+                        className="lx-stage w-full max-w-5xl overflow-hidden rounded-3xl text-white shadow-2xl"
+                        style={{ border: "2px solid rgba(255,198,42,.45)" }}
                       >
-                        {uiLang === "bn" ? "শুরু করুন" : "Start Quiz"}
-                      </button>
+                        {/* Header bar */}
+                        <div
+                          className="lx-a-in flex flex-wrap items-center gap-x-4 gap-y-2 px-5 sm:px-7 py-3"
+                          style={{ background: "rgba(5,15,42,.92)", borderBottom: "3px solid #FFC62A" }}
+                        >
+                          <div
+                            className="grid place-items-center rounded-full font-bold shrink-0"
+                            style={{ width: 48, height: 48, border: "3px solid #FFC62A", color: "#FFC62A", fontSize: 19 }}
+                          >
+                            DE
+                          </div>
+                          <div className="leading-tight">
+                            <div className="text-xl sm:text-2xl font-bold">
+                              Desh<span style={{ color: "#FFC62A" }}>Exam</span>
+                            </div>
+                            <div className="text-[10px] tracking-[3px] text-white/80">LEARN • PRACTICE • SUCCEED</div>
+                          </div>
+                          <div className="hidden md:block w-[3px] h-10 shrink-0" style={{ background: "#FFC62A" }} />
+                          <div className="text-base sm:text-xl font-semibold flex-1 min-w-[160px]">
+                            {uiLang === "bn" ? "সঠিক প্রস্তুতি, সফলতার পথে" : "Right preparation, on the path to success"}
+                          </div>
+                          <span className="hidden sm:inline-flex items-center gap-2 text-sm font-bold leading-tight">
+                            <span className="rounded-lg px-2 py-1 text-base" style={{ background: "#e41818" }}>▶</span>
+                            Subscribe DeshExam
+                          </span>
+                        </div>
+
+                        {/* Body */}
+                        <div className="flex flex-col items-center text-center px-5 sm:px-8 pt-6 pb-6">
+                          <img src="/launch/emb.png" alt="" width={295} height={133} className="lx-a-pop w-[130px] sm:w-[170px] h-auto" style={{ animationDelay: ".25s" }} />
+                          <img src="/launch/logo.png" alt="DeshExam" width={640} height={106} className="lx-a-pop w-[240px] sm:w-[360px] h-auto mt-2" style={{ animationDelay: ".4s" }} />
+                          {typeLabel ? (
+                            <span className="lx-pill lx-a-pop inline-block rounded-full px-6 py-1 text-lg sm:text-xl font-bold italic mt-4" style={{ animationDelay: ".55s" }}>
+                              {typeLabel}
+                            </span>
+                          ) : null}
+                          <h1 className="lx-a-up text-3xl sm:text-4xl lg:text-5xl font-bold leading-snug mt-4 max-w-4xl" style={{ animationDelay: ".65s" }}>
+                            {displayTitle || (uiLang === "bn" ? "সাধারণ জ্ঞান কুইজ" : "General Knowledge Quiz")}
+                          </h1>
+                          {displayTaxonomy ? (
+                            <h2 className="lx-a-up text-lg sm:text-2xl font-bold text-sky-300 mt-3 max-w-3xl" style={{ animationDelay: ".75s" }}>
+                              {displayTaxonomy}
+                            </h2>
+                          ) : null}
+                          <p className="lx-a-in text-base sm:text-lg text-white/85 mt-3" style={{ animationDelay: ".85s" }}>
+                            <span style={{ color: "#FFC62A" }}>—</span>&nbsp;
+                            {uiLang === "bn" ? "নিজেকে যাচাই করুন, এগিয়ে যান আরও দূরে..." : "Test yourself, and go even further..."}
+                            &nbsp;<span style={{ color: "#FFC62A" }}>—</span>
+                          </p>
+
+                          {launchInfoRows.length > 0 && (
+                            <div className="w-full max-w-xl mt-5">
+                              <span className="lx-pill lx-a-pop inline-block rounded-full px-5 py-1 text-base sm:text-lg font-bold" style={{ animationDelay: ".95s" }}>
+                                {uiLang === "bn" ? "📋 পরীক্ষার তথ্য" : "📋 Exam Info"}
+                              </span>
+                              <div className="lx-panel lx-a-up rounded-3xl px-5 py-1 mt-3 text-left" style={{ animationDelay: "1.05s" }}>
+                                {launchInfoRows.map((row, i) => (
+                                  <div
+                                    key={row.label}
+                                    className="flex items-center gap-3 py-2.5 text-base sm:text-lg"
+                                    style={{ borderBottom: i < launchInfoRows.length - 1 ? "1px solid rgba(255,255,255,.14)" : "none" }}
+                                  >
+                                    <span className="w-9 text-center text-xl">{row.icon}</span>
+                                    <span>{row.label}</span>
+                                    <span className="ml-auto font-bold" style={{ color: "#FFC62A" }}>
+                                      {row.value}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Photo strip */}
+                          <div className="hidden md:flex items-center justify-center gap-3 mt-5">
+                            <img src="/launch/student.jpg" alt="" width={480} height={420} className="lx-a-in h-24 w-auto rounded-xl object-cover" style={{ animationDelay: "1.1s" }} />
+                            <img src="/launch/books.jpg" alt="" width={290} height={181} className="lx-a-in h-24 w-auto rounded-xl object-cover" style={{ animationDelay: "1.15s" }} />
+                            <img src="/launch/bldg.jpg" alt="" width={512} height={325} className="lx-a-in h-24 w-auto rounded-xl object-cover" style={{ animationDelay: "1.2s" }} />
+                          </div>
+
+                          <button
+                            onClick={nextStep}
+                            className="lx-pill lx-a-up inline-block rounded-full px-8 sm:px-10 py-3 sm:py-4 text-2xl sm:text-3xl font-bold mt-6 hover:scale-105 active:scale-95 transition-transform"
+                            style={{ animationDelay: "1.25s", boxShadow: "0 0 40px rgba(255,198,42,.6)" }}
+                          >
+                            {uiLang === "bn" ? "▶ টেস্ট শুরু করো »" : "▶ Start Test »"}
+                          </button>
+                        </div>
+
+                        {/* Footer strip */}
+                        <div
+                          className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 sm:px-7 py-3 text-sm sm:text-base"
+                          style={{ background: "#050f2a", borderTop: "3px solid #FFC62A" }}
+                        >
+                          <span>🏆 {uiLang === "bn" ? "সফলতার জন্য আজই শুরু হোক আপনার প্রস্তুতি..." : "Start your preparation for success today..."}</span>
+                          <span className="font-semibold">🌐 deshexam.vercel.app</span>
+                        </div>
+                      </div>
                     </div>
                   )}
 

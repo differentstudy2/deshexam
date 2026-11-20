@@ -259,6 +259,10 @@ export default function PresentationClient({ assessments, featured }: { assessme
                         testLanguage={previewTest.language}
                         autoStart={true}
                         onClose={() => setPreviewTest(null)}
+                        durationMin={previewTest.durationMin}
+                        totalMarks={previewTest.totalMarks}
+                        negativeMarking={previewTest.negativeMarking}
+                        typeLabel={previewTest.type || 'Mock Test'}
                     />
                 </div>
             )}

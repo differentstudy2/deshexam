@@ -18,6 +18,11 @@ interface Assessment {
     textbookId?: string;
     chapterId?: string;
     topicId?: string;
+    language?: string;
+    durationMin?: number;
+    totalMarks?: number;
+    negativeMarking?: number;
+    type?: string;
 }
 
 export default function PresentationAutoOpen({ assessment }: { assessment: Assessment }) {
@@ -57,6 +62,10 @@ export default function PresentationAutoOpen({ assessment }: { assessment: Asses
             autoStart={true}
             onClose={handleClose}
             isPremiumUser={true}
+            durationMin={assessment.durationMin}
+            totalMarks={assessment.totalMarks}
+            negativeMarking={assessment.negativeMarking}
+            typeLabel={assessment.type}
         />
     );
 }

@@ -2112,6 +2112,9 @@ export function ExamClient({ mockTest, initialQuestions }: ExamClientProps) {
                 onClose={() => setShowPresentationMode(false)}
                 isPremiumUser={isPremiumUser}
                 testLanguage={mockTest.language}
+                durationMin={mockTest.durationMin}
+                totalMarks={mockTest.totalMarks}
+                negativeMarking={mockTest.negativeMarking}
               />
             </div>
           </div>

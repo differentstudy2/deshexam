@@ -7,9 +7,9 @@ import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import PresentationAutoOpen from './PresentationAutoOpen';
 
 const FIREBASE_COLLECTIONS = [
-    'mockTests',
-    'quizzes',
-    'practiceSets',
+    { name: 'mockTests', type: 'Mock Test' },
+    { name: 'quizzes', type: 'Quiz' },
+    { name: 'practiceSets', type: 'Practice Set' },
 ] as const;
 
 async function findAssessmentFromFirebase(slugOrId: string): Promise<any | null> {
@@ -17,12 +17,12 @@ async function findAssessmentFromFirebase(slugOrId: string): Promise<any | null>
     for (const col of FIREBASE_COLLECTIONS) {
         try {
             // Try by slug
-            const bySlug = await getAssessmentBySlug(col, slugOrId);
-            if (bySlug) return bySlug;
+            const bySlug = await getAssessmentBySlug(col.name as any, slugOrId);
+            if (bySlug) return { ...bySlug, type: col.type };
 
             // Try by id
-            const byId = await getAssessment(col, slugOrId);
-            if (byId) return byId;
+            const byId = await getAssessment(col.name as any, slugOrId);
+            if (byId) return { ...byId, type: col.type };
         } catch (_) {
             // Continue to next collection
         }
@@ -71,9 +71,9 @@ export default async function SinglePresentationPage(props: { params: Promise<{ 
 
     // 1. Try hardcoded sources first (fast, no network)
     let test =
-        getHardcodedMockTest(slugOrId) ||
-        getHardcodedQuiz(slugOrId) ||
-        getHardcodedPracticeSet(slugOrId);
+        (getHardcodedMockTest(slugOrId) ? { ...getHardcodedMockTest(slugOrId), type: 'Mock Test' } : null) ||
+        (getHardcodedQuiz(slugOrId) ? { ...getHardcodedQuiz(slugOrId), type: 'Quiz' } : null) ||
+        (getHardcodedPracticeSet(slugOrId) ? { ...getHardcodedPracticeSet(slugOrId), type: 'Practice Set' } : null);
 
     // 2. Fallback to Firebase
     if (!test) {
