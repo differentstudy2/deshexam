@@ -5471,7 +5471,7 @@ export default function PresentationOverlay({
                   )}
 
                   {presentationStage === "outro" && (
-                    <div className="w-full flex-1 h-full min-h-[70vh] overflow-y-auto px-3 sm:px-5 py-6 flex flex-col animate-in fade-in zoom-in duration-500">
+                    <div className="w-full flex-1 h-full min-h-[70vh] overflow-y-auto bg-[#050d1a] px-3 sm:px-5 py-6 flex flex-col animate-in fade-in zoom-in duration-500">
                       <div className="m-auto w-full max-w-5xl flex flex-col gap-4 sm:gap-5">
                         {/* Completion badge */}
                         <div className="flex justify-center">
