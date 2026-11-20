@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { ClassPicker } from "@/components/wb/class-picker";
 import { DemoTest } from "@/components/wb/demo-test";
+import { Hero } from "@/components/wb/hero";
 import { EmptyState, PriceTag, SectionHeader, Thumbnail } from "@/components/wb/ui";
 import {
   PLANS,
@@ -94,59 +95,7 @@ export default function Home() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
 
       {/* 4.2 Hero */}
-      <section className="section-dark-hero text-white">
-        <div className="container mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-2 md:items-center md:py-14">
-          <div>
-            <p className="mb-3 inline-block rounded-full border border-amber-300/40 bg-white/10 px-3 py-1 text-[15px] font-bold tracking-wide text-amber-200">
-              WBBSE · WBCHSE · ক্লাস ৫–১২
-            </p>
-            <h1 className="text-3xl font-bold leading-snug tracking-tight md:text-5xl md:leading-tight">
-              ক্লাস ৫ থেকে ১২ — পশ্চিমবঙ্গ বোর্ডের সম্পূর্ণ প্রস্তুতি, এক জায়গায়
-            </h1>
-            <p className="mt-4 max-w-xl text-base leading-relaxed text-teal-100 md:text-lg">
-              অধ্যায়ভিত্তিক MCQ, আগের বছরের প্রশ্নপত্র, সাজেশন ও মক টেস্ট — বাংলা ও ইংরেজি মাধ্যমে, এক জায়গায়।
-            </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="#demo-test"
-                className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-brand-gold px-8 text-base font-bold text-[#042f2e] shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
-              >
-                ফ্রি টেস্ট দিন
-              </Link>
-              <Link
-                href="#class-picker"
-                className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-amber-300/50 bg-white/5 px-8 text-base font-bold text-amber-100 backdrop-blur transition-all hover:bg-white/10"
-              >
-                ক্লাস বেছে নিন
-              </Link>
-            </div>
-            <p className="mt-4 text-base text-teal-100">লগইন ছাড়াই ফ্রি টেস্ট দেওয়া যায়।</p>
-          </div>
-          {/* Phone-frame mockup of the exam interface — original CSS mockup, no photo */}
-          <div className="mx-auto w-full max-w-xs" aria-hidden="true">
-            <div className="rounded-[2rem] border-4 border-slate-700 bg-slate-900 p-3 shadow-2xl">
-              <div className="rounded-[1.5rem] bg-white p-4 dark:bg-slate-800">
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">ক্লাস ১০ · জীবনবিজ্ঞান</span>
-                  <span className="text-sm font-bold text-slate-700 dark:text-slate-200">⏱ ০৪:৩২</span>
-                </div>
-                <p className="mt-3 text-base font-bold leading-relaxed text-slate-900 dark:text-white">
-                  সালোকসংশ্লেষ প্রক্রিয়ায় উদ্ভিদ কোন গ্যাস গ্রহণ করে?
-                </p>
-                <div className="mt-3 space-y-2">
-                  <div className="rounded-xl border border-slate-200 px-3 py-2 text-base text-slate-700 dark:border-slate-600 dark:text-slate-200">ক) অক্সিজেন</div>
-                  <div className="rounded-xl border-2 border-emerald-600 bg-emerald-50 px-3 py-2 text-base font-bold text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200">খ) কার্বন ডাই-অক্সাইড ✓</div>
-                  <div className="rounded-xl border border-slate-200 px-3 py-2 text-base text-slate-700 dark:border-slate-600 dark:text-slate-200">গ) নাইট্রোজেন</div>
-                </div>
-                <div className="mt-4 rounded-xl bg-slate-50 p-3 text-center dark:bg-slate-900">
-                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">ফলাফল</p>
-                  <p className="text-2xl font-extrabold text-emerald-700 dark:text-emerald-400">৪ / ৫ সঠিক</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Hero />
 
       {/* 4.3 Class picker */}
       <section id="class-picker" className="section-dark scroll-mt-20 py-12 md:py-16">
