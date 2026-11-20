@@ -1,0 +1,2192 @@
+[
+  {
+    "id": "subject-math-class-10",
+    "title": "Mathematics",
+    "slug": "mathematics",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-cbse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "cbse-board/class-10/mathematics",
+    "boardSlug": "cbse-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-cbse",
+        "slug": "cbse-board",
+        "title": "CBSE Board",
+        "type": "board"
+      },
+      {
+        "id": "class-10-cbse",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-science-class-10",
+    "title": "Science",
+    "slug": "science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-cbse",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "cbse-board/class-10/science",
+    "boardSlug": "cbse-board",
+    "classSlug": "class-10",
+    "subjectSlug": "science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-cbse",
+        "slug": "cbse-board",
+        "title": "CBSE Board",
+        "type": "board"
+      },
+      {
+        "id": "class-10-cbse",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-class-10",
+    "title": "English",
+    "slug": "english",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-cbse",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "cbse-board/class-10/english",
+    "boardSlug": "cbse-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-cbse",
+        "slug": "cbse-board",
+        "title": "CBSE Board",
+        "type": "board"
+      },
+      {
+        "id": "class-10-cbse",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-social-class-10",
+    "title": "Social Science",
+    "slug": "social-science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-cbse",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "cbse-board/class-10/social-science",
+    "boardSlug": "cbse-board",
+    "classSlug": "class-10",
+    "subjectSlug": "social-science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-cbse",
+        "slug": "cbse-board",
+        "title": "CBSE Board",
+        "type": "board"
+      },
+      {
+        "id": "class-10-cbse",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-hindi-class-10",
+    "title": "Hindi",
+    "slug": "hindi",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-cbse",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "cbse-board/class-10/hindi",
+    "boardSlug": "cbse-board",
+    "classSlug": "class-10",
+    "subjectSlug": "hindi",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-cbse",
+        "slug": "cbse-board",
+        "title": "CBSE Board",
+        "type": "board"
+      },
+      {
+        "id": "class-10-cbse",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-evs-class-5-wb",
+    "title": "Environmental Science",
+    "slug": "environmental-science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-5-wb",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/environmental-science",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "environmental-science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-math-class-5-wb",
+    "title": "Mathematics",
+    "slug": "mathematics",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-5-wb",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/mathematics",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "mathematics",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-lang-class-5-wb",
+    "title": "Bengali Language",
+    "slug": "bengali-language",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-5-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-language",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-language",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-health-class-5-wb",
+    "title": "Health & Physical Education",
+    "slug": "health-physical-education",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-5-wb",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/health-physical-education",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "health-physical-education",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-lit-class-5-wb",
+    "title": "Bengali Literature",
+    "slug": "bengali-literature",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-5-wb",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/bengali-literature",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "bengali-literature",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-geography-class-6-wb",
+    "title": "Geography",
+    "slug": "geography",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-6-wb",
+    "orderIndex": 11,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/geography",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "geography",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-history-class-6-wb",
+    "title": "History",
+    "slug": "history",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-6-wb",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/history",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "history",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-grammar-class-6-wb",
+    "title": "Bengali Grammar",
+    "slug": "bengali-grammar",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-6-wb",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-grammar",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-grammar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-mathematics-class-6-wb",
+    "title": "Mathematics",
+    "slug": "mathematics",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-6-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/mathematics",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "mathematics",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-rapid-reader-class-6-wb",
+    "title": "Rapid Reader",
+    "slug": "rapid-reader",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-6-wb",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/rapid-reader",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "rapid-reader",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-science-class-6-wb",
+    "title": "Science",
+    "slug": "science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-6-wb",
+    "orderIndex": 16,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/science",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-literature-class-6-wb",
+    "title": "Bengali Literature",
+    "slug": "bengali-literature",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-6-wb",
+    "orderIndex": 17,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/bengali-literature",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "bengali-literature",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-geography-class-7-wb",
+    "title": "Geography",
+    "slug": "geography",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-7-wb",
+    "orderIndex": 18,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/geography",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "geography",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-history-class-7-wb",
+    "title": "History",
+    "slug": "history",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-7-wb",
+    "orderIndex": 19,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/history",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "history",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-grammar-class-7-wb",
+    "title": "Bengali Grammar",
+    "slug": "bengali-grammar",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-7-wb",
+    "orderIndex": 20,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/bengali-grammar",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "bengali-grammar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-mathematics-class-7-wb",
+    "title": "Mathematics",
+    "slug": "mathematics",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-7-wb",
+    "orderIndex": 21,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/mathematics",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "mathematics",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-rapid-reader-class-7-wb",
+    "title": "Rapid Reader",
+    "slug": "rapid-reader",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-7-wb",
+    "orderIndex": 22,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/rapid-reader",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "rapid-reader",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-science-class-7-wb",
+    "title": "Science",
+    "slug": "science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-7-wb",
+    "orderIndex": 23,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/science",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-literature-class-7-wb",
+    "title": "Bengali Literature",
+    "slug": "bengali-literature",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-7-wb",
+    "orderIndex": 24,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/bengali-literature",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "bengali-literature",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-geography-class-8-wb",
+    "title": "Geography",
+    "slug": "geography",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-8-wb",
+    "orderIndex": 25,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/geography",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "geography",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-history-class-8-wb",
+    "title": "History",
+    "slug": "history",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-8-wb",
+    "orderIndex": 26,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/history",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "history",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-grammar-class-8-wb",
+    "title": "Bengali Grammar",
+    "slug": "bengali-grammar",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-8-wb",
+    "orderIndex": 27,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-grammar",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-grammar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-mathematics-class-8-wb",
+    "title": "Mathematics",
+    "slug": "mathematics",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-8-wb",
+    "orderIndex": 28,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/mathematics",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "mathematics",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-rapid-reader-class-8-wb",
+    "title": "Rapid Reader",
+    "slug": "rapid-reader",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-8-wb",
+    "orderIndex": 29,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/rapid-reader",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "rapid-reader",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-science-class-8-wb",
+    "title": "Science",
+    "slug": "science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-8-wb",
+    "orderIndex": 30,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/science",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-literature-class-8-wb",
+    "title": "Bengali Literature",
+    "slug": "bengali-literature",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-8-wb",
+    "orderIndex": 31,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/bengali-literature",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "bengali-literature",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-mathematics-class-9-wb",
+    "title": "Mathematics",
+    "slug": "mathematics",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-9-wb",
+    "orderIndex": 32,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/mathematics",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "mathematics",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-rapid-reader-class-9-wb",
+    "title": "Rapid Reader",
+    "slug": "rapid-reader",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-9-wb",
+    "orderIndex": 33,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/rapid-reader",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "rapid-reader",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-literature-class-9-wb",
+    "title": "Bengali Literature",
+    "slug": "bengali-literature",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-9-wb",
+    "orderIndex": 34,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/bengali-literature",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "bengali-literature",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-mathematics-class-10-wb",
+    "title": "Mathematics",
+    "slug": "mathematics",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-wb",
+    "orderIndex": 35,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/mathematics",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "mathematics",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-rapid-reader-class-10-wb",
+    "title": "Rapid Reader",
+    "slug": "rapid-reader",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-wb",
+    "orderIndex": 36,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/rapid-reader",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "rapid-reader",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-literature-class-10-wb",
+    "title": "Bengali Literature",
+    "slug": "bengali-literature",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-wb",
+    "orderIndex": 37,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/bengali-literature",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "bengali-literature",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-language-class-1-wbbpe",
+    "title": "Bengali Language",
+    "slug": "bengali-language",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-1-wbbpe",
+    "orderIndex": 38,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-1/bengali-language",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-1",
+    "subjectSlug": "bengali-language",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-1-wbbpe",
+        "slug": "class-1",
+        "title": "Class 1",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-health-physical-education-class-1-wbbpe",
+    "title": "Health & Physical Education",
+    "slug": "health-physical-education",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-1-wbbpe",
+    "orderIndex": 39,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-1/health-physical-education",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-1",
+    "subjectSlug": "health-physical-education",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-1-wbbpe",
+        "slug": "class-1",
+        "title": "Class 1",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-literature-class-1-wbbpe",
+    "title": "Bengali Literature",
+    "slug": "bengali-literature",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-1-wbbpe",
+    "orderIndex": 40,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-1/bengali-literature",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-1",
+    "subjectSlug": "bengali-literature",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-1-wbbpe",
+        "slug": "class-1",
+        "title": "Class 1",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-language-class-2-wbbpe",
+    "title": "Bengali Language",
+    "slug": "bengali-language",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-2-wbbpe",
+    "orderIndex": 41,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-2/bengali-language",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-2",
+    "subjectSlug": "bengali-language",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-2-wbbpe",
+        "slug": "class-2",
+        "title": "Class 2",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-health-physical-education-class-2-wbbpe",
+    "title": "Health & Physical Education",
+    "slug": "health-physical-education",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-2-wbbpe",
+    "orderIndex": 42,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-2/health-physical-education",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-2",
+    "subjectSlug": "health-physical-education",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-2-wbbpe",
+        "slug": "class-2",
+        "title": "Class 2",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-literature-class-2-wbbpe",
+    "title": "Bengali Literature",
+    "slug": "bengali-literature",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-2-wbbpe",
+    "orderIndex": 43,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-2/bengali-literature",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-2",
+    "subjectSlug": "bengali-literature",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-2-wbbpe",
+        "slug": "class-2",
+        "title": "Class 2",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-environmental-science-class-3-wbbpe",
+    "title": "Environmental Science",
+    "slug": "environmental-science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-3-wbbpe",
+    "orderIndex": 44,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-3/environmental-science",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-3",
+    "subjectSlug": "environmental-science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-3-wbbpe",
+        "slug": "class-3",
+        "title": "Class 3",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-mathematics-class-3-wbbpe",
+    "title": "Mathematics",
+    "slug": "mathematics",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-3-wbbpe",
+    "orderIndex": 45,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-3/mathematics",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-3",
+    "subjectSlug": "mathematics",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-3-wbbpe",
+        "slug": "class-3",
+        "title": "Class 3",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-health-physical-education-class-3-wbbpe",
+    "title": "Health & Physical Education",
+    "slug": "health-physical-education",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-3-wbbpe",
+    "orderIndex": 46,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-3/health-physical-education",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-3",
+    "subjectSlug": "health-physical-education",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-3-wbbpe",
+        "slug": "class-3",
+        "title": "Class 3",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-literature-class-3-wbbpe",
+    "title": "Bengali Literature",
+    "slug": "bengali-literature",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-3-wbbpe",
+    "orderIndex": 47,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-3/bengali-literature",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-3",
+    "subjectSlug": "bengali-literature",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-3-wbbpe",
+        "slug": "class-3",
+        "title": "Class 3",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-environmental-science-class-4-wbbpe",
+    "title": "Environmental Science",
+    "slug": "environmental-science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-wbbpe",
+    "orderIndex": 48,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-4/environmental-science",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-4",
+    "subjectSlug": "environmental-science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-wbbpe",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-mathematics-class-4-wbbpe",
+    "title": "Mathematics",
+    "slug": "mathematics",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-wbbpe",
+    "orderIndex": 49,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-4/mathematics",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-wbbpe",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-grammar-class-4-wbbpe",
+    "title": "Bengali Grammar",
+    "slug": "bengali-grammar",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-wbbpe",
+    "orderIndex": 50,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-4/bengali-grammar",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-wbbpe",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-health-physical-education-class-4-wbbpe",
+    "title": "Health & Physical Education",
+    "slug": "health-physical-education",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-wbbpe",
+    "orderIndex": 51,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-4/health-physical-education",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-4",
+    "subjectSlug": "health-physical-education",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-wbbpe",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-literature-class-4-wbbpe",
+    "title": "Bengali Literature",
+    "slug": "bengali-literature",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-wbbpe",
+    "orderIndex": 52,
+    "status": "published",
+    "fullSlug": "wbbpe-board/class-4/bengali-literature",
+    "boardSlug": "wbbpe-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-literature",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wbbpe",
+        "slug": "wbbpe-board",
+        "title": "WBBPE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-wbbpe",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-class-5-wb",
+    "title": "English",
+    "slug": "english",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-5-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-5/english",
+    "boardSlug": "wb-board",
+    "classSlug": "class-5",
+    "subjectSlug": "english",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-5-wb",
+        "slug": "class-5",
+        "title": "Class 5",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-class-6-wb",
+    "title": "English",
+    "slug": "english",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-6-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-6/english",
+    "boardSlug": "wb-board",
+    "classSlug": "class-6",
+    "subjectSlug": "english",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-6-wb",
+        "slug": "class-6",
+        "title": "Class 6",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-class-7-wb",
+    "title": "English",
+    "slug": "english",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-7-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-7/english",
+    "boardSlug": "wb-board",
+    "classSlug": "class-7",
+    "subjectSlug": "english",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-7-wb",
+        "slug": "class-7",
+        "title": "Class 7",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-class-8-wb",
+    "title": "English",
+    "slug": "english",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-8-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-8/english",
+    "boardSlug": "wb-board",
+    "classSlug": "class-8",
+    "subjectSlug": "english",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-8-wb",
+        "slug": "class-8",
+        "title": "Class 8",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-class-9-wb",
+    "title": "English",
+    "slug": "english",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-9-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/english",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "english",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-physical-science-class-9-wb",
+    "title": "Physical Science",
+    "slug": "physical-science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-9-wb",
+    "orderIndex": 12,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/physical-science",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "physical-science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-history-class-9-wb",
+    "title": "History",
+    "slug": "history",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-9-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-9/history",
+    "boardSlug": "wb-board",
+    "classSlug": "class-9",
+    "subjectSlug": "history",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-9-wb",
+        "slug": "class-9",
+        "title": "Class 9",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-class-10-wb",
+    "title": "English",
+    "slug": "english",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-wb",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/english",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "english",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-life-science-class-10-wb",
+    "title": "Life Science",
+    "slug": "life-science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-wb",
+    "orderIndex": 13,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/life-science",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "life-science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-history-class-10-wb",
+    "title": "History",
+    "slug": "history",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-wb",
+    "orderIndex": 14,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/history",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "history",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-geography-class-10-wb",
+    "title": "Geography",
+    "slug": "geography",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-10-wb",
+    "orderIndex": 15,
+    "status": "published",
+    "fullSlug": "wb-board/class-10/geography",
+    "boardSlug": "wb-board",
+    "classSlug": "class-10",
+    "subjectSlug": "geography",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-wb",
+        "slug": "wb-board",
+        "title": "WBBSE",
+        "type": "board"
+      },
+      {
+        "id": "class-10-wb",
+        "slug": "class-10",
+        "title": "Class 10",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-social-studies-class-4-icse",
+    "title": "Social Studies",
+    "slug": "social-studies",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 1,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/social-studies",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "social-studies",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-grammar-class-4-icse",
+    "title": "English Grammar",
+    "slug": "english-grammar",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 2,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english-grammar",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english-grammar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-general-knowledge-class-4-icse",
+    "title": "General Knowledge",
+    "slug": "general-knowledge",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 3,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/general-knowledge",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "general-knowledge",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-value-education-class-4-icse",
+    "title": "Value Education",
+    "slug": "value-education",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 4,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/value-education",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "value-education",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-english-class-4-icse",
+    "title": "English",
+    "slug": "english",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 5,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/english",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "english",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-class-4-icse",
+    "title": "Bengali",
+    "slug": "bengali",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 6,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-mathematics-class-4-icse",
+    "title": "Mathematics",
+    "slug": "mathematics",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 7,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/mathematics",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "mathematics",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-science-class-4-icse",
+    "title": "Science",
+    "slug": "science",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 8,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/science",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "science",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-bengali-grammar-class-4-icse",
+    "title": "Bengali Grammar",
+    "slug": "bengali-grammar",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 9,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/bengali-grammar",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "bengali-grammar",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  },
+  {
+    "id": "subject-computer-class-4-icse",
+    "title": "Computer Studies",
+    "slug": "computer-studies",
+    "type": "subject",
+    "track": "academic",
+    "parentId": "class-4-icse",
+    "orderIndex": 10,
+    "status": "published",
+    "fullSlug": "icse-board/class-4/computer-studies",
+    "boardSlug": "icse-board",
+    "classSlug": "class-4",
+    "subjectSlug": "computer-studies",
+    "isIndexable": true,
+    "isHardcoded": true,
+    "ancestors": [
+      {
+        "id": "board-icse",
+        "slug": "icse-board",
+        "title": "ICSE",
+        "type": "board"
+      },
+      {
+        "id": "class-4-icse",
+        "slug": "class-4",
+        "title": "Class 4",
+        "type": "class"
+      }
+    ]
+  }
+]

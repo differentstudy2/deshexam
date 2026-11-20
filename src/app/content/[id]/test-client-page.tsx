@@ -1,32 +1,60 @@
 
+
 'use client';
 
-import { useEffect, useState } from 'react';
-import { addTestSubmission } from '@/lib/firebase/firestore';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Suspense, useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useRouter, usePathname, useParams } from 'next/navigation';
+import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import Image from 'next/image';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
-import { cn } from '@/lib/utils';
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-
+import { addTestSubmission, getUserProfile } from '@/lib/firebase/firestore';
+import { cn } from "@/lib/utils";
+import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import rehypeRaw from 'rehype-raw';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Progress } from '@/components/ui/progress';
+import { ScoreCircle } from '@/components/feature/score-circle';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Separator } from '@/components/ui/separator';
 
 type Option = {
   text: string;
+  image?: string;
 };
 
 type MatchingItem = {
     text: string;
     image?: string;
+    originalIndex?: number;
 }
 
 type MatchingOptions = {
@@ -54,25 +82,174 @@ type Test = {
   testType: string;
 };
 
-const QUESTIONS_PER_PAGE = 5;
+const shuffleArray = (array: any[]) => {
+  if (!array) return [];
+  const indexedArray = array.map((item, index) => ({ ...item, originalIndex: index }));
+  
+  for (let i = indexedArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indexedArray[i], indexedArray[j]] = [indexedArray[j], indexedArray[i]];
+  }
+  return indexedArray;
+};
+
 
 export default function TestClientPage({ test }: { test: Test }) {
-  const [answers, setAnswers] = useState<{ [key: string]: any }>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
   const { toast } = useToast();
   const router = useRouter();
-  const pathname = usePathname();
   const { user } = useAuth();
   const { openAuthDialog } = useAuthDialog();
-  const [timeLeft, setTimeLeft] = useState<number | null>(test.duration * 60);
+
+  const [testWithShuffledOptions, setTestWithShuffledOptions] = useState<Test | null>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<{ [key: string]: any }>({});
+  const [showResults, setShowResults] = useState(false);
+  const [score, setScore] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number | null>(test.duration > 0 ? test.duration * 60 : null);
   const [timeUp, setTimeUp] = useState(false);
+  const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
+  
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<'submit' | 'back' | 'new' | null>(null);
+  
+  const lastQuestionRef = useRef<HTMLDivElement>(null);
+
+  const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [visibleQuestions, setVisibleQuestions] = useState(5);
+
+  const highestAttemptedIndex = useMemo(() => {
+    if (!testWithShuffledOptions) return -1;
+    return testWithShuffledOptions.questions.reduce((maxIndex, q, index) => {
+        return answers[q.id] !== undefined ? Math.max(maxIndex, index) : maxIndex;
+    }, -1);
+  }, [answers, testWithShuffledOptions]);
+
+  const skippedQuestions = useMemo(() => {
+    if (!testWithShuffledOptions) return [];
+    return testWithShuffledOptions.questions
+      .map((q, index) => ({ q, index }))
+      .filter(({ q, index }) => index < highestAttemptedIndex && answers[q.id] === undefined)
+      .map(({ index }) => index);
+  }, [answers, testWithShuffledOptions, highestAttemptedIndex]);
 
   useEffect(() => {
-    if (timeLeft === null || timeLeft <= 0) {
+    if (test && test.questions) {
+      const questionsWithMatchingOptions = test.questions.map(q => {
+        if (q.type === 'Matching' && q.correctAnswer) {
+          const pairs = q.correctAnswer as { a: string, b: string }[];
+          const columnA = pairs.map(p => ({ text: p.a, image: '' })); // Assuming no images for now
+          let columnB = pairs.map(p => ({ text: p.b, image: '' }));
+          return { ...q, matchingOptions: { columnA, columnB: shuffleArray(columnB) } };
+        }
+        return q;
+      });
+      setTestWithShuffledOptions({ ...test, questions: questionsWithMatchingOptions });
+    } else if (test) {
+      setTestWithShuffledOptions({ ...test, questions: [] });
+    }
+    questionRefs.current = Array(test?.questions?.length || 0).fill(null);
+  }, [test]);
+
+   useEffect(() => {
+    const observer = new IntersectionObserver(
+        (entries) => {
+            if (entries[0].isIntersecting && testWithShuffledOptions && visibleQuestions < testWithShuffledOptions.questions.length) {
+                setVisibleQuestions(prev => prev + 5);
+            }
+        },
+        { threshold: 1.0 }
+    );
+
+    const currentRef = lastQuestionRef.current;
+    if (currentRef) {
+        observer.observe(currentRef);
+    }
+
+    return () => {
+        if (currentRef) {
+            observer.unobserve(currentRef);
+        }
+    };
+  }, [lastQuestionRef, testWithShuffledOptions, visibleQuestions]);
+
+  const totalMarks = useMemo(() => {
+    return testWithShuffledOptions?.questions.reduce((total, q) => {
+        if (q.type === 'Matching') {
+            return total + (q.correctAnswer?.length || 0);
+        }
+        return total + (q.marks || 1);
+    }, 0) || 0;
+  }, [testWithShuffledOptions]);
+
+  const handleSubmit = useCallback(async (e?: React.FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
+    if (isSubmitting) return;
+
+    if (!user) {
+      openAuthDialog('sign-in');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    let calculatedScore = 0;
+    testWithShuffledOptions?.questions.forEach((question) => {
+        const userAnswer = answers[question.id];
+        if (question.type === 'Matching') {
+            const correctAnswers = question.correctAnswer;
+            if (userAnswer && Array.isArray(correctAnswers)) {
+                for(const pair of correctAnswers) {
+                    if(userAnswer[pair.a] === pair.b) {
+                        calculatedScore++;
+                    }
+                }
+            }
+        } else {
+            if (userAnswer === question.correctAnswer) {
+                calculatedScore += question.marks || 1;
+            }
+        }
+    });
+
+    setScore(calculatedScore);
+
+    const totalDurationInSeconds = test.duration > 0 ? test.duration * 60 : 0;
+    const timeTakenInSeconds = totalDurationInSeconds - (timeLeft || 0);
+
+    try {
+      const submissionId = await addTestSubmission({
+        testId: test.id,
+        testTitle: test.title,
+        answers,
+        score: calculatedScore,
+        totalQuestions: totalMarks,
+        testType: test.testType,
+        timeTaken: timeTakenInSeconds,
+        duration: test.duration,
+      });
+
+      toast({
+        title: "Test Submitted!",
+        description: "Your results have been recorded.",
+      });
+      setShowResults(true);
+      router.push(`/content/${test.id}/results?submissionId=${submissionId}`);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error submitting test",
+        description: (error as Error).message,
+      });
+      setIsSubmitting(false);
+    }
+  }, [isSubmitting, user, openAuthDialog, test, answers, totalMarks, router, toast, timeLeft]);
+
+  useEffect(() => {
+    if (timeLeft === null || timeLeft <= 0 || showResults) {
       if (timeLeft === 0) {
         setTimeUp(true);
-        handleSubmit();
+        if(!isSubmitting) handleSubmit();
       }
       return;
     }
@@ -82,282 +259,306 @@ export default function TestClientPage({ test }: { test: Test }) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft]);
-
-
+  }, [timeLeft, showResults, isSubmitting, handleSubmit]);
+  
   const handleAnswerChange = (questionId: string, answer: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: answer }));
   };
-
+  
   const handleMatchingAnswerChange = (questionId: string, columnAItem: string, columnBItem: string) => {
-    setAnswers(prev => {
-        const newAnswers = { ...prev };
-        const currentMatchingAnswers = newAnswers[questionId] || {};
-        currentMatchingAnswers[columnAItem] = columnBItem;
-        newAnswers[questionId] = currentMatchingAnswers;
-        return newAnswers;
-    });
+    const currentAnswer = answers[questionId] || {};
+    const newAnswer = { ...currentAnswer, [columnAItem]: columnBItem };
+    handleAnswerChange(questionId, newAnswer);
   }
 
-  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
-    e?.preventDefault();
-    if (!user) {
-        openAuthDialog('sign-in');
-        return;
+  const formatTime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
+  };
+
+  const handleConfirmAction = () => {
+    setIsConfirming(false);
+    if(confirmAction === 'submit') {
+        handleSubmit();
+    } else if (confirmAction === 'back') {
+        router.back();
     }
-
-    setIsSubmitting(true);
-
-    try {
-        let score = 0;
-        test?.questions.forEach((question, index) => {
-            if (question.type === 'Matching') {
-                const correctAnswers = question.correctAnswer;
-                const userAnswersForQuestion = answers[question.id];
-                if (userAnswersForQuestion && Array.isArray(correctAnswers)) {
-                    for (const pair of correctAnswers) {
-                        if (userAnswersForQuestion[pair.a] === pair.b) {
-                            score++; // Award 1 mark for each correct pair
-                        }
-                    }
-                }
-            } else {
-                 if (answers[question.id] === question.correctAnswer) {
-                    score += question.marks || 1;
-                }
-            }
-        });
-        
-        const totalMarks = test?.questions.reduce((total, q) => {
-            if (q.type === 'Matching') {
-                // Total marks for a matching question is the number of pairs
-                return total + (q.correctAnswer?.length || 0);
-            }
-            return total + (q.marks || 1);
-        }, 0) || 0;
-
-
-        const submissionData = {
-            testId: test?.id,
-            testTitle: test?.title,
-            answers,
-            score,
-            totalQuestions: totalMarks,
-            testType: test?.testType,
-            duration: test?.duration,
-        };
-
-        const submissionId = await addTestSubmission(submissionData);
-
-        toast({
-            title: "Test Submitted!",
-            description: "Your results have been recorded.",
-        });
-        
-        const currentPath = pathname.split('/').slice(0,2).join('/');
-        router.push(`${currentPath}/${test?.id}/results?submissionId=${submissionId}`);
-
-    } catch (error) {
-        toast({
-            variant: "destructive",
-            title: 'Error submitting test',
-            description: (error as Error).message,
-        });
-    } finally {
-        setIsSubmitting(false);
-    }
+    setConfirmAction(null);
   };
   
-    const formatTime = (seconds: number) => {
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = seconds % 60;
-        return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
-    };
+  const handleNavigateToQuestion = (qIndex: number) => {
+    setIsConfirming(false);
+    questionRefs.current[qIndex]?.scrollIntoView({behavior: 'smooth', block: 'center'});
+  }
 
-  const totalPages = test ? Math.ceil(test.questions.length / QUESTIONS_PER_PAGE) : 0;
-  const startIndex = currentPage * QUESTIONS_PER_PAGE;
-  const endIndex = startIndex + QUESTIONS_PER_PAGE;
-  const currentQuestions = test?.questions.slice(startIndex, endIndex);
+  const getConfirmDialogContent = () => {
+      switch(confirmAction) {
+          case 'submit':
+            return { title: 'Submit Your Answers?', description: 'You cannot change your answers after this.' };
+          case 'back':
+             return { title: 'Go Back?', description: 'Your current progress will be lost.'};
+          case 'new':
+             return { title: 'Start a New Test?', description: 'Your current progress will be lost.'};
+          default:
+             return { title: '', description: '' };
+      }
+  }
+
+
+  if (!testWithShuffledOptions) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const { title, subject, description, questions } = testWithShuffledOptions;
+  const totalDuration = test.duration * 60;
+  const progress = timeLeft !== null ? 100 - (timeLeft / totalDuration) * 100 : 0;
+  const answeredCount = Object.keys(answers).length;
 
   return (
-    <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8">
-            <div className="md:col-span-1">
-                <header className="mb-8 p-4">
-                    <p className="text-primary font-semibold">{test.subject}</p>
-                    <h1 className="font-headline text-4xl font-bold tracking-tighter">{test.title}</h1>
-                    <p className="text-muted-foreground mt-2 max-w-3xl">{test.description}</p>
-                    <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
-                        <div className="flex items-center gap-1.5">
-                        <HelpCircle className="w-4 h-4" />
-                        <span>{test.questions.length} Questions</span>
-                        </div>
-                        {timeLeft !== null && (
-                            <div className="flex items-center gap-1.5 font-mono text-lg font-semibold text-foreground">
-                                <Clock className="w-4 h-4" />
+    <>
+      <div className="bg-secondary/30">
+        <div className="container py-8 max-w-4xl mx-auto">
+          <div className="mb-6">
+            <Button variant="ghost" onClick={() => {setConfirmAction('back'); setIsConfirming(true);}}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+            </Button>
+          </div>
+          <header className="mb-8 text-center">
+            <h1 className="font-headline text-4xl font-bold">{title}</h1>
+            <p className="text-muted-foreground">{description}</p>
+          </header>
+          
+          <form onSubmit={(e) => { e.preventDefault(); setConfirmAction('submit'); setIsConfirming(true); }} className="p-6 pt-0">
+             <Card className={cn(
+                "sticky top-[64px] z-40 border-x-0 border-b",
+                timeLeft !== null && timeLeft <= 60 && "bg-red-50 dark:bg-red-900/20 border-red-200"
+            )}>
+                <CardContent className="p-3">
+                     <div className="flex items-center justify-center gap-4 sm:gap-6">
+                        {timeLeft !== null && totalDuration > 0 && (
+                            <div className="flex items-center gap-2 font-mono text-xl font-semibold text-foreground">
+                                <Clock className="w-5 h-5" />
                                 <span>{formatTime(timeLeft)}</span>
                             </div>
                         )}
-                    </div>
-                </header>
+                        <Progress value={progress} className="w-24 h-2" />
 
-                <form onSubmit={handleSubmit}>
-                    <fieldset disabled={timeUp} className="space-y-8">
-                    {currentQuestions && currentQuestions.map((question, index) => {
-                        const questionIndex = startIndex + index;
-                        return (
-                            <Card key={question.id || questionIndex}>
-                            <CardHeader>
-                                <CardTitle>Question {questionIndex + 1}</CardTitle>
-                                <CardDescription className="text-lg text-foreground pt-2">{question.text}</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                {question.type === 'Multiple Choice' && question.options && (
-                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="space-y-2">
-                                    {question.options.map((option, optIndex) => (
-                                    <div key={optIndex} className="flex items-center space-x-2">
-                                        <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
-                                        <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-2xl">{option.text}</Label>
-                                    </div>
-                                    ))}
-                                </RadioGroup>
-                                )}
-                                {question.type === 'True/False' && (
-                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="flex space-x-4 true-false-group">
-                                    <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="True" id={`q${question.id}-true`} />
-                                    <Label htmlFor={`q${question.id}-true`} className="text-lg">True</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="False" id={`q${question.id}-false`} />
-                                    <Label htmlFor={`q${question.id}-false`} className="text-lg">False</Label>
-                                    </div>
-                                </RadioGroup>
-                                )}
-                                {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
-                                <Input 
-                                    placeholder="Your answer..." 
-                                    onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                                    value={answers[question.id] || ''}
-                                />
-                                )}
-                                {question.type === 'Matching' && question.matchingOptions && (
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                            <div className="font-bold text-center">Column A</div>
-                                            <div></div>
-                                            <div className="font-bold text-center">Column B</div>
-                                        </div>
-                                        {question.matchingOptions.columnA.map((itemA, itemIndex) => (
-                                            <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                                <div className="p-3 border rounded-md text-center bg-secondary">
-                                                    {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
-                                                    {itemA.text}
-                                                </div>
-                                                <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                                <Select 
-                                                    onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
-                                                    value={answers[question.id]?.[itemA.text] || ''}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a match" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {question.matchingOptions?.columnB.map((itemB, bIndex) => (
-                                                            <SelectItem key={bIndex} value={itemB.text}>
-                                                                <div className="flex items-center gap-2">
-                                                                    {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
-                                                                    <span>{itemB.text}</span>
-                                                                </div>
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </CardContent>
-                            </Card>
-                        )
-                    })}
-                    </fieldset>
+                        <Separator orientation="vertical" className="h-6" />
 
-                    <div className="mt-8 flex justify-between items-center">
-                        <Button 
-                            type="button"
-                            variant="outline" 
-                            onClick={() => setCurrentPage(p => p - 1)} 
-                            disabled={currentPage === 0}
-                        >
-                        <ChevronLeft className="mr-2"/>
-                        Previous
-                        </Button>
+                        <div className="flex items-center gap-4 text-sm font-medium">
+                            <div className="text-green-600">Ans: {answeredCount}</div>
+                        </div>
                         
-                        <span className="text-sm text-muted-foreground">
-                            Page {currentPage + 1} of {totalPages}
-                        </span>
+                        <Separator orientation="vertical" className="h-6" />
 
-                        <Button 
-                            type="button"
-                            variant="outline" 
-                            onClick={() => setCurrentPage(p => p + 1)} 
-                            disabled={currentPage === totalPages - 1}
-                        >
-                        Next
-                        <ChevronRight className="ml-2"/>
-                        </Button>
+                        <div className="flex items-center gap-2 text-sm font-medium">
+                            <span>Skipped:</span>
+                             {skippedQuestions.length <= 5 ? (
+                                <div className="flex items-center gap-1.5">
+                                    {skippedQuestions.map((qIndex) => (
+                                        <Button
+                                            key={`skipped-${qIndex}`}
+                                            variant="destructive"
+                                            size="sm"
+                                            className="h-7 w-7 rounded-full p-0 text-xs"
+                                            onClick={() => handleNavigateToQuestion(qIndex)}
+                                        >
+                                            {qIndex + 1}
+                                        </Button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="w-48">
+                                    <Carousel opts={{ align: "start", loop: false }}>
+                                        <CarouselContent className="-ml-2">
+                                            {skippedQuestions.map((qIndex) => (
+                                                <CarouselItem key={`skipped-carousel-${qIndex}`} className="pl-2 basis-auto">
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        className="h-7 w-7 rounded-full p-0 text-xs"
+                                                        onClick={() => handleNavigateToQuestion(qIndex)}
+                                                    >
+                                                        {qIndex + 1}
+                                                    </Button>
+                                                </CarouselItem>
+                                            ))}
+                                        </CarouselContent>
+                                    </Carousel>
+                                </div>
+                            )}
+                        </div>
                     </div>
+                </CardContent>
+            </Card>
 
-
-                    <div className="mt-8 flex justify-center">
-                        <Button size="lg" type="submit" disabled={isSubmitting || timeUp}>
-                            {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Test"}
-                        </Button>
-                    </div>
-                </form>
-            </div>
-            
-            <aside className="md:col-span-1">
-                <div className="sticky top-24">
-                     <Card>
-                        <CardHeader>
-                            <CardTitle>Question Navigator</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex flex-wrap gap-2">
-                                {test.questions.map((q, qIndex) => (
-                                    <Button
-                                        key={q.id || qIndex}
-                                        variant={answers[q.id] !== undefined ? 'default' : 'outline'}
-                                        size="sm"
-                                        className="h-8 w-8"
-                                        onClick={() => setCurrentPage(Math.floor(qIndex / QUESTIONS_PER_PAGE))}
-                                    >
-                                        {qIndex + 1}
-                                    </Button>
-                                ))}
+            <fieldset disabled={timeUp || isSubmitting} className="space-y-8 mt-6">
+              {questions.slice(0, visibleQuestions).map((question, index) => {
+                 const isLastQuestion = index === visibleQuestions - 1;
+                 const userAnswer = answers[question.id];
+                 const isCorrectForCapture = false; // Not used on this page
+                 return (
+                  <Card key={question.id || index} ref={el => {
+                      questionRefs.current[index] = el;
+                      if (isLastQuestion) {
+                          (lastQuestionRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+                      }
+                  }} className="p-6 shadow-none border scroll-m-24">
+                    <CardHeader className="p-0 mb-4">
+                      <CardTitle className="flex items-baseline gap-2 text-xl font-semibold prose dark:prose-invert">
+                           <span className="self-start">{index + 1}.</span>
+                           <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{question.text}</ReactMarkdown>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      {question.type === 'Multiple Choice' && question.options && (
+                        <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {question.options.map((option, optIndex) => (
+                            <div key={optIndex}>
+                                {option.image && (
+                                    <div className="relative w-full aspect-video rounded-md overflow-hidden bg-secondary mb-2">
+                                        <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
+                                    </div>
+                                )}
+                                <Label
+                                    htmlFor={`q-all-${question.id}-opt${optIndex}`}
+                                    className={cn(
+                                        "w-full flex items-center justify-between min-h-[4rem] p-4 text-left border rounded-lg",
+                                        "cursor-pointer hover:bg-accent"
+                                    )}
+                                >
+                                    <div className="flex-1 text-base font-normal">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
+                                    </div>
+                                    <RadioGroupItem value={option.text} id={`q-all-${question.id}-opt${optIndex}`} />
+                                </Label>
                             </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            </aside>
+                          ))}
+                        </RadioGroup>
+                      )}
+                      {question.type === 'True/False' && (
+                        <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="flex space-x-4 true-false-group">
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="True" id={`q${question.id}-true`} />
+                            <Label htmlFor={`q${question.id}-true`} className="text-lg">True</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="False" id={`q${question.id}-false`} />
+                            <Label htmlFor={`q${question.id}-false`} className="text-lg">False</Label>
+                          </div>
+                        </RadioGroup>
+                      )}
+                      {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
+                        <Input 
+                            placeholder="Your answer..." 
+                            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                            value={answers[question.id] || ''}
+                        />
+                      )}
+                      {question.type === 'Matching' && question.matchingOptions && (
+                          <div className="space-y-4">
+                              <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                  <div className="font-bold text-center">Column A</div>
+                                  <div></div>
+                                  <div className="font-bold text-center">Column B</div>
+                              </div>
+                              {question.matchingOptions.columnA.map((itemA, itemIndex) => (
+                                  <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                      <div className="p-3 border rounded-md text-center bg-secondary">
+                                          {itemA.image && <Image src={itemA.image} alt={itemA.text} width={40} height={40} className="mx-auto mb-1 rounded-sm" />}
+                                          {itemA.text}
+                                      </div>
+                                      <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                      <Select onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} value={answers[question.id]?.[itemA.text] || ''}>
+                                          <SelectTrigger>
+                                              <SelectValue placeholder="Select a match" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                              {question.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
+                                                  <SelectItem key={`${question.id}-${itemA.text}-${bIndex}`} value={itemB.text}>
+                                                      <div className="flex items-center gap-2">
+                                                          {itemB.image && <Image src={itemB.image} alt={itemB.text} width={20} height={20} className="rounded-sm" />}
+                                                          <span>{itemB.text}</span>
+                                                      </div>
+                                                  </SelectItem>
+                                              ))}
+                                          </SelectContent>
+                                      </Select>
+                                  </div>
+                              ))}
+                          </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                 )
+                })}
+            </fieldset>
+
+             <div className="mt-8 flex justify-center">
+                 <Button size="lg" type="submit" disabled={isSubmitting || timeUp}>
+                    {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Test"}
+                </Button>
+            </div>
+          </form>
+          
         </div>
-        
-        <AlertDialog open={timeUp}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Time's Up!</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        The time limit for this test has been reached. Your answers will now be submitted.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogAction onClick={() => handleSubmit()}>
-                    View Results
-                </AlertDialogAction>
-            </AlertDialogContent>
-        </AlertDialog>
-    </div>
+      </div>
+       <AlertDialog open={timeUp}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Time's Up!</AlertDialogTitle>
+            <AlertDialogDescription>
+              The time limit for this mock test has been reached. Your answers will now be submitted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogAction onClick={() => handleSubmit()}>
+            View Results
+          </AlertDialogAction>
+        </AlertDialogContent>
+      </AlertDialog>
+
+       <AlertDialog open={isConfirming} onOpenChange={setIsConfirming}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="text-yellow-500" />
+                {getConfirmDialogContent().title}
+            </AlertDialogTitle>
+          </AlertDialogHeader>
+            <AlertDialogDescription>
+                {getConfirmDialogContent().description}
+            </AlertDialogDescription>
+             {confirmAction === 'submit' && skippedQuestions.length > 0 && (
+                <div className="mt-4 rounded-md border bg-secondary p-4">
+                    <div className="font-semibold">You have skipped the following questions:</div>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {skippedQuestions.map(qIndex => (
+                            <Button
+                                key={`confirm-skip-${qIndex}`}
+                                variant="outline"
+                                size="sm"
+                                className="h-7 w-7 p-0"
+                                onClick={() => handleNavigateToQuestion(qIndex)}
+                            >
+                                {qIndex + 1}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+            )}
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setConfirmAction(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmAction}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -16,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star, GraduationCap, DollarSign, Book } from 'lucide-react';
+import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star, GraduationCap, DollarSign, Book, School as SchoolIcon, Mic } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useCallback } from 'react';
 import { 
@@ -54,7 +53,11 @@ import {
     getGradesByClass,
     addGradeToClass,
     updateGradeInClass,
-    deleteGradeFromClass
+    deleteGradeFromClass,
+    getSchoolsByClass,
+    addSchoolToClass,
+    updateSchoolInClass,
+    deleteSchoolFromClass
 } from '@/lib/firebase/firestore';
 import {
   AlertDialog,
@@ -78,8 +81,8 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { generateMetadata } from '@/ai/flows/ai-metadata-generator';
-import type { AIMetadataGeneratorOutput, AIMetadataGeneratorInput } from '@/ai/flows/ai-metadata-generator';
+import { generateMetadata, type AIMetadataGeneratorOutput, type AIMetadataGeneratorInput } from '@/ai/flows/ai-metadata-generator';
+
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 
@@ -101,6 +104,7 @@ const settingsSchema = z.object({
     enableStateMetafield: z.boolean(),
     enableExamMetafield: z.boolean(),
     enableChapterMetafield: z.boolean(),
+    enableSchoolMetafield: z.boolean().default(true),
     defaultBoard: z.string().optional(),
     defaultClass: z.string().optional(),
     defaultSubject: z.string().optional(),
@@ -123,6 +127,8 @@ const settingsSchema = z.object({
         pass: z.coerce.number().int().min(1).default(50),
         pro: z.coerce.number().int().min(1).default(200),
     }).default({ free: 5, pass: 50, pro: 200 }),
+    ttsVoice: z.string().optional(),
+    ttsModel: z.string().optional(),
 });
 
 
@@ -131,7 +137,7 @@ type ContentSummary = { [key: string]: number; };
 type MetafieldItem = { id: string; name?: string; chapterNo?: string, chapterName?: string };
 
 const aiGeneratorSchema = z.object({
-  metafieldType: z.enum(['Subject', 'Board', 'Exam Category', 'Class', 'State', 'Chapter', 'Exam']),
+  metafieldType: z.enum(['Subject', 'Board', 'Exam Category', 'Class', 'State', 'Chapter', 'Exam', 'School']),
   topic: z.string().min(3, "Topic must be at least 3 characters."),
   count: z.coerce.number().int().min(1).max(20),
   parentId: z.string().optional(),
@@ -253,9 +259,9 @@ const DependentMetafieldManager = ({
     childTitle: string;
     parentItems: MetafieldItem[];
     fetchChildren: (parentId: string) => Promise<MetafieldItem[]>;
-    onAdd: (parentId: string, data: any) => Promise<void>;
-    onUpdate: (parentId: string, childId: string, data: any) => Promise<void>;
-    onDelete: (parentId: string, childId: string) => Promise<void>;
+    onAdd: (parentId: string, data: any) => Promise<any>;
+    onUpdate: (parentId: string, childId: string, data: any) => Promise<any>;
+    onDelete: (parentId: string, childId: string) => Promise<any>;
     defaultValue?: string;
     onSetDefault: (name: string) => void;
 }) => {
@@ -308,6 +314,7 @@ const DependentMetafieldManager = ({
     
     const isChapter = childTitle === 'Chapters';
     const isGrade = childTitle === 'Grades';
+    const isSchool = childTitle === 'Schools';
 
     const getFullItemName = (item: MetafieldItem) => {
         return isChapter ? `${item.chapterNo}. ${item.chapterName}` : item.name!;
@@ -374,6 +381,50 @@ const DependentMetafieldManager = ({
     )
 }
 
+const flashTtsVoices = [
+    { name: 'Algenib', description: 'Standard Female 1' },
+    { name: 'Achernar', description: 'Standard Male 1' },
+    { name: 'Canopus', description: 'Standard Female 2' },
+    { name: 'Capella', description: 'Standard Male 2' },
+    { name: 'Deneb', description: 'WaveNet Female 1' },
+    { name: 'Fomalhaut', description: 'WaveNet Male 1' },
+    { name: 'Hadar', description: 'WaveNet Male 2' },
+    { name: 'Pollux', description: 'WaveNet Female 2' },
+    { name: 'Procyon', description: 'WaveNet Male 3' },
+    { name: 'Rigel', description: 'WaveNet Female 3' },
+];
+
+const proTtsVoices = [
+  { name: 'achird', description: 'Pro Voice 1' },
+  { name: 'algenib', description: 'Pro Voice 2' },
+  { name: 'algieba', description: 'Pro Voice 3' },
+  { name: 'alnilam', description: 'Pro Voice 4' },
+  { name: 'aoede', description: 'Pro Voice 5' },
+  { name: 'autonoe', description: 'Pro Voice 6' },
+  { name: 'callirrhoe', description: 'Pro Voice 7' },
+  { name: 'despina', description: 'Pro Voice 8' },
+  { name: 'enceladus', description: 'Pro Voice 9' },
+  { name: 'erinome', description: 'Pro Voice 10' },
+  { name: 'fenrir', description: 'Pro Voice 11' },
+  { name: 'gacrux', description: 'Pro Voice 12' },
+  { name: 'iapetus', description: 'Pro Voice 13' },
+  { name: 'kore', description: 'Pro Voice 14' },
+  { name: 'laomedeia', description: 'Pro Voice 15' },
+  { name: 'leda', description: 'Pro Voice 16' },
+  { name: 'orus', description: 'Pro Voice 17' },
+  { name: 'puck', description: 'Pro Voice 18' },
+  { name: 'pulcherrima', description: 'Pro Voice 19' },
+  { name: 'rasalgethi', description: 'Pro Voice 20' },
+  { name: 'sadach', description: 'Pro Voice 21' },
+  { name: 'sadaltager', description: 'Pro Voice 22' },
+  { name: 'schedar', description: 'Pro Voice 23' },
+  { name: 'sulafat', description: 'Pro Voice 24' },
+  { name: 'umbriel', description: 'Pro Voice 25' },
+  { name: 'vindemiatrix', description: 'Pro Voice 26' },
+  { name: 'zephyr', description: 'Pro Voice 27' },
+  { name: 'zubenelgenubi', description: 'Pro Voice 28' },
+];
+
 
 export default function AdminSettingsPage() {
   const { toast } = useToast();
@@ -408,6 +459,7 @@ export default function AdminSettingsPage() {
         enableSubjectMetafield: true,
         enableBoardMetafield: true,
         enableClassMetafield: true,
+        enableSchoolMetafield: true,
         enableExamCategoryMetafield: true,
         enableStateMetafield: true,
         enableExamMetafield: true,
@@ -426,6 +478,8 @@ export default function AdminSettingsPage() {
         practiceSetPassMark: 60,
         gateChaptersOnPass: false,
         practiceSetSubmissionLimit: { free: 5, pass: 50, pro: 200 },
+        ttsVoice: 'Algenib',
+        ttsModel: 'gemini-2.5-flash-preview-tts',
     },
   });
 
@@ -438,6 +492,7 @@ export default function AdminSettingsPage() {
     }
   });
   const aiMetafieldType = aiForm.watch('metafieldType');
+  const selectedTtsModel = form.watch('ttsModel');
 
 
   const fetchInitialData = useCallback(async () => {
@@ -488,6 +543,20 @@ export default function AdminSettingsPage() {
     fetchInitialData();
   }, [fetchInitialData]);
 
+  useEffect(() => {
+    const availableVoices = selectedTtsModel === 'gemini-2.5-pro-preview-tts' ? proTtsVoices.map(v => v.name) : flashTtsVoices.map(v => v.name);
+    const currentVoice = form.getValues('ttsVoice');
+    
+    if (currentVoice && !availableVoices.some(v => v.toLowerCase() === currentVoice.toLowerCase())) {
+        const newDefault = availableVoices.includes('Algenib') ? 'Algenib' : availableVoices[0];
+        form.setValue('ttsVoice', newDefault);
+        toast({
+            title: "Voice Reset",
+            description: `The previously selected voice is not available for this model. It has been reset to a default.`
+        });
+    }
+  }, [selectedTtsModel, form, toast]);
+
 
   const handleSave: SubmitHandler<SettingsFormValues> = async (data) => {
     try {
@@ -510,13 +579,18 @@ export default function AdminSettingsPage() {
       setGeneratedItems([]);
       try {
           const input: AIMetadataGeneratorInput = {
-              metafieldType: data.metafieldType,
+              metafieldType: data.metafieldType as AIMetadataGeneratorInput['metafieldType'],
               count: data.count,
               topic: data.topic,
           };
            if (data.parentId) {
-               const parentCollection = data.metafieldType === 'Chapter' ? subjects : examTypes;
-               const parent = parentCollection.find(p => p.id === data.parentId);
+               const parentCollectionMap: {[key: string]: MetafieldItem[]} = {
+                 'Chapter': subjects,
+                 'Exam': examTypes,
+                 'School': classes,
+               };
+               const parentCollection = parentCollectionMap[data.metafieldType];
+               const parent = parentCollection?.find(p => p.id === data.parentId);
                if (parent) {
                    input.topic = parent.name!;
                }
@@ -542,7 +616,7 @@ export default function AdminSettingsPage() {
       const { metafieldType, parentId } = aiForm.getValues();
       if (generatedItems.length === 0) return;
       
-      const addFunctionMap = {
+      const addFunctionMap: {[key:string]: Function} = {
           'Subject': addSubject,
           'Board': addBoard,
           'Exam Category': addExamType,
@@ -550,6 +624,7 @@ export default function AdminSettingsPage() {
           'State': addState,
           'Chapter': (item: string) => addChapter(parentId!, { chapterNo: '1', chapterName: item }), // Dummy chapter no
           'Exam': (item: string) => addExam(parentId!, { name: item }),
+          'School': (item: string) => addSchoolToClass(parentId!, { name: item }),
       };
 
       const addFunc = addFunctionMap[metafieldType];
@@ -599,9 +674,9 @@ export default function AdminSettingsPage() {
       const setState = stateSetterMap[type];
 
       return {
-          onAdd: async (name: string) => { await addFuncMap[type](name); setState(await getFunc()); },
-          onUpdate: async (id: string, name: string) => { await updateFuncMap[type](id, name); setState(await getFunc()); },
-          onDelete: async (id: string) => { await deleteFuncMap[type](id); setState(await getFunc()); }
+          onAdd: async (name: string) => { await addFuncMap[type](name); setState(await getFunc() as any); },
+          onUpdate: async (id: string, name: string) => { await updateFuncMap[type](id, name); setState(await getFunc() as any); },
+          onDelete: async (id: string) => { await deleteFuncMap[type](id); setState(await getFunc() as any); }
       };
   };
 
@@ -624,17 +699,28 @@ export default function AdminSettingsPage() {
         onUpdate: updateGradeInClass,
         onDelete: deleteGradeFromClass,
     }
+    
+    const schoolHandlers = {
+        fetchChildren: getSchoolsByClass,
+        onAdd: addSchoolToClass,
+        onUpdate: updateSchoolInClass,
+        onDelete: deleteSchoolFromClass,
+    };
+
 
     const settingTabs = [
         { id: 'general', label: 'General', icon: Settings },
         { id: 'api', label: 'API Keys', icon: KeyRound },
         { id: 'users', label: 'User Management', icon: Users },
+        { id: 'tts', label: 'Text-to-Speech', icon: Mic },
         { id: 'plans', label: 'Plans & Pricing', icon: DollarSign },
         { id: 'textbooks', label: 'Textbooks', icon: Book },
         { id: 'metafields', label: 'Content Metafields', icon: LayoutTemplate },
         { id: 'questionTypes', label: 'Question Types', icon: Type },
         { id: 'content', label: 'Content Details', icon: Library },
     ];
+    
+    const availableTtsVoices = selectedTtsModel === 'gemini-2.5-pro-preview-tts' ? proTtsVoices : flashTtsVoices;
   
   if (loading) {
     return (
@@ -788,6 +874,67 @@ export default function AdminSettingsPage() {
                                 </FormItem>
                             )}
                             />
+                        </CardContent>
+                    </Card>
+                )}
+
+                {activeTab === 'tts' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Text-to-Speech Settings</CardTitle>
+                            <CardDescription>Configure the voice used for AI-generated audio across the site.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                             <FormField
+                                control={form.control}
+                                name="ttsModel"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>TTS Model</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a TTS model" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="Browser">Browser (Client-side)</SelectItem>
+                                                <SelectItem value="gemini-2.5-flash-preview-tts">Gemini 2.5 Flash TTS</SelectItem>
+                                                <SelectItem value="gemini-2.5-pro-preview-tts">Gemini 2.5 Pro TTS</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormDescription>Select the engine for generating audio. "Browser" is free but not saved.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             {selectedTtsModel !== 'Browser' && (
+                                <FormField
+                                    control={form.control}
+                                    name="ttsVoice"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Default TTS Voice</FormLabel>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a voice" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {availableTtsVoices.map((voice) => (
+                                                        <SelectItem key={voice.name} value={voice.name}>
+                                                            {voice.name} <span className="text-muted-foreground ml-2">({voice.description})</span>
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormDescription>This voice will be used for generating audio from text.</FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                             )}
                         </CardContent>
                     </Card>
                 )}
@@ -1009,6 +1156,7 @@ export default function AdminSettingsPage() {
                                                                 <SelectItem value="Class">Class</SelectItem>
                                                                 <SelectItem value="State">State</SelectItem>
                                                                 <SelectItem value="Exam Category">Exam Category</SelectItem>
+                                                                <SelectItem value="School">School</SelectItem>
                                                                 <SelectItem value="Chapter">Chapter</SelectItem>
                                                                 <SelectItem value="Exam">Exam</SelectItem>
                                                             </SelectContent>
@@ -1017,14 +1165,14 @@ export default function AdminSettingsPage() {
                                                     </FormItem>
                                                 )} />
 
-                                                { (aiMetafieldType === 'Chapter' || aiMetafieldType === 'Exam') && (
+                                                { (aiMetafieldType === 'Chapter' || aiMetafieldType === 'Exam' || aiMetafieldType === 'School') && (
                                                     <FormField control={aiForm.control} name="parentId" render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>{aiMetafieldType === 'Chapter' ? 'Parent Subject' : 'Parent Exam Category'}</FormLabel>
+                                                            <FormLabel>{aiMetafieldType === 'Chapter' ? 'Parent Subject' : aiMetafieldType === 'Exam' ? 'Parent Exam Category' : 'Parent Class Category'}</FormLabel>
                                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                                <FormControl><SelectTrigger><SelectValue placeholder={`Select a ${aiMetafieldType === 'Chapter' ? 'Subject' : 'Category'}`} /></SelectTrigger></FormControl>
+                                                                <FormControl><SelectTrigger><SelectValue placeholder={`Select a ${aiMetafieldType === 'Chapter' ? 'Subject' : aiMetafieldType === 'Exam' ? 'Category' : 'Class Category'}`} /></SelectTrigger></FormControl>
                                                                 <SelectContent>
-                                                                    {(aiMetafieldType === 'Chapter' ? subjects : examTypes).map(item => (
+                                                                    {(aiMetafieldType === 'Chapter' ? subjects : aiMetafieldType === 'Exam' ? examTypes : classes).map(item => (
                                                                         <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
                                                                     ))}
                                                                 </SelectContent>
@@ -1182,6 +1330,38 @@ export default function AdminSettingsPage() {
                                         onDelete={stateHandlers.onDelete}
                                         defaultValue={form.watch('defaultState')}
                                         onSetDefault={(value) => form.setValue('defaultState', value)}
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader>
+                                    <FormField
+                                        control={form.control}
+                                        name="enableSchoolMetafield"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between">
+                                                <div className="space-y-0.5">
+                                                    <FormLabel className="text-base">Schools/Colleges</FormLabel>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                     <DependentMetafieldManager
+                                        parentTitle="Class Categories"
+                                        childTitle="Schools"
+                                        parentItems={classes}
+                                        fetchChildren={schoolHandlers.fetchChildren}
+                                        onAdd={schoolHandlers.onAdd}
+                                        onUpdate={schoolHandlers.onUpdate}
+                                        onDelete={schoolHandlers.onDelete}
+                                        defaultValue={undefined} // No default school
+                                        onSetDefault={() => {}} // No default school
                                     />
                                 </CardContent>
                             </Card>

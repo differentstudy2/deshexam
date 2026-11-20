@@ -1,0 +1,486 @@
+'use client';
+
+import React, { useState, useRef } from 'react';
+import { collection, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '@/lib/firebase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Save, Loader2, Upload, FileText, X, FolderOpen, Image as ImageIcon,
+  Tag, Globe, Lock, BookOpen, Users, FileArchive, FileSpreadsheet,
+  Presentation, CheckCircle2
+} from 'lucide-react';
+
+// ─── Types ──────────────────────────────────────────────────────────────────
+export interface DocumentFormData {
+  title: string;
+  slug: string;
+  shortDescription: string;
+  description: string;
+  category: string;
+  language: string;
+  pages: string;
+  version: string;
+  author: string;
+  tags: string;
+  boardId: string;
+  classId: string;
+  subjectId: string;
+  textbookId: string;
+  chapterId: string;
+  topicId: string;
+  access: string;
+  status: string;
+  thumbnail: string;
+}
+
+export interface DocumentUploadFormProps {
+  /** Pre-fill topicId (used when embedded inside topic editor) */
+  topicId?: string;
+  /** Called after document is saved. Returns the document ID. */
+  onSaved?: (docId: string, data: any) => void;
+  /** Compact mode — hides curriculum fields when they're already known */
+  compact?: boolean;
+  /** Initial data for editing */
+  initialData?: any;
+  /** Document ID for editing */
+  documentId?: string;
+}
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+const CATEGORIES = [
+  { value: 'study_notes', label: 'Study Notes' },
+  { value: 'pdf_notes', label: 'PDF Notes' },
+  { value: 'question_paper', label: 'Question Paper' },
+  { value: 'suggestion', label: 'Suggestion' },
+  { value: 'syllabus', label: 'Syllabus' },
+  { value: 'assignment', label: 'Assignment' },
+  { value: 'worksheet', label: 'Worksheet' },
+  { value: 'model_answer', label: 'Model Answer' },
+  { value: 'answer_key', label: 'Answer Key' },
+  { value: 'admission_form', label: 'Admission Form' },
+  { value: 'notice', label: 'Notice' },
+  { value: 'routine', label: 'Routine' },
+  { value: 'book', label: 'Book' },
+  { value: 'ebook', label: 'E-book' },
+  { value: 'teacher_resource', label: 'Teacher Resource' },
+];
+
+const ACCEPTED_TYPES = '.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar,.txt';
+
+const TYPE_COLORS: Record<string, string> = {
+  pdf: 'bg-red-500', docx: 'bg-blue-600', doc: 'bg-blue-600',
+  pptx: 'bg-orange-500', ppt: 'bg-orange-500', xlsx: 'bg-green-600',
+  xls: 'bg-green-600', zip: 'bg-yellow-500', rar: 'bg-yellow-500',
+  txt: 'bg-slate-500',
+};
+
+function generateSlug(text: string) {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+}
+
+// ─── File Icon ────────────────────────────────────────────────────────────────
+function FileTypeIcon({ ext, size = 'md' }: { ext: string; size?: 'sm' | 'md' | 'lg' }) {
+  const colors = TYPE_COLORS[ext] || 'bg-slate-400';
+  const dims = { sm: 'w-8 h-10', md: 'w-12 h-14', lg: 'w-16 h-20' }[size];
+  const textSize = { sm: 'text-[7px]', md: 'text-[9px]', lg: 'text-[11px]' }[size];
+  return (
+    <div className={`${dims} ${colors} rounded-lg flex flex-col overflow-hidden shadow-md relative`}>
+      <div className={`px-1 py-0.5 bg-black/20 ${textSize} font-black text-white tracking-wider uppercase`}>{ext}</div>
+      <div className="flex-1 p-1">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-0.5 bg-white/30 rounded mb-0.5" style={{ width: `${50 + i * 12}%` }} />
+        ))}
+      </div>
+      {/* Folded corner */}
+      <div className="absolute top-0 right-0 w-3 h-3 bg-white/20" style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }} />
+    </div>
+  );
+}
+
+// ─── Main Component ──────────────────────────────────────────────────────────
+export function DocumentUploadForm({ topicId, onSaved, compact = false, initialData, documentId }: DocumentUploadFormProps) {
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const thumbInputRef = useRef<HTMLInputElement>(null);
+
+  const [saving, setSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+
+  const [file, setFile] = useState<File | null>(null);
+  const [thumbFile, setThumbFile] = useState<File | null>(null);
+  const [inputMode, setInputMode] = useState<'upload' | 'url'>('upload');
+  const [fileUrlInput, setFileUrlInput] = useState(initialData?.fileUrl || '');
+
+  React.useEffect(() => {
+    if (file && getExt(file) === 'pdf' && !form.pages) {
+      const getPages = async () => {
+        try {
+          const PDFJS_VERSION = '4.4.168';
+          const lib = await import(/* webpackIgnore: true */ `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_VERSION}/build/pdf.min.mjs`);
+          lib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_VERSION}/build/pdf.worker.min.mjs`;
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await lib.getDocument({ data: arrayBuffer }).promise;
+          setForm(prev => ({ ...prev, pages: pdf.numPages.toString() }));
+        } catch (e) {
+          console.error('Failed to parse pdf pages', e);
+        }
+      };
+      getPages();
+    }
+  }, [file]);
+  const [thumbPreview, setThumbPreview] = useState('');
+
+  const [form, setForm] = useState<DocumentFormData>({
+    title: initialData?.title || '', slug: initialData?.slug || '', shortDescription: initialData?.shortDescription || '', description: initialData?.description || '',
+    category: initialData?.category || 'study_notes', language: initialData?.language || 'bengali', pages: initialData?.pages?.toString() || '',
+    version: initialData?.version || '', author: initialData?.author || '', tags: initialData?.tags?.join(', ') || '', boardId: initialData?.boardId || '', classId: initialData?.classId || '',
+    subjectId: initialData?.subjectId || '', textbookId: initialData?.textbookId || '', chapterId: initialData?.chapterId || '', topicId: initialData?.topicId || topicId || '',
+    access: initialData?.access || 'free', status: initialData?.status || 'published', thumbnail: initialData?.thumbnail || '',
+  });
+
+  const update = (key: string, val: string) =>
+    setForm(prev => ({ ...prev, [key]: val, ...(key === 'title' ? { slug: generateSlug(val) } : {}) }));
+
+  const getExt = (f: File) => f.name.split('.').pop()?.toLowerCase() || '';
+
+  const handleFileDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const f = e.dataTransfer.files[0];
+    if (f) setFile(f);
+  };
+
+  const handleThumbChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) { setThumbFile(f); setThumbPreview(URL.createObjectURL(f)); }
+  };
+
+  const uploadFileToStorage = (f: File, path: string): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const storageRef = ref(storage, path);
+      const task = uploadBytesResumable(storageRef, f);
+      task.on('state_changed',
+        snap => setUploadProgress((snap.bytesTransferred / snap.totalBytes) * 100),
+        reject,
+        async () => resolve(await getDownloadURL(task.snapshot.ref))
+      );
+    });
+
+  const handleSave = async (statusOverride?: string) => {
+    if (!form.title) {
+      toast({ title: 'Title is required', variant: 'destructive' }); return;
+    }
+    setSaving(true);
+    setUploadProgress(0);
+
+    try {
+      const newRef = documentId ? doc(db, 'guide_documents', documentId) : doc(collection(db, 'guide_documents'));
+      const docId = newRef.id;
+
+      let fileUrl = '';
+      let fileType = '';
+      let fileSize = 0;
+
+      if (inputMode === 'upload' && file) {
+        setIsUploading(true);
+        fileUrl = await uploadFileToStorage(file, `documents/${docId}/${file.name}`);
+        fileType = getExt(file);
+        fileSize = file.size;
+        setIsUploading(false);
+      } else if (inputMode === 'url' && fileUrlInput) {
+        fileUrl = fileUrlInput;
+        const extMatch = fileUrl.match(/\.([a-zA-Z0-9]+)(?:[\?#]|$)/);
+        fileType = extMatch ? extMatch[1].toLowerCase() : 'pdf';
+        fileSize = 0;
+      } else if (initialData?.fileUrl) {
+        fileUrl = initialData.fileUrl;
+        fileType = initialData.fileType || '';
+        fileSize = initialData.fileSize || 0;
+      }
+
+      let thumbnailUrl = form.thumbnail;
+      if (thumbFile) {
+        thumbnailUrl = await uploadFileToStorage(thumbFile, `documents/${docId}/thumbnail`);
+      } else if (!thumbnailUrl && initialData?.thumbnail) {
+        thumbnailUrl = initialData.thumbnail;
+      }
+
+      const effectiveTopicId = form.topicId || topicId || '';
+
+      const payload = {
+        id: docId,
+        ...form,
+        status: statusOverride || form.status,
+        topicId: effectiveTopicId,
+        topicIds: effectiveTopicId ? [effectiveTopicId] : [],
+        fileUrl,
+        fileType,
+        fileSize,
+        thumbnail: thumbnailUrl,
+        pages: form.pages ? parseInt(form.pages) : null,
+        tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
+        downloads: 0,
+        views: initialData?.views || 0,
+        createdAt: initialData?.createdAt || new Date(),
+        updatedAt: new Date(),
+      };
+
+      await setDoc(newRef, payload, { merge: true });
+      setSaved(true);
+      toast({ title: '✅ Document uploaded!', description: 'It is now in the Document Library.' });
+      onSaved?.(docId, payload);
+    } catch (e: any) {
+      toast({ title: 'Upload failed', description: e.message, variant: 'destructive' });
+    } finally {
+      setSaving(false);
+      setIsUploading(false);
+    }
+  };
+
+  if (saved) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center animate-in fade-in">
+        <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4">
+          <CheckCircle2 className="w-9 h-9 text-emerald-600" />
+        </div>
+        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">Document Uploaded!</h3>
+        <p className="text-slate-500 mb-6">It's now available in the Document Library and attached to this topic.</p>
+        <Button onClick={() => { setSaved(false); setFile(null); setThumbFile(null); setThumbPreview(''); setForm(f => ({ ...f, title: '', slug: '', shortDescription: '', description: '', pages: '', tags: '' })); }}>
+          Upload Another
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`grid gap-6 sm:gap-8 ${!compact ? 'lg:grid-cols-12' : 'grid-cols-1'}`}>
+      
+      {/* ── Left Column (File, Thumbnail, Categories) ── */}
+      <div className={`space-y-6 ${!compact ? 'lg:col-span-5' : ''}`}>
+        {/* File Drop Zone / URL Input */}
+        <div className="space-y-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-bold text-slate-700 dark:text-slate-200">Document Source</Label>
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setInputMode('upload')}
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${inputMode === 'upload' ? 'bg-white dark:bg-slate-700 shadow text-amber-600' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+              >
+                Upload File
+              </button>
+              <button
+                type="button"
+                onClick={() => setInputMode('url')}
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${inputMode === 'url' ? 'bg-white dark:bg-slate-700 shadow text-amber-600' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+              >
+                Link URL
+              </button>
+            </div>
+          </div>
+          
+          {inputMode === 'upload' ? (
+            <>
+              <input ref={fileInputRef} type="file" accept={ACCEPTED_TYPES} className="hidden" onChange={e => setFile(e.target.files?.[0] || null)} />
+              {!file && !initialData?.fileUrl ? (
+                <div
+                  onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleFileDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-xl p-6 sm:p-8 text-center cursor-pointer transition-all select-none ${dragOver ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20 scale-[1.02]' : 'border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-700 hover:bg-amber-50/40 dark:hover:bg-amber-900/10'}`}
+                >
+                  <div className="flex justify-center gap-2 sm:gap-3 mb-4 opacity-60 flex-wrap">
+                    <FileTypeIcon ext="pdf" size="sm" />
+                    <FileTypeIcon ext="docx" size="sm" />
+                    <FileTypeIcon ext="pptx" size="sm" />
+                    <FileTypeIcon ext="xlsx" size="sm" />
+                  </div>
+                  <p className="font-bold text-slate-700 dark:text-slate-300 text-sm sm:text-base">Drag & Drop your file here</p>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1 mb-4">PDF · DOCX · PPTX · XLSX · ZIP · TXT</p>
+                  <Button type="button" size="sm" className="bg-amber-500 hover:bg-amber-600 text-white w-full sm:w-auto" onClick={e => { e.stopPropagation(); fileInputRef.current?.click(); }}>
+                    <Upload className="w-4 h-4 mr-2" /> Browse Files
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+                  <FileTypeIcon ext={file ? getExt(file) : initialData?.fileType || 'pdf'} size="md" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-slate-800 dark:text-slate-100 truncate text-sm sm:text-base">{file ? file.name : (initialData?.title + ' (Existing File)')}</p>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-0.5">{file ? (file.size / (1024 * 1024)).toFixed(2) : ((initialData?.fileSize || 0) / (1024 * 1024)).toFixed(2)} MB · {file ? getExt(file).toUpperCase() : (initialData?.fileType || 'PDF').toUpperCase()}</p>
+                    {isUploading && (
+                      <div className="mt-2">
+                        <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                          <div className="h-full bg-amber-500 transition-all duration-300 rounded-full" style={{ width: `${uploadProgress}%` }} />
+                        </div>
+                        <p className="text-xs text-amber-600 mt-1">Uploading {Math.round(uploadProgress)}%...</p>
+                      </div>
+                    )}
+                  </div>
+                  {file ? (
+                    <Button type="button" variant="ghost" size="icon" onClick={() => setFile(null)} className="text-red-400 hover:text-red-600 shrink-0">
+                      <X className="w-5 h-5" />
+                    </Button>
+                  ) : (
+                    <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="shrink-0 text-amber-600 border-amber-200 hover:bg-amber-100 text-xs sm:text-sm">
+                      Replace File
+                    </Button>
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="space-y-2 mt-2">
+              <Input 
+                placeholder="https://example.com/document.pdf" 
+                value={fileUrlInput} 
+                onChange={e => setFileUrlInput(e.target.value)} 
+                className="dark:bg-slate-800 rounded-xl font-mono text-sm"
+              />
+              <p className="text-xs text-slate-500">Provide a direct link to the document (e.g., PDF URL, Google Drive file link).</p>
+            </div>
+          )}
+        </div>
+
+        {/* Thumbnail */}
+        <div className="space-y-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+          <Label className="text-sm font-bold text-slate-700 dark:text-slate-200">Cover Thumbnail</Label>
+          <input ref={thumbInputRef} type="file" accept="image/*" className="hidden" onChange={handleThumbChange} />
+          {thumbPreview || form.thumbnail ? (
+            <div className="relative w-32 h-40 sm:w-36 sm:h-48 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm group mx-auto">
+              <img src={thumbPreview || form.thumbnail} alt="Cover" className="w-full h-full object-cover" />
+              <button onClick={() => { setThumbPreview(''); setThumbFile(null); setForm(prev => ({ ...prev, thumbnail: '' })); }}
+                className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => thumbInputRef.current?.click()}
+              className="w-32 h-40 sm:w-36 sm:h-48 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-amber-300 transition-colors text-slate-400 hover:text-amber-500 mx-auto bg-slate-50 dark:bg-slate-800/50 hover:bg-amber-50 dark:hover:bg-amber-900/20">
+              <ImageIcon className="w-8 h-8 opacity-50" />
+              <span className="text-xs font-semibold text-center px-2">Upload Cover</span>
+            </button>
+          )}
+        </div>
+
+        {/* Category chips */}
+        <div className="space-y-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+          <Label className="text-sm font-bold text-slate-700 dark:text-slate-200">Category</Label>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map(c => (
+              <button key={c.value} onClick={() => update('category', c.value)}
+                className={`px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold transition-all ${form.category === c.value ? 'bg-amber-500 text-white shadow-sm ring-2 ring-amber-500 ring-offset-1 dark:ring-offset-slate-900' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-900/30'}`}>
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Right Column (Metadata, Curriculum, Actions) ── */}
+      <div className={`space-y-6 ${!compact ? 'lg:col-span-7' : ''}`}>
+        
+        {/* Basic Info */}
+        <div className="space-y-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-bold">Title *</Label>
+              <Input value={form.title} onChange={e => update('title', e.target.value)} placeholder="e.g. The Wind Cap — Full Chapter Notes" className="dark:bg-slate-800 rounded-xl" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-bold">Slug *</Label>
+              <Input value={form.slug} onChange={e => update('slug', e.target.value)} placeholder="e.g. the-wind-cap-notes" className="dark:bg-slate-800 rounded-xl font-mono text-sm" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-bold">Short Description</Label>
+            <Textarea value={form.shortDescription} onChange={e => update('shortDescription', e.target.value)} rows={3} placeholder="Brief description visible in listings..." className="dark:bg-slate-800 resize-none rounded-xl" />
+          </div>
+        </div>
+
+        {/* Curriculum (only shown when not compact or topicId not set) */}
+        {!compact && (
+          <div className="space-y-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+            <Label className="text-sm font-bold flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-amber-500" /> Curriculum Link (optional)
+            </Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                { key: 'boardId', label: 'Board', placeholder: 'e.g. WBBSE' },
+                { key: 'classId', label: 'Class', placeholder: 'e.g. Class 8' },
+                { key: 'subjectId', label: 'Subject', placeholder: 'e.g. English' },
+                { key: 'topicId', label: 'Topic ID', placeholder: 'Topic ID' },
+              ].map(f => (
+                <div key={f.key} className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{f.label}</Label>
+                  <Input value={(form as any)[f.key]} onChange={e => update(f.key, e.target.value)} placeholder={f.placeholder} className="dark:bg-slate-800 rounded-lg" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Access + Metadata row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+          <div className="space-y-2">
+            <Label className="text-sm font-bold flex items-center gap-1.5"><FileText className="w-4 h-4 text-slate-400" /> Pages</Label>
+            <Input type="number" value={form.pages} onChange={e => update('pages', e.target.value)} placeholder="24" className="dark:bg-slate-800 rounded-xl" />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-bold flex items-center gap-1.5"><Globe className="w-4 h-4 text-slate-400" /> Language</Label>
+            <select value={form.language} onChange={e => update('language', e.target.value)}
+              className="flex h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 dark:focus-visible:ring-slate-300">
+              <option value="bengali">Bengali</option>
+              <option value="english">English</option>
+              <option value="hindi">Hindi</option>
+              <option value="both">Bilingual</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-bold flex items-center gap-1.5"><Lock className="w-4 h-4 text-slate-400" /> Access</Label>
+            <select value={form.access} onChange={e => update('access', e.target.value)}
+              className="flex h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 dark:focus-visible:ring-slate-300">
+              <option value="free">Free</option>
+              <option value="premium">Premium</option>
+              <option value="private">Private</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div className="space-y-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+          <Label className="text-sm font-bold flex items-center gap-2"><Tag className="w-4 h-4 text-slate-400" /> Tags</Label>
+          <Input value={form.tags} onChange={e => update('tags', e.target.value)} placeholder="notes, chapter-1, wbbse (comma separated)" className="dark:bg-slate-800 rounded-xl" />
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <Button
+            onClick={() => handleSave('published')}
+            disabled={saving}
+            size="lg"
+            className="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold gap-2 rounded-xl h-12 shadow-md shadow-amber-500/20"
+          >
+            {saving ? (
+              <><Loader2 className="w-5 h-5 animate-spin" />{isUploading ? `Uploading ${Math.round(uploadProgress)}%` : 'Saving...'}</>
+            ) : (
+              <><Save className="w-5 h-5" /> {documentId ? 'Save Changes' : 'Upload & Publish Document'}</>
+            )}
+          </Button>
+          <Button variant="outline" size="lg" onClick={() => handleSave('draft')} disabled={saving} className="gap-2 rounded-xl h-12 w-full sm:w-auto">
+            Save Draft
+          </Button>
+        </div>
+      </div>
+      
+    </div>
+  );
+}

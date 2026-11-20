@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Award, CheckCircle, XCircle, Loader2, FileQuestion, GraduationCap, Target, School, Book, Layers, BarChart, Clock, Star, Calendar, BadgeCheck, Crown, Gem } from 'lucide-react';
+import { Award, CheckCircle, XCircle, Loader2, FileQuestion, GraduationCap, Target, School, Book, Layers, BarChart, Clock, Star, Calendar, BadgeCheck, Crown, Gem, User } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -21,6 +21,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { ScoreCircle } from '@/components/feature/score-circle';
 import { Badge } from '@/components/ui/badge';
+import { UserAttemptsDisplay } from '@/components/assessment/UserAttemptsDisplay';
 
 type Submission = { id: string; testId: string; userId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string; submittedAt: any;};
 type Test = { id: string; title: string; testType: string; board: string; subject: string; exam: string; chapter: string; duration: number; difficulty: string;};
@@ -101,7 +102,7 @@ function ResultsDisplay() {
   const { score, totalQuestions, testType } = submission;
   const percentage = Math.round((score / totalQuestions) * 100);
   const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
-  const contentBaseUrl = `/${typeSlug}`;
+  const contentBaseUrl = `/${typeSlug}s`; // Make it plural for the link
   const submittedAtDate = submission.submittedAt ? new Date(submission.submittedAt) : null;
 
 
@@ -153,7 +154,7 @@ function ResultsDisplay() {
             <Separator />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
-                {test.chapter && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
+                {test.chapter && <div className="flex items-center gap-2 text-muted-foreground col-span-full lg:col-span-2"><Layers className="w-4 h-4" /> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
                 
                 {test.subject && <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{test.subject}</span></div>}
                 {test.board && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Board:</strong> <span className="text-foreground">{test.board}</span></div>}
@@ -174,13 +175,13 @@ function ResultsDisplay() {
             <Separator />
              <div className="flex gap-4 justify-center pt-2">
                 <Button asChild>
-                <Link href={`${contentBaseUrl}/${test.id}/review?submissionId=${submissionId}`}>
+                <Link href={`${typeSlug}/${test.id}/review?submissionId=${submissionId}`}>
                     <FileQuestion className="mr-2"/>
                     Review Answers
                 </Link>
                 </Button>
                 <Button variant="outline" asChild>
-                <Link href={`${contentBaseUrl}/${test.id}`}>Try Again</Link>
+                <Link href={`${typeSlug}/${test.id}`}>Try Again</Link>
                 </Button>
             </div>
             <div className="pt-2 text-center">
@@ -190,6 +191,9 @@ function ResultsDisplay() {
             </div>
         </CardContent>
       </Card>
+      <div className="max-w-4xl mx-auto mt-8">
+         <UserAttemptsDisplay assessmentId={test.id} />
+      </div>
     </>
   );
 }
@@ -202,8 +206,8 @@ export default function TestResultsPage() {
     const getTestType = async () => {
         const submissionId = searchParams.get('submissionId');
         if(submissionId) {
-            const sub = await getSubmissionById(submissionId);
-            if(sub) {
+            const sub = (await getSubmissionById(submissionId)) as Submission;
+            if(sub && sub.testType) {
                 setTestType(sub.testType);
             }
         }

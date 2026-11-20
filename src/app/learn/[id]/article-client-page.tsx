@@ -16,6 +16,12 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/use-auth';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import rehypeRaw from 'rehype-raw';
 
 
 type Article = {
@@ -28,6 +34,7 @@ type Article = {
   authorName: string;
   createdAt: string;
   testType: string;
+  featureImage?: string;
 };
 
 type Comment = {
@@ -290,7 +297,7 @@ export default function ArticleClientPage({ article }: { article: Article }) {
             </header>
 
             <Image
-                src={`https://picsum.photos/seed/${article.id}/800/450`}
+                src={article.featureImage || `https://picsum.photos/seed/${article.id}/800/450`}
                 alt={article.title}
                 width={800}
                 height={450}
@@ -299,10 +306,13 @@ export default function ArticleClientPage({ article }: { article: Article }) {
                 priority
             />
 
-            <div 
+            <article 
               className="prose dark:prose-invert lg:prose-xl max-w-none"
-              dangerouslySetInnerHTML={{ __html: article.body }}
-            />
+            >
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                    {article.body}
+                </ReactMarkdown>
+            </article>
 
             <Separator className="my-12" />
 

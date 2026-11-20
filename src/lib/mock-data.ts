@@ -76,48 +76,59 @@ export const mockTests: MockTest[] = [
 ];
 
 export const pricingData = {
+    // Benefits use the real PLANS feature lists (src/lib/wb-board.ts) —
+    // no invented counts. Basic/Plus/Pro are monthly plans.
     benefits: [
-        { id: "b1", name: "70,000+ Mock Test", pro: true, pass: true },
-        { id: "b2", name: "Unlimited Pro Live Test", pro: true, pass: false },
-        { id: "b3", name: "Unlimited Practice Pro Questions", pro: true, pass: false },
-        { id: "b4", name: "17,000+ Previous Year Papers", pro: true, pass: false },
-        { id: "b5", name: "Unlimited Re-Attempt mode for All Tests", pro: true, pass: false },
+        { id: "b1", name: "অধ্যায়ভিত্তিক MCQ অনুশীলন", basic: true, plus: true, pro: true },
+        { id: "b2", name: "আগের বছরের প্রশ্নপত্র", basic: true, plus: true, pro: true },
+        { id: "b3", name: "বিনামূল্যের ডেমো টেস্ট", basic: true, plus: true, pro: true },
+        { id: "b4", name: "মক টেস্ট ও সাজেশন", basic: false, plus: true, pro: true },
+        { id: "b5", name: "অধ্যায়ভিত্তিক নোট", basic: false, plus: true, pro: true },
+        { id: "b6", name: "ফলাফল বিশ্লেষণ", basic: false, plus: true, pro: true },
+        { id: "b7", name: "ভিডিও ক্লাস", basic: false, plus: false, pro: true },
+        { id: "b8", name: "লাইভ ক্লাস", basic: false, plus: false, pro: true },
+        { id: "b9", name: "সব বিষয় ও সব ক্লাস", basic: false, plus: false, pro: true },
     ],
-    plans: {
-        pro: [
-             { id: "pro_monthly", name: "Monthly Pass Pro", validity: "31 Days", originalPrice: 1199, price: 599, discount: null, bestseller: false },
-             { id: "pro_yearly", name: "Yearly Pass Pro", validity: "365 Days", originalPrice: 1799, price: 649, discount: 64, bestseller: true },
-             { id: "pro_18months", name: "18 Months Pass Pro", validity: "548 Days", originalPrice: 1999, price: 799, discount: 60, bestseller: false },
-        ],
-        pass: [
-            { id: "pass_monthly", name: "Monthly Pass", validity: "31 Days", originalPrice: 599, price: 299, discount: 50, bestseller: false },
-            { id: "pass_yearly", name: "Yearly Pass", validity: "365 Days", originalPrice: 999, price: 349, discount: 65, bestseller: true },
-            { id: "pass_18months", name: "18 Months Pass", validity: "548 Days", originalPrice: 1299, price: 499, discount: 62, bestseller: false },
-        ]
-    }
+    plans: [
+        { id: "basic", name: "Basic", validity: "1 মাস", originalPrice: 100, price: 50, discount: 50, bestseller: false },
+        { id: "plus", name: "Plus", validity: "1 মাস", originalPrice: 250, price: 100, discount: 60, bestseller: true },
+        { id: "pro", name: "Pro", validity: "1 মাস", originalPrice: 400, price: 200, discount: 50, bestseller: false },
+    ]
 }
 
 export const faqData = [
-    { 
-        question: "What is DeshExam Pass Pro?", 
-        answer: "DeshExam Pass Pro is a premium subscription that gives you access to a vast library of mock tests, previous year papers, and live tests to help you prepare for various competitive exams." 
+    {
+        question: "DeshExam-এর প্ল্যানগুলো কী?",
+        answer: "তিনটি মাসিক প্ল্যান আছে — Basic ₹৫০/মাস, Plus ₹১০০/মাস ও Pro ₹২০০/মাস। সব প্ল্যান ক্লাস ৫–১২, WBBSE ও WBCHSE প্রস্তুতির জন্য।"
     },
-    { 
-        question: "When will my Pass Pro expire? Will I be able to access the Test Series after my Pass Pro expires?", 
-        answer: "Your Pass Pro subscription expires based on the validity period of the plan you choose (e.g., 31 days for Monthly plan). After expiry, you will lose access to the premium content. You can renew your subscription to continue." 
+    {
+        question: "প্ল্যানের মেয়াদ কতদিন?",
+        answer: "প্রতিটি প্ল্যান ১ মাসের জন্য। মেয়াদ শেষ হলে আবার কিনে নবায়ন করতে পারবেন।"
     },
-    { 
-        question: "Will all of my enrolled Test Series be available during the DeshExam Pass Pro validity period?", 
-        answer: "Yes, all Test Series included in the Pass Pro plan will be available to you throughout your subscription's validity period. You can attempt them multiple times to improve your score." 
+    {
+        question: "Basic, Plus ও Pro-এর মধ্যে পার্থক্য কী?",
+        answer: "Basic-এ অধ্যায়ভিত্তিক MCQ, আগের বছরের প্রশ্নপত্র ও ফ্রি ডেমো টেস্ট আছে। Plus-এ তার সঙ্গে মক টেস্ট, সাজেশন, নোট ও ফলাফল বিশ্লেষণ যোগ হয়। Pro-এ সব সুবিধার সঙ্গে ভিডিও ক্লাস ও লাইভ ক্লাস আছে।"
     },
-    { 
-        question: "How can I renew my DeshExam Pass Pro?", 
-        answer: "You can renew your Pass Pro subscription directly from the pricing page. Simply select your desired plan and proceed to payment. Your new validity period will be added to your account." 
+    {
+        question: "পেমেন্ট কীভাবে করব?",
+        answer: "UPI, কার্ড ও নেট ব্যাংকিংয়ে পেমেন্ট করা যায়। পেমেন্টের আগে প্ল্যান, দাম ও মেয়াদ দেখে নিশ্চিত হয়ে নিন।"
     },
-    { 
-        question: "I do not have online payment activated. Can I use any other mode for payment?", 
-        answer: "We support a variety of payment methods, including credit/debit cards, net banking, and UPI. Please check the payment page for all available options. If you face any issues, our support team is ready to help." 
+    {
+        question: "কুপন কোড কীভাবে ব্যবহার করব?",
+        answer: "প্ল্যান বেছে নেওয়ার পর কুপন কোডের ঘরে কোড লিখে Apply চাপুন। বৈধ কোড হলে ছাড় মোট দাম থেকে বাদ যাবে।"
     },
+    {
+        question: "রিফান্ড কি পাওয়া যায়?",
+        answer: "ডিজিটাল কনটেন্ট কেনার পর অ্যাক্সেস পেলে সাধারণত রিফান্ড হয় না। বিস্তারিত জানতে Refund Policy পাতাটি দেখুন।"
+    },
+    {
+        question: "একটি প্ল্যান কি একাধিক ডিভাইসে ব্যবহার করা যায়?",
+        answer: "হ্যাঁ, আপনার অ্যাকাউন্ট দিয়ে মোবাইল, ট্যাবলেট ও কম্পিউটারে লগইন করতে পারবেন।"
+    },
+    {
+        question: "সাহায্য দরকার হলে কোথায় যোগাযোগ করব?",
+        answer: "ইমেইল করুন support@deshexam.com-এ অথবা +91 62940 06590 নম্বরে যোগাযোগ করুন।"
+    }
 ];
 
 
@@ -157,5 +168,97 @@ export const chartConfig = {
     color: "hsl(var(--primary))",
   },
 } satisfies ChartConfig;
+
+export const mockBooks = [
+  {
+    title: "অষ্টম শ্রেণির সাহিত্য কণিকা পূর্ণাঙ্গ এমসিকিউ প্রশ্নব্যাংক ও সমাধান (PDF)",
+    slug: "class-8-sahitya-kanika-mcq",
+    authorName: "DeshExam",
+    authorBusinessName: "DeshExam",
+    price: 25,
+    originalPrice: 100,
+    discount: 75,
+    rating: 4.5,
+    reviewCount: 2,
+    sales: 10,
+    downloads: 27,
+    publishedDate: "2025-11-24",
+    coverImage: "https://picsum.photos/seed/book1/400/600",
+    bookType: "Soft Copy",
+    language: "Bangla",
+    classCategory: "1 - 12 Class",
+    subject: "Bangla",
+    tags: ["MCQ", "Class 8", "Sahitya Kanika"],
+    description: "This is a complete MCQ question bank and solution guide for Class 8 Sahitya Kanika.",
+    specifications: {
+      "Title": "অষ্টম শ্রেণির সাহিত্য কণিকা পূর্ণাঙ্গ এমসিকিউ প্রশ্নব্যাংক ও সমাধান (PDF)",
+      "Language": "Bangla",
+    },
+    features: ["Complete MCQ", "Detailed Solutions", "PDF Download"]
+  },
+  {
+    title: "ভেক্টর",
+    slug: "vector",
+    authorName: "NC Sarkar",
+    authorBusinessName: "DeshExam",
+    price: 10,
+    originalPrice: 10,
+    discount: 0,
+    rating: 4.5,
+    reviewCount: 2,
+    sales: 1,
+    downloads: 5,
+    publishedDate: "2025-10-10",
+    coverImage: "https://picsum.photos/seed/book2/400/600",
+    bookType: "Hard Copy",
+    language: "Bangla",
+    classCategory: "1 - 12 Class",
+    subject: "Physics",
+    tags: ["Physics", "Vector"],
+    description: "A comprehensive guide on Vector physics for students.",
+  },
+  {
+    title: "নবম-দশম শ্রেণির তথ্য ও যোগাযোগ প্রযুক্তি বোর্ড প্রশ্ন ও সমাধান",
+    slug: "class-9-10-ict-board-questions",
+    authorName: "DeshExam",
+    authorBusinessName: "DeshExam",
+    price: 24,
+    originalPrice: 50,
+    discount: 52,
+    rating: 5.0,
+    reviewCount: 2,
+    sales: 6,
+    downloads: 15,
+    publishedDate: "2025-08-15",
+    coverImage: "https://picsum.photos/seed/book3/400/600",
+    bookType: "Soft Copy",
+    language: "Bangla",
+    classCategory: "1 - 12 Class",
+    subject: "ICT",
+    tags: ["ICT", "Board Questions"],
+    description: "ICT Board Questions and Solutions for Class 9 and 10.",
+  },
+  {
+    title: "উচ্চ মাধ্যমিক কৃষিশিক্ষা সকল বোর্ড এমসিকিউ",
+    slug: "hsc-agriculture-mcq",
+    authorName: "DeshExam",
+    authorBusinessName: "DeshExam",
+    price: 30,
+    originalPrice: 75,
+    discount: 60,
+    rating: 5.0,
+    reviewCount: 2,
+    sales: 9,
+    downloads: 20,
+    publishedDate: "2025-07-20",
+    coverImage: "https://picsum.photos/seed/book4/400/600",
+    bookType: "Soft Copy",
+    language: "Bangla",
+    classCategory: "1 - 12 Class",
+    subject: "Agriculture",
+    tags: ["HSC", "Agriculture", "MCQ"],
+    description: "HSC Agriculture MCQ question bank for all boards.",
+  }
+];
 
     

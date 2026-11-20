@@ -1,288 +1,351 @@
-
-import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Metadata } from "next";
+import { Suspense } from "react";
 import {
-  BrainCircuit,
-  ClipboardCheck,
+  BookOpen,
   FileText,
-  Rocket,
-  Star,
-  Trophy,
-  BarChart,
-  Users,
-  TrendingUp,
+  PlayCircle,
+  ClipboardList,
+  BarChart3,
+  Lightbulb,
+  CheckCircle2,
+  Timer,
+  FileQuestion,
+  ArrowRight,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { Metadata } from 'next';
+import { ClassPicker } from "@/components/wb/class-picker";
+import { DemoTest } from "@/components/wb/demo-test";
+import { Hero } from "@/components/wb/hero";
+import { EmptyState, PriceTag, SectionHeader, Thumbnail } from "@/components/wb/ui";
+import {
+  PLANS,
+  SAMPLE_COURSES,
+  SAMPLE_MOCK_TESTS,
+  SAMPLE_NOTES,
+  toBn,
+} from "@/lib/wb-board";
+import { getFAQSchema, getOrganizationSchema, getSearchActionSchema } from "@/lib/seo/json-ld";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://deshexam.vercel.app";
 
 export const metadata: Metadata = {
-  title: "DeshExam | Ace Your Competitive Exams",
-  description: "The ultimate platform for mock tests, quizzes, and AI-powered personalized learning paths for NEET, JEE, UPSC, and more. Boost your exam preparation with DeshExam.",
-  keywords: ["mock tests", "online quiz", "exam preparation", "NEET", "JEE", "UPSC", "competitive exams", "AI learning"],
+  metadataBase: new URL(siteUrl),
+  title: "DeshExam — ক্লাস ৫–১২, পশ্চিমবঙ্গ বোর্ড প্রস্তুতি | WBBSE ও WBCHSE",
+  description:
+    "ক্লাস ৫ থেকে ১২ — WBBSE (মাধ্যমিক) ও WBCHSE (উচ্চমাধ্যমিক) পরীক্ষার অধ্যায়ভিত্তিক MCQ, আগের বছরের প্রশ্নপত্র, সাজেশন ও মক টেস্ট। বাংলা ও ইংরেজি মাধ্যম।",
+  keywords: [
+    "DeshExam",
+    "WBBSE",
+    "WBCHSE",
+    "Madhyamik suggestion",
+    "WBCHSE Class 12 mock test",
+    "ক্লাস ১০ মক টেস্ট",
+    "পশ্চিমবঙ্গ বোর্ড",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "DeshExam — ক্লাস ৫–১২, পশ্চিমবঙ্গ বোর্ডের সম্পূর্ণ প্রস্তুতি",
+    description:
+      "অধ্যায়ভিত্তিক MCQ, আগের বছরের প্রশ্নপত্র, সাজেশন ও মক টেস্ট — বাংলা ও ইংরেজি মাধ্যমে, এক জায়গায়।",
+    url: siteUrl,
+    siteName: "DeshExam",
+    locale: "bn_IN",
+    type: "website",
+    images: [{ url: `${siteUrl}/og-image.png`, width: 1200, height: 630, alt: "DeshExam — ক্লাস ৫ থেকে ১২, পশ্চিমবঙ্গ বোর্ডের সম্পূর্ণ প্রস্তুতি" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DeshExam — ক্লাস ৫–১২, পশ্চিমবঙ্গ বোর্ডের সম্পূর্ণ প্রস্তুতি",
+    description:
+      "অধ্যায়ভিত্তিক MCQ, আগের বছরের প্রশ্নপত্র, সাজেশন ও মক টেস্ট — বাংলা ও ইংরেজি মাধ্যমে।",
+    images: [`${siteUrl}/og-image.png`],
+  },
 };
 
-
-const features = [
-  {
-    icon: <ClipboardCheck className="w-8 h-8 text-primary" />,
-    title: "Mock Tests",
-    description: "Distraction-free interface with timer and instant scoring.",
-    link: "/mock-tests",
-  },
-  {
-    icon: <BrainCircuit className="w-8 h-8 text-primary" />,
-    title: "AI Learning Path",
-    description: "Personalized study plans based on your test results.",
-    link: "/learning-path",
-  },
-  {
-    icon: <FileText className="w-8 h-8 text-primary" />,
-    title: "Solved Textbooks",
-    description: "AI-powered summaries and solutions for textbook pages.",
-    link: "/textbook-solver",
-  },
-  {
-    icon: <Trophy className="w-8 h-8 text-primary" />,
-    title: "Leaderboards",
-    description: "Compete with others and climb the ranks.",
-    link: "/leaderboard",
-  },
+const FEATURES = [
+  { icon: FileQuestion, title: "অধ্যায়ভিত্তিক MCQ অনুশীলন", benefit: "প্রতিটি অধ্যায় শেষে নিজেকে যাচাই করুন।", href: "/practice" },
+  { icon: FileText, title: "আগের বছরের প্রশ্নপত্র", benefit: "মাধ্যমিক ও উচ্চমাধ্যমিকের আসল প্রশ্নপত্র।", href: "/previous-year-papers" },
+  { icon: Lightbulb, title: "সাজেশন ও মডেল প্রশ্নপত্র", benefit: "পরীক্ষার আগে গুরুত্বপূর্ণ প্রশ্ন এক জায়গায়।", href: "/mock-tests" },
+  { icon: ClipboardList, title: "ইউনিট, হাফ-ইয়ারলি ও অ্যানুয়াল মক টেস্ট", benefit: "পরীক্ষার মতো পরিবেশে সময় ধরে অনুশীলন।", href: "/mock-tests" },
+  { icon: PlayCircle, title: "ভিডিও ক্লাস ও সন্দেহ সমাধান", benefit: "কঠিন বিষয় সহজ করে বোঝানো ভিডিও।", href: "/videos" },
+  { icon: BarChart3, title: "ফলাফল বিশ্লেষণ", benefit: "কোন অধ্যায়ে দুর্বলতা, সেটা স্পষ্ট দেখুন।", href: "/learn" },
 ];
 
-const whyChooseUs = [
-    {
-        icon: <BarChart className="w-10 h-10 text-primary" />,
-        title: "Comprehensive Analytics",
-        description: "Get detailed insights into your performance to identify strengths and weaknesses."
-    },
-    {
-        icon: <Users className="w-10 h-10 text-primary" />,
-        title: "Expert-Crafted Content",
-        description: "Our tests and materials are created by subject-matter experts for top-quality preparation."
-    },
-    {
-        icon: <TrendingUp className="w-10 h-10 text-primary" />,
-        title: "Proven Results",
-        description: "Join thousands of successful students who have achieved their exam goals with DeshExam."
-    }
-];
-
-const testimonials = [
-  {
-    name: "Priya Sharma",
-    role: "Medical Aspirant, NEET",
-    quote:
-      "DeshExam's mock tests were a game-changer for my NEET preparation. The AI analysis of my weak areas was incredibly accurate and helped me focus my study time effectively.",
-    avatar: "/avatars/01.png",
-  },
-  {
-    name: "Rahul Verma",
-    role: "Engineering Student, JEE",
-    quote:
-      "The solved textbook feature is amazing! It's like having a personal tutor available 24/7. It made understanding complex physics problems so much easier.",
-    avatar: "/avatars/02.png",
-  },
-  {
-    name: "Anjali Singh",
-    role: "UPSC Aspirant",
-    quote:
-      "I love the variety of quizzes available on DeshExam. It makes learning fun and competitive. The leaderboard is a great motivator to keep improving.",
-    avatar: "/avatars/03.png",
-  },
+const FAQS = [
+  { q: "কোন ক্লাস ও বোর্ডের জন্য DeshExam?", a: "ক্লাস ৫ থেকে ১২ পর্যন্ত। ক্লাস ৫–১০ WBBSE (মাধ্যমিক) এবং ক্লাস ১১–১২ WBCHSE (উচ্চমাধ্যমিক) বোর্ডের জন্য।" },
+  { q: "বাংলা মাধ্যম নাকি ইংরেজি মাধ্যম?", a: "দুটোই। ক্লাস বেছে নেওয়ার সময় বাংলা মাধ্যম বা ইংরেজি মাধ্যম বেছে নিতে পারবেন — আপনার পছন্দ মনে রাখা হয়।" },
+  { q: "ফ্রি টেস্ট কীভাবে দেব?", a: "এই পাতার ‘ফ্রি টেস্ট দিন’ অংশে ফ্রি ডেমো টেস্ট আছে — ৫টি ডেমো প্রশ্ন, লগইন ছাড়াই দেওয়া যায়, সঙ্গে সঙ্গে ফলাফল পাবেন।" },
+  { q: "পেমেন্ট কীভাবে করব?", a: "UPI, কার্ড ও নেট ব্যাংকিংয়ে পেমেন্ট করা যায়। পেমেন্টের আগে প্ল্যান, দাম ও মেয়াদ দেখে নিশ্চিত হয়ে নিন।" },
+  { q: "রিফান্ড কি পাওয়া যায়?", a: "ডিজিটাল কনটেন্ট কেনার পর অ্যাক্সেস পেলে সাধারণত রিফান্ড হয় না। বিস্তারিত জানতে Refund Policy পাতাটি দেখুন।" },
+  { q: "প্ল্যানের মেয়াদ কতদিন?", a: "প্রতিটি প্ল্যান ১ মাসের জন্য — প্রতি মাসে নবায়ন হয়। মেয়াদ শেষ হলে আবার কিনতে পারবেন।" },
+  { q: "কোন ডিভাইসে চলবে?", a: "মোবাইল, ট্যাবলেট ও কম্পিউটার — যেকোনো আধুনিক ব্রাউজারে চলে। কম দামের অ্যান্ড্রয়েড ফোনের কথা মাথায় রেখে পাতাগুলো হালকা রাখা হয়েছে।" },
+  { q: "অফলাইনে কি পড়া যায়?", a: "এখনো অফলাইন সুবিধা নেই — পড়তে ইন্টারনেট লাগবে। অফলাইন সুবিধা ভবিষ্যতে আসতে পারে।" },
+  { q: "সাহায্য দরকার হলে কোথায় যোগাযোগ করব?", a: "ইমেইল করুন support@deshexam.com-এ অথবা +91 62940 06590 নম্বরে যোগাযোগ করুন। Contact পাতায় বিস্তারিত আছে।" },
 ];
 
 export default function Home() {
-    const organizationJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "DeshExam",
-    "url": "https://deshexam.com",
-    "logo": "https://deshexam.com/logo.png",
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": "+91-123-456-7890",
-      "contactType": "Customer Service"
-    }
-  };
-
-  const websiteJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "DeshExam",
-    "url": "https://deshexam.com/",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": "https://deshexam.com/search?q={search_term_string}"
-      },
-      "query-input": "required name=search_term_string"
-    }
-  };
+  const schemas = [
+    getSearchActionSchema(),
+    getOrganizationSchema(),
+    getFAQSchema(FAQS.map((f) => ({ q: f.q, a: f.a }))),
+  ];
 
   return (
-    <div className="flex flex-col min-h-screen">
-       <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-      />
-      <section className="relative w-full pt-20 pb-12 md:pt-32 md:pb-24 lg:pt-40 lg:pb-32">
-        <div className="absolute inset-0 z-0">
-           <Image
-            src="https://picsum.photos/seed/hero/1920/1080"
-            alt="Students studying diligently in a modern, well-lit library"
-            fill
-            className="object-cover"
-            data-ai-hint="students library"
-            priority
+    <div className="flex flex-col overflow-x-hidden bg-[#040a16] font-body text-base text-slate-100">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
+
+      {/* 4.2 Hero */}
+      <Hero />
+
+      {/* 4.3 Class picker */}
+      <section id="class-picker" className="section-dark scroll-mt-20 py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+        <SectionHeader tone="dark"
+          eyebrow="ক্লাস বেছে নিন"
+          title="আপনার ক্লাস কোনটি?"
+          subtitle="আপনার বোর্ড ও ক্লাস নির্বাচন করে প্রস্তুতি শুরু করুন। সঠিক প্রস্তুতি, সফল ভবিষ্যৎ।"
+        />
+        <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-white/[0.05] p-8 text-center text-slate-300">ক্লাস লোড হচ্ছে…</div>}>
+          <ClassPicker />
+        </Suspense>
+        </div>
+      </section>
+
+      {/* 4.4 Features — only the 6 that exist */}
+      <section className="section-dark-teal py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+          <SectionHeader tone="dark" title="যা যা পাবেন" subtitle="যা যা দরকার, সব এক জায়গায়।" />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((f) => (
+              <Link
+                key={f.title}
+                href={f.href}
+                className="group rounded-2xl border border-white/10 bg-white/[0.05] p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-gold hover:shadow-md"
+              >
+                <span className="inline-flex rounded-xl bg-brand-green/10 p-3 text-brand-green dark:text-emerald-400">
+                  <f.icon className="h-6 w-6" />
+                </span>
+                <h3 className="mt-3 text-lg font-bold text-white">{f.title}</h3>
+                <p className="mt-1 text-base text-slate-300">{f.benefit}</p>
+                <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-emerald-400">
+                  দেখুন <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4.5 Free demo test */}
+      <section id="demo-test" className="section-dark-blue scroll-mt-20 py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+        <SectionHeader tone="dark"
+          eyebrow="ফ্রি ডেমো টেস্ট"
+          title="আগে চেষ্টা করে দেখুন, তারপর সিদ্ধান্ত নিন"
+          subtitle="৫টি ডেমো প্রশ্ন — কোনো লগইন লাগবে না, ফলাফল সঙ্গে সঙ্গে।"
+        />
+        <DemoTest tone="dark" />
+        </div>
+      </section>
+
+      {/* 4.6 Mock tests preview */}
+      <section className="section-dark-blue py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+          <SectionHeader tone="dark"
+            eyebrow="মক টেস্ট"
+            title="মক টেস্ট ও কুইজ"
+            subtitle="নমুনা টেস্ট — আসল প্রশ্নভান্ডার ক্লাস অনুযায়ী তৈরি হচ্ছে।"
+            href="/mock-tests"
+            linkLabel="সব টেস্ট দেখুন"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {SAMPLE_MOCK_TESTS.slice(0, 4).map((t) => (
+              <article key={t.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+                <Thumbnail classNo={t.class} subject={t.subject} title={t.title} type="মক টেস্ট" showTitle={false} />
+                <div className="p-5">
+                  <div className="mb-2 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[15px] font-bold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">নমুনা</span>
+                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-[15px] font-semibold text-slate-300">{t.difficulty}</span>
+                  </div>
+                  <h3 className="min-h-[3rem] text-base font-bold leading-snug text-white">{t.title}</h3>
+                  <p className="mt-2 flex items-center gap-2 text-sm text-slate-300">
+                    <FileQuestion className="h-4 w-4" /> {toBn(t.questions ?? 0)}টি প্রশ্ন
+                    <Timer className="ml-2 h-4 w-4" /> {toBn(t.minutes ?? 0)} মিনিট
+                  </p>
+                  <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
+                    <PriceTag tone="dark" price={t.price ?? 0} />
+                    <Link
+                      href={`/mock-tests?class=${t.class}`}
+                      className="inline-flex min-h-[40px] items-center rounded-full bg-brand-green px-5 text-sm font-bold text-white hover:bg-emerald-800"
+                    >
+                      শুরু করুন
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
-        <div className="container px-4 md:px-6 relative z-10">
-          <div className="flex flex-col items-center space-y-4 text-center">
-            <div className="space-y-2">
-              <h1 className={cn("font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl", "text-gradient-green-blue")} style={{ fontSize: '3.25rem', lineHeight: '1.3' }}>
-                Unlock Your Potential <br className="hidden md:block" /> with DeshExam
-              </h1>
-              <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                Master your competitive exam preparation for NEET, JEE, UPSC, and more with our mock tests, quizzes, and personalized AI-powered learning paths.
+      </section>
+
+      {/* 4.7 Exam notices — honest empty state, no hardcoded dates */}
+      <section className="section-dark-teal px-4 py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+        <SectionHeader tone="dark" eyebrow="পরীক্ষার নোটিশ" title="মাধ্যমিক ও উচ্চমাধ্যমিক নোটিশ" subtitle="রুটিন ও ফলাফলের খবর — অফিসিয়াল সূত্রসহ।" />
+        <EmptyState tone="dark"
+          title="এখনো কোনো নোটিশ যোগ করা হয়নি"
+          body="পরীক্ষার রুটিন ও ফলাফলের নোটিশ এখানে আসবে। পরীক্ষার তারিখ অফিসিয়াল বোর্ডের ঘোষণা যাচাই করে তবেই যোগ করা হবে।"
+        />
+        <p className="mt-4 text-center text-sm text-slate-300">
+          অফিসিয়াল তথ্যের জন্য:{" "}
+          <a href="https://wbbse.wb.gov.in" target="_blank" rel="noopener noreferrer" className="font-semibold text-emerald-400 hover:underline">WBBSE</a>
+          {" "}ও{" "}
+          <a href="https://wbchse.wb.gov.in" target="_blank" rel="noopener noreferrer" className="font-semibold text-emerald-400 hover:underline">WBCHSE</a>
+          -এর ওয়েবসাইট দেখুন।
+        </p>
+        </div>
+      </section>
+
+      {/* 4.8 Courses + Notes/Books preview */}
+      <section className="section-dark py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+          <SectionHeader tone="dark" eyebrow="কোর্স ও নোট" title="কোর্স ও অধ্যায়ভিত্তিক নোট" subtitle="নমুনা কনটেন্ট — আসল কোর্স ও নোট ক্লাস অনুযায়ী তৈরি হচ্ছে।" />
+          <h3 className="mb-4 text-xl font-bold text-white">কোর্স</h3>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {SAMPLE_COURSES.map((c) => (
+              <article key={c.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+                <Thumbnail classNo={c.class} subject={c.subject} title={c.title} type="কোর্স" showTitle={false} />
+                <div className="p-5">
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[15px] font-bold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">নমুনা</span>
+                  <h3 className="mt-2 min-h-[3rem] text-base font-bold leading-snug text-white">{c.title}</h3>
+                  <p className="mt-2 text-sm text-slate-300">শিক্ষক: DeshExam Faculty · {toBn(c.lessons ?? 0)}টি পাঠ</p>
+                  <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
+                    <PriceTag tone="dark" price={c.price ?? 0} />
+                    <Link href="/course" className="inline-flex min-h-[40px] items-center rounded-full border border-emerald-500/60 px-5 text-sm font-bold text-emerald-400 hover:bg-emerald-500/10">
+                      বিস্তারিত
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+          <h3 className="mb-4 mt-10 text-xl font-bold text-white">নোট ও বই</h3>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {SAMPLE_NOTES.map((n) => (
+              <article key={n.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+                <Thumbnail classNo={n.class} subject={n.subject} title={n.title} type="নোট" showTitle={false} />
+                <div className="p-5">
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[15px] font-bold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">নমুনা</span>
+                  <h3 className="mt-2 min-h-[3rem] text-base font-bold leading-snug text-white">{n.title}</h3>
+                  <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
+                    <PriceTag tone="dark" price={n.price ?? 0} />
+                    <Link href="/book" className="inline-flex min-h-[40px] items-center rounded-full border border-emerald-500/60 px-5 text-sm font-bold text-emerald-400 hover:bg-emerald-500/10">
+                      বিস্তারিত
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4.9 Pricing — no yearly toggle: no yearly pricing exists in the repo */}
+      <section className="section-dark-blue px-4 py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+        <SectionHeader tone="dark"
+          eyebrow="প্রাইসিং"
+          title="আপনার জন্য সঠিক প্ল্যান বেছে নিন"
+          subtitle="মাসিক প্ল্যান — UPI, কার্ড ও নেট ব্যাংকিংয়ে পেমেন্ট করা যায়।"
+          href="/pricing"
+          linkLabel="প্ল্যান তুলনা করুন"
+        />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {PLANS.map((p) => (
+            <div
+              key={p.id}
+              className={`relative rounded-2xl border p-6 shadow-sm ${
+                "popular" in p && p.popular
+                  ? "border-2 border-brand-gold bg-white/[0.06] shadow-lg md:-translate-y-2"
+                  : "border-white/10 bg-white/[0.04]"
+              }`}
+            >
+              {"popular" in p && p.popular ? (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-brand-gold px-3 py-1 text-xs font-bold text-[#042f2e]">
+                  সবচেয়ে জনপ্রিয়
+                </span>
+              ) : null}
+              <h3 className="text-xl font-bold text-white">{p.name}</h3>
+              <p className="mt-3 flex items-baseline gap-2">
+                <span className="text-sm text-slate-300 line-through">
+                  <span className="sr-only">আগের দাম </span>₹{p.oldPrice}
+                </span>
+                <span className="text-4xl font-extrabold text-white">₹{p.price}</span>
+                <span className="text-sm text-slate-300">/মাস</span>
               </p>
+              <ul className="mt-5 space-y-2">
+                {p.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-base text-slate-300">
+                    <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-emerald-400" /> {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/pricing"
+                className={`mt-6 flex min-h-[48px] items-center justify-center rounded-full text-base font-bold ${
+                  "popular" in p && p.popular
+                    ? "bg-brand-gold text-[#042f2e] hover:bg-amber-400"
+                    : "bg-brand-green text-white hover:bg-emerald-800"
+                }`}
+              >
+                কিনুন
+              </Link>
             </div>
-            <div className="space-x-4">
-              <Button asChild size="lg">
-                <Link href="/mock-tests">Start a Mock Test</Link>
-              </Button>
-              <Button asChild size="lg" variant="secondary">
-                <Link href="/quizzes">Explore Free Quizzes</Link>
-              </Button>
-            </div>
-          </div>
+          ))}
+        </div>
+        <p className="mt-6 text-center text-sm text-slate-300">
+          পেমেন্ট: UPI · কার্ড · নেট ব্যাংকিং। ডিজিটাল কনটেন্ট কেনার পর অ্যাক্সেস পেলে সাধারণত রিফান্ড হয় না — বিস্তারিত{" "}
+          <Link href="/refund-policy" className="font-semibold text-emerald-400 hover:underline">
+            Refund Policy
+          </Link>{" "}
+          দেখুন।
+        </p>
         </div>
       </section>
 
-      <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-secondary">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-            <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
-              Key Features
-            </div>
-            <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">
-              Everything You Need to Succeed
-            </h2>
-            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              From realistic mock tests simulating exam conditions to AI-driven insights that target your weak spots, our platform is meticulously designed to give you a competitive edge.
-            </p>
-          </div>
-          <div className="mx-auto grid max-w-5xl items-start gap-6 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-4">
-            {features.map((feature) => (
-              <Card key={feature.title} className="h-full transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
-                <CardHeader className="flex flex-col items-center text-center">
-                  {feature.icon}
-                  <CardTitle className="mt-4 font-headline">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center text-muted-foreground">
-                  <p>{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* 4.10 Social proof — hidden: no real testimonials exist yet. */}
 
-       <section id="why-us" className="w-full py-12 md:py-24 lg:py-32">
-        <div className="container px-4 md:px-6">
-           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-             <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
-              Why Choose DeshExam?
-            </div>
-            <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">
-              A Smarter Way to Prepare
-            </h2>
-            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                We blend expert content with intelligent technology to create a learning experience that is both effective and engaging.
-            </p>
-          </div>
-           <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-1 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
-            {whyChooseUs.map((reason) => (
-              <div key={reason.title} className="grid gap-4 text-center">
-                <div className="flex justify-center">{reason.icon}</div>
-                <h3 className="text-xl font-bold font-headline">{reason.title}</h3>
-                <p className="text-muted-foreground">{reason.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="testimonials" className="w-full py-12 md:py-24 lg:py-32 bg-secondary">
-        <div className="container mx-auto px-4 md:px-6">
-          <h2 className="font-headline text-3xl font-bold tracking-tighter text-center sm:text-4xl md:text-5xl mb-12">
-            Loved by Learners Across India
-          </h2>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {testimonials.map((testimonial) => (
-              <Card key={testimonial.name} className="flex flex-col justify-between">
-                <CardContent className="pt-6">
-                  <div className="flex mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                    ))}
-                  </div>
-                  <blockquote className="text-lg italic">
-                    "{testimonial.quote}"
-                  </blockquote>
-                </CardContent>
-                <CardHeader>
-                  <div className="flex items-center gap-4">
-                    <Image
-                      src={`https://picsum.photos/seed/${testimonial.name.replace(/\s/g, '')}/40/40`}
-                      alt={`Profile picture of ${testimonial.name}`}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                      data-ai-hint="person face"
-                    />
-                    <div>
-                      <CardTitle className="text-base font-semibold">
-                        {testimonial.name}
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        {testimonial.role}
-                      </p>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="w-full py-12 md:py-24 lg:py-32">
-        <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
+      {/* 4.11 FAQ */}
+      <section className="section-dark-teal py-12 md:py-16">
+        <div className="dark container mx-auto max-w-3xl px-4">
+          <SectionHeader tone="dark" eyebrow="জিজ্ঞাসা" title="সচরাচর জিজ্ঞাসা" />
           <div className="space-y-3">
-            <h2 className="font-headline text-3xl font-bold tracking-tighter md:text-4xl/tight">
-              Ready to Start Your Journey?
-            </h2>
-            <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Join thousands of students who are already acing their exams with
-              DeshExam.
-            </p>
+            {FAQS.map((f) => (
+              <details key={f.q} className="group rounded-2xl border border-white/10 bg-white/[0.04] p-4 open:bg-white/[0.07]">
+                <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-base font-bold text-white">
+                  {f.q}
+                  <span className="shrink-0 text-xl text-amber-400 transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p className="mt-2 text-base leading-relaxed text-slate-300">{f.a}</p>
+              </details>
+            ))}
           </div>
-          <div className="mx-auto w-full max-w-sm space-y-2">
-            <Button asChild size="lg" className="w-full">
-              <Link href="/sign-up">Sign Up for Free</Link>
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              Get started with free quizzes and a sample mock test.
-            </p>
-          </div>
+        </div>
+      </section>
+
+      {/* 4.12 Final CTA */}
+      <section className="section-dark-hero py-12 text-white md:py-16">
+        <div className="container mx-auto max-w-3xl px-4 text-center">
+          <h2 className="text-2xl font-bold md:text-4xl">আজই ফ্রি টেস্ট দিয়ে শুরু করুন</h2>
+          <p className="mx-auto mt-3 max-w-xl text-base text-teal-100">
+            লগইন ছাড়াই ফ্রি ডেমো টেস্টের ৫টি প্রশ্নের উত্তর দিন — তারপর আপনার ক্লাসের প্রস্তুতি শুরু করুন।
+          </p>
+          <Link
+            href="#demo-test"
+            className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-full bg-brand-gold px-8 text-base font-bold text-[#042f2e] shadow-lg hover:bg-amber-400"
+          >
+            ফ্রি টেস্ট দিন
+          </Link>
         </div>
       </section>
     </div>

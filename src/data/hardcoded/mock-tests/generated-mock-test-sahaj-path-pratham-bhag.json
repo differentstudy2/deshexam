@@ -1,0 +1,732 @@
+{
+  "id": "generated-mock-test-sahaj-path-pratham-bhag",
+  "slug": "sahaj-path-pratham-bhag-mock-test",
+  "title": "সহজ পাঠ (প্রথম ভাগ) - বর্ণপরিচয় ও পদ্যভিত্তিক মূল্যায়ন",
+  "description": "এই মক টেস্টটি রবীন্দ্রনাথ ঠাকুরের রচিত 'সহজ পাঠ' প্রথম ভাগের বর্ণ ও পদ্যভিত্তিক পাঠের উপর ভিত্তি করে তৈরি। পাঠ্যাংশের শব্দার্থ, পঙক্তি ও বর্ণমালা সম্পর্কিত মোট ৩০টি MCQ প্রশ্ন রয়েছে। প্রাথমিক বিদ্যালয়ের শিক্ষার্থীদের প্রস্তুতির জন্য এটি বিশেষভাবে উপযোগী।",
+  "thumbnail": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
+  "status": "Published",
+  "difficulty": "Easy",
+  "language": "Bengali",
+  "questionType": "MCQ",
+  "questionCount": 30,
+  "questionIds": ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15", "q16", "q17", "q18", "q19", "q20", "q21", "q22", "q23", "q24", "q25", "q26", "q27", "q28", "q29", "q30"],
+  "durationMin": 30,
+  "totalMarks": 30,
+  "passingMarks": 23,
+  "negativeMarking": 0,
+  "attemptsAllowed": 0,
+  "accessType": "free",
+  "attemptCount": 2450,
+  "averageScore": 68,
+  "instructions": "* এই পরীক্ষায় মোট ৩০টি MCQ প্রশ্ন থাকবে।\n* প্রতিটি সঠিক উত্তরের জন্য ১ নম্বর পাবে।\n* কোনো নেগে티브 মার্কিং নেই।\n* প্রতিটি প্রশ্নের চারটি অপশনের মধ্যে একটিই সঠিক উত্তর।\n* পরীক্ষা শুরু হলে সময় গণনা শুরু হয়ে যাবে।\n* সময়সীমার মধ্যে সর্বোচ্চ প্রশ্নের উত্তর দেওয়ার চেষ্টা করুন।\n* একবার উত্তর সেভ করার পরেও পরীক্ষা শেষ হওয়ার আগে পরিবর্তন করা যাবে।\n* পরীক্ষা সাবমিট করার পর উত্তরপত্র ও ব্যাখ্যা দেখা যাবে।\n* পরীক্ষা চলাকালীন পেজ রিফ্রেশ করলে অগ্রগতি সংরক্ষিত থাকবে।\n* সৎভাবে পরীক্ষা দাও এবং নিজের প্রস্তুতি যাচাই করো।",
+  "examRules": "* পরীক্ষার সময় কোনো বই বা নোট দেখা যাবে না।\n* মোবাইল বা অন্য ডিভাইস ব্যবহার সম্পূর্ণ নিষিদ্ধ।\n* প্রতিটি প্রশ্নের শুধুমাত্র একটি সঠিক উত্তর নির্বাচন করুন।\n* সময় শেষ হলে স্বয়ংক্রিয়ভাবে পরীক্ষা সাবমিট হয়ে যাবে।\n* একই পরীক্ষা একাধিকবার দেওয়া যাবে।\n* ফলাফল দেখতে সাবমিট বাটনে ক্লিক করুন।\n* যেকোনো প্রযুক্তিগত সমস্যায় পেজ রিফ্রেশ করুন।\n* অসৎ উপায়ে পরীক্ষা দেওয়া থেকে বিরত থাকুন।",
+  "boardId": "board-wbbpe",
+  "classId": "class-1-wbbpe",
+  "subjectId": "subject-bengali-class-1-wbbpe",
+  "textbookId": "textbook-sahaj-path-pratham-bhag-class-1-wbbpe",
+  "chapterId": "chapter-sahaj-path-pratham-bhag-alphabet-class-1-wbbpe",
+  "topicId": "topic-sahaj-path-pratham-bhag-rhymes-class-1-wbbpe",
+  "competitiveExam": null,
+  "verificationBadges": [
+    "WBBPE Verified"
+  ],
+  "tags": [
+    "সহজ পাঠ",
+    "প্রথম ভাগ",
+    "বর্ণমালা",
+    "রবীন্দ্রনাথ ঠাকুর"
+  ],
+  "createdAt": "2026-09-14T10:00:00.000Z",
+  "questions": [
+    {
+      "id": "q1",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ছোট খোকা কী বলে অ আ শেখে?",
+      "options": {
+        "a": "কথা কওয়া",
+        "b": "গান গাওয়া",
+        "c": "বই পড়া",
+        "d": "লেখা পড়া"
+      },
+      "correctAnswer": "a",
+      "explanation": "ছোট খোকা অ আ বলে কথা কওয়া শেখে না এমনটাই ছড়ায় বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "Correct! ছোট খোকা বলে অ আ শেখেনি সে কথা কওয়া।",
+        "b": "গান গাওয়া জেলে ডিঙি চলার সাথে সম্পর্কিত।",
+        "c": "বই পড়া এই পঙক্তির অন্তর্ভুক্ত নয়।",
+        "d": "লেখা পড়া এই ছড়ার মূল বিষয়বস্তু নয়।"
+      }
+    },
+    {
+      "id": "q2",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "হ্রস্ব ই দীর্ঘ ঈ বসে কী খায়?",
+      "options": {
+        "a": "মুড়ি খই",
+        "b": "ক্ষীর খই",
+        "c": "দুধ ভাত",
+        "d": "ফলমূল"
+      },
+      "correctAnswer": "b",
+      "explanation": "হ্রস্ব ই ও দীর্ঘ ঈ বর্ণ দুটির ছড়ায় ক্ষীর ও খই খাওয়ার কথা বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "মুড়ি খই এই ছড়ার সঠিক শব্দ নয়।",
+        "b": "Correct! হ্রস্ব ই দীর্ঘ ঈ বসে খায় ক্ষীর খই।",
+        "c": "দুধ ভাত অন্য পঙক্তির সাথে সম্পর্কিত।",
+        "d": "ফলমূল এখানে সঠিক উত্তর নয়।"
+      }
+    },
+    {
+      "id": "q3",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "হ্রস্ব উ দীর্ঘ ঊ কী বলে ডাক ছাড়ে?",
+      "options": {
+        "a": "ম্যাঁও ম্যাঁও",
+        "b": "ঘেউ ঘেউ",
+        "c": "হাঁক দেয়",
+        "d": "চিৎকার করে"
+      },
+      "correctAnswer": "b",
+      "explanation": "হ্রস্ব উ এবং দীর্ঘ ঊ এর ছড়ায় ঘেউ ঘেউ করে ডাক ছাড়ার কথা উল্লেখ আছে।",
+      "optionExplanations": {
+        "a": "ম্যাঁও ম্যাঁও বিড়ালের ডাক।",
+        "b": "Correct! হ্রস্ব উ দীর্ঘ ঊ ডাক ছাড়ে ঘেউ ঘেউ।",
+        "c": "হাঁক দেয় এ ও ঐ এর ছড়ায় আছে।",
+        "d": "চিৎকার করে সাধারণ শব্দ, ছড়ার পঙক্তি নয়।"
+      }
+    },
+    {
+      "id": "q4",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ঘন মেঘ কী বলে?",
+      "options": {
+        "a": "আ",
+        "b": "ই",
+        "c": "ঋ",
+        "d": "উ"
+      },
+      "correctAnswer": "c",
+      "explanation": "ঘন মেঘ ঋ বর্ণকে নির্দেশ করে দিন বিশ্রী হওয়ার কথা বলে।",
+      "optionExplanations": {
+        "a": "অ আ ছোট খোকা বলে।",
+        "b": "ই ঈ ক্ষীর খই খায়।",
+        "c": "Correct! ঘন মেঘ বলে ঋ দিন বড় বিশ্রী।",
+        "d": "উ ঊ ঘেউ ঘেউ ডাক ছাড়ে।"
+      }
+    },
+    {
+      "id": "q5",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ঋ বর্ণের ছড়ায় দিনটি কেমন বলা হয়েছে?",
+      "options": {
+        "a": "খুব সুন্দর",
+        "b": "বড় বিশ্রী",
+        "c": "খুব গরম",
+        "d": "খুব ঠাণ্ডা"
+      },
+      "correctAnswer": "b",
+      "explanation": "ঘন মেঘের দিনে ঋ বর্ণে দিনটিকে বড় বিশ্রী বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "খুব সুন্দর পঙক্তির বর্ণনা নয়।",
+        "b": "Correct! ঘন মেঘ বলে ঋ দিন বড় বিশ্রী।",
+        "c": "খুব গরম ছড়ায় বলা হয়নি।",
+        "d": "খুব ঠাণ্ডা এই ছড়ার অংশ নয়।"
+      }
+    },
+    {
+      "id": "q6",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "বাটি হাতে কে হাঁক দেয়?",
+      "options": {
+        "a": "ক খ",
+        "b": "এ ঐ",
+        "c": "ও ঔ",
+        "d": "ত থ"
+      },
+      "correctAnswer": "b",
+      "explanation": "এ এবং ঐ বর্ণের ছড়ায় বাটি হাতে দৈ চাওয়ার কথা বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "ক খ জেলে ডিঙির সাথে যুক্ত।",
+        "b": "Correct! বাটি হাতে এ ঐ হাঁক দেয় দে দৈ।",
+        "c": "ও ঔ ভাত আনার কথা বলে।",
+        "d": "ত থ আম পাড়তে বলে।"
+      }
+    },
+    {
+      "id": "q7",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "এ ঐ বাটি হাতে কী দিতে হাঁক দেয়?",
+      "options": {
+        "a": "দুধ",
+        "b": "দৈ",
+        "c": "ভাত",
+        "d": "ক্ষীর"
+      },
+      "correctAnswer": "b",
+      "explanation": "বাটি হাতে এ ঐ বর্ণদ্বয় দই বা দৈ দেওয়ার জন্য হাঁক দেয়।",
+      "optionExplanations": {
+        "a": "দুধ এখানে সঠিক উত্তর নয়।",
+        "b": "Correct! বাটি হাতে এ ঐ হাঁক দেয় দে দৈ।",
+        "c": "ভাত ও ঔ এর ছড়ায় আসে।",
+        "d": "ক্ষীর ই ঈ এর ছড়ায় থাকে।"
+      }
+    },
+    {
+      "id": "q8",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ও ঔ কাকে ভাত আনতে ডাক পাড়ে?",
+      "options": {
+        "a": "ছোট খোকা",
+        "b": "বড় বৌ",
+        "c": "জেলে",
+        "d": "খুকী"
+      },
+      "correctAnswer": "b",
+      "explanation": "ও এবং ঔ বর্ণ ডাক দিয়ে বড় বৌকে ভাত আনতে বলে।",
+      "optionExplanations": {
+        "a": "ছোট খোকা অ আ ছড়ায় আসে।",
+        "b": "Correct! ডাক পাড়ে ও ঔ ভাত আনো বড় বৌ।",
+        "c": "জেলে ডিঙি চালায় ক খ গ ঘ তে।",
+        "d": "খুকী ঞ এর ছড়ায় কাঁদে।"
+      }
+    },
+    {
+      "id": "q9",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "গান গেয়ে জেলে কী বেয়ে চলে?",
+      "options": {
+        "a": "নৌকা",
+        "b": "ডিঙি",
+        "c": "লঞ্চ",
+        "d": "জাহাজ"
+      },
+      "correctAnswer": "b",
+      "explanation": "ক খ গ ঘ বর্ণগুলোর ছড়ায় জেলের ডিঙি বেয়ে চলার কথা বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "নৌকা সাধারণ শব্দ, ছড়ায় নির্দিষ্ট শব্দ ডিঙি আছে।",
+        "b": "Correct! ক খ গ ঘ গান গেয়ে জেলে ডিঙি চলে বেয়ে।",
+        "c": "লঞ্চ আধুনিক জলযান যা ছড়ায় নেই।",
+        "d": "জাহাজ এই ছড়ার অংশ নয়।"
+      }
+    },
+    {
+      "id": "q10",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কোন বর্ণ চরে বসে রান্না করে?",
+      "options": {
+        "a": "ঙ",
+        "b": "ঞ",
+        "c": "ণ",
+        "d": "ন"
+      },
+      "correctAnswer": "a",
+      "explanation": "ঙ বর্ণটি চরে বসে রান্না করার সময় চোখে ধোঁয়া লাগার কথা বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "Correct! চরে বসে রাঁধে ঙ চোখে তার লাগে ধোঁয়া।",
+        "b": "ঞ খুকীর খিদে পাওয়ার সাথে যুক্ত।",
+        "c": "ণ মূর্দ্ধন্য চুপ করতে বলে।",
+        "d": "দন্ত্য ন রেগে যাওয়ার কথা বলে।"
+      }
+    },
+    {
+      "id": "q11",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ঙ যখন চরে বসে রান্না করে, তখন তার চোখে কী লাগে?",
+      "options": {
+        "a": "জল",
+        "b": "ধোঁয়া",
+        "c": "বালি",
+        "d": "ধুলো"
+      },
+      "correctAnswer": "b",
+      "explanation": "রাঁধতে গিয়ে উঁ-এর চোখে ধোঁয়া লাগার কথা ছড়ায় উল্লেখ আছে।",
+      "optionExplanations": {
+        "a": "জল চোখে লাগার কথা ছড়ায় নেই।",
+        "b": "Correct! চরে বসে রাঁধে ঙ চোখে তার লাগে ধোঁয়া।",
+        "c": "বালি রান্নার স্থানে ওড়ার কথা বলা হয়নি।",
+        "d": "ধুলো এখানে সঠিক উত্তর নয়।"
+      }
+    },
+    {
+      "id": "q12",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "চ ছ জ ঝ দলে দলে কী নিয়ে হাটে চলে?",
+      "options": {
+        "a": "সবজি",
+        "b": "বোঝা",
+        "c": "ধান",
+        "d": "কাঠ"
+      },
+      "correctAnswer": "b",
+      "explanation": "চ ছ জ ঝ দলে দলে বোঝা নিয়ে হাটে যাওয়ার কথা বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "সবজি নির্দিষ্ট করে ছড়ায় বলা নেই।",
+        "b": "Correct! চ ছ জ ঝ দলে দলে বোঝা নিয়ে হাটে চলে।",
+        "c": "ধান প ফ ব ভ কাটে মাঠে।",
+        "d": "কাঠ এখানে সঠিক উত্তর নয়।"
+      }
+    },
+    {
+      "id": "q13",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ক্ষিদে পেলে খুকী ঞ কী করে কাঁদে?",
+      "options": {
+        "a": "উঁউঁ করে",
+        "b": "কিয়োঁ কিয়োঁ করে",
+        "c": "উচ্চস্বরে",
+        "d": "ঘেউ ঘেউ করে"
+      },
+      "correctAnswer": "b",
+      "explanation": "ঞ বর্ণের ছড়ায় ক্ষিদে পেলে খুকীর কিয়োঁ কিয়োঁ করে কাঁদার কথা আছে।",
+      "optionExplanations": {
+        "a": "উঁউঁ করে সাধারণ কান্নার শব্দ।",
+        "b": "Correct! ক্ষিদে পায় খুকী ঞ শুয়ে কাঁদে কিয়োঁ কিয়োঁ।",
+        "c": "উচ্চস্বরে পঙক্তির সঠিক রূপ নয়।",
+        "d": "ঘেউ ঘেউ কুকুরের ডাক।"
+      }
+    },
+    {
+      "id": "q14",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ট ঠ ড ঢ কাঁধে কী নিয়ে গোল করে?",
+      "options": {
+        "a": "ব্যাগ থলে",
+        "b": "ঢাক ঢোল",
+        "c": "বাসনপত্র",
+        "d": "খাতা কলম"
+      },
+      "correctAnswer": "b",
+      "explanation": "ট ঠ ড ঢ কাঁধে ঢাক ঢোল নিয়ে গোল করার কথা ছড়ায় রয়েছে।",
+      "optionExplanations": {
+        "a": "ব্যাগ থলে এই ছড়ার অংশ নয়।",
+        "b": "Correct! ট ঠ ড ঢ করে গোল কাঁধে নিয়ে ঢাক ঢোল।",
+        "c": "বাসনপত্র এখানে ভুল উত্তর।",
+        "d": "খাতা কলম পড়ার উপকরণের অংশ।"
+      }
+    },
+    {
+      "id": "q15",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "মূর্দ্ধন্য ণ চুপ করে কী শুনতে বলে?",
+      "options": {
+        "a": "গান",
+        "b": "কথা",
+        "c": "বই",
+        "d": "পড়া"
+      },
+      "correctAnswer": "b",
+      "explanation": "মূর্দ্ধন্য ণ চুপ করে কথা শুনতে নির্দেশ দেয়।",
+      "optionExplanations": {
+        "a": "গান জেলেদের ছড়ায় আছে।",
+        "b": "Correct! বলে মূর্দ্ধন্য ণ, চুপ কর কথা শোন।",
+        "c": "বই পড়ার কথা সরাসরি নেই।",
+        "d": "পড়া এক মনে করে য র ল ব।"
+      }
+    },
+    {
+      "id": "q16",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ত থ দ ধ ভাইরা কী করতে বলে?",
+      "options": {
+        "a": "আম পাড়তে",
+        "b": "ধান কাটতে",
+        "c": "মাছ ধরতে",
+        "d": "ফুল তুলতে"
+      },
+      "correctAnswer": "a",
+      "explanation": "ত থ দ ধ বর্ণে আম পাড়তে যাওয়ার কথা বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "Correct! ত থ দ ধ বলে, ভাই আম পাড়ি চল যাই।",
+        "b": "ধান কাটে প ফ ব ভ মাঠে গিয়ে।",
+        "c": "মাছ ধরার কথা ছড়ায় নেই।",
+        "d": "ফুল তোলার কথা এখানে বলা হয়নি।"
+      }
+    },
+    {
+      "id": "q17",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "দন্ত্য ন রেগে কী বলে?",
+      "options": {
+        "a": "যাব না তো কক্ষনো",
+        "b": "কথা শুনব না",
+        "c": "বাড়ি যাব",
+        "d": "খেলা করব না"
+      },
+      "correctAnswer": "a",
+      "explanation": "দন্ত্য ন রেগে গিয়ে কক্ষনো যাবে না বলে জানায়।",
+      "optionExplanations": {
+        "a": "Correct! রেগে বলে দন্ত্য ন যাব না তো কক্ষনো।",
+        "b": "কথা শুনব না ছড়ার সঠিক বাক্য নয়।",
+        "c": "বাড়ি যাওয়ার কথা ম এর ছড়ায় আছে।",
+        "d": "খেলা করার কথা এখানে নেই।"
+      }
+    },
+    {
+      "id": "q18",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "প ফ ব ভ মাঠে গিয়ে সারাদিন কী করে?",
+      "options": {
+        "a": "আম পাড়ে",
+        "b": "ধান কাটে",
+        "c": "ঘাস কাটে",
+        "d": "খেলা করে"
+      },
+      "correctAnswer": "b",
+      "explanation": "প ফ ব ভ মাঠে গিয়ে সারাদিন ধান কাটার কাজ করে।",
+      "optionExplanations": {
+        "a": "আম পাড়ে ত থ দ ধ এর ছড়ায়।",
+        "b": "Correct! প ফ ব ভ যায় মাঠে সারাদিন ধান কাটে।",
+        "c": "ঘাস কাটার কথা ছড়ায় উল্লেখ নেই।",
+        "d": "খেলা করার কথা বলা হয়নি।"
+      }
+    },
+    {
+      "id": "q19",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ম কী চালায়?",
+      "options": {
+        "a": "গোরু-গাড়ি",
+        "b": "সাইকেল",
+        "c": "রিকশা",
+        "d": "নৌকা"
+      },
+      "correctAnswer": "a",
+      "explanation": "ম বর্ণ দিয়ে গোরু-গাড়ি চালিয়ে ধান বাড়িতে নিয়ে আসার কথা বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "Correct! ম চালায় গোরু-গাড়ি ধান নিয়ে যায় বাড়ি।",
+        "b": "সাইকেল আধুনিক বাহন।",
+        "c": "রিকশা ছড়ায় অনুপস্থিত।",
+        "d": "নৌকা বা ডিঙি জেলেদের সাথে যুক্ত।"
+      }
+    },
+    {
+      "id": "q20",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ম গোরু-গাড়ি করে কী নিয়ে বাড়ি যায়?",
+      "options": {
+        "a": "আম",
+        "b": "খই",
+        "c": "ধান",
+        "d": "বোঝা"
+      },
+      "correctAnswer": "c",
+      "explanation": "ম গোরু-গাড়িতে করে মাঠ থেকে ধান বাড়ি নিয়ে যায়।",
+      "optionExplanations": {
+        "a": "আম ত থ বর্ণে পাড়া হয়।",
+        "b": "খই ই ঈ এর ছড়ায় থাকে।",
+        "c": "Correct! ম চালায় গোরু-গাড়ি ধান নিয়ে যায় বাড়ি।",
+        "d": "বোঝা হাটে নিয়ে যায় চ ছ জ ঝ।"
+      }
+    },
+    {
+      "id": "q21",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "য র ল ব ঘরে বসে কী করে?",
+      "options": {
+        "a": "গান গায়",
+        "b": "এক মনে পড়া করে",
+        "c": "ঘুমে কাটায়",
+        "d": "খেলা করে"
+      },
+      "correctAnswer": "b",
+      "explanation": "য র ল ব ঘরে বসে এক মনে পড়া করার কথা বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "গান গাওয়া জেলের কাজ।",
+        "b": "Correct! য র ল ব বসে ঘরে এক মনে পড়া করে।",
+        "c": "ঘুমানোর কথা ছড়ায় নেই।",
+        "d": "খেলা করার কথা বলা হয়নি।"
+      }
+    },
+    {
+      "id": "q22",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "বাদল দিনে শ ষ স কী কিনতে যায়?",
+      "options": {
+        "a": "বই",
+        "b": "ছাতা",
+        "c": "জামা",
+        "d": "খাতা"
+      },
+      "correctAnswer": "b",
+      "explanation": "বাদল বা বৃষ্টির দিনে শ ষ স ছাতা কিনে বাড়ি যায়।",
+      "optionExplanations": {
+        "a": "বই কেনার কথা ছড়ায় নেই।",
+        "b": "Correct! শ ষ স বাদল দিনে ঘরে যায় ছাতা কিনে।",
+        "c": "জামা ছড়ার অংশ নয়।",
+        "d": "খাতা পড়ার উপকরণের অংশ।"
+      }
+    },
+    {
+      "id": "q23",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "শাল মুড়ি দিয়ে হ ক্ষ কী করে?",
+      "options": {
+        "a": "ঘুমায়",
+        "b": "কাশে খ ক্ষ",
+        "c": "গান গায়",
+        "d": "কথা বলে"
+      },
+      "correctAnswer": "b",
+      "explanation": "শাল মুড়ি দিয়ে হ ও ক্ষ কোণে বসে কাশে খ ক্ষ।",
+      "optionExplanations": {
+        "a": "ঘুমানোর কথা এখানে বলা হয়নি।",
+        "b": "Correct! শাল মুড়ি দিয়ে হ ক্ষ কোণে বসে কাশে খ ক্ষ।",
+        "c": "গান গাওয়া জেলের কাজ।",
+        "d": "কথা বলার কথা অন্য ছড়ায় আছে।"
+      }
+    },
+    {
+      "id": "q24",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কোন বর্ণগুলির ছড়ায় 'ক্ষীর খই' খাওয়ার কথা আছে?",
+      "options": {
+        "a": "অ আ",
+        "b": "ই ঈ",
+        "c": "উ ঊ",
+        "d": "এ ঐ"
+      },
+      "correctAnswer": "b",
+      "explanation": "হ্রস্ব ই ও দীর্ঘ ঈ বর্ণ দুটির পঙক্তিতে ক্ষীর খই খাওয়ার উল্লেখ আছে।",
+      "optionExplanations": {
+        "a": "অ আ ছোট খোকা বলে।",
+        "b": "Correct! হ্রস্ব ই দীর্ঘ ঈ বসে খায় ক্ষীর খই।",
+        "c": "উ ঊ ঘেউ ঘেউ করে।",
+        "d": "এ ঐ বাটি হাতে দৈ চায়।"
+      }
+    },
+    {
+      "id": "q25",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কোন বর্ণের ছড়ায় 'দিন বড় বিশ্রী' বলা হয়েছে?",
+      "options": {
+        "a": "অ",
+        "b": "ঋ",
+        "c": "ঔ",
+        "d": "ঙ"
+      },
+      "correctAnswer": "b",
+      "explanation": "ঘন মেঘের সাথে ঋ বর্ণ যুক্ত হয়ে দিন বড় বিশ্রী বলার কথা বলে।",
+      "optionExplanations": {
+        "a": "অ ছোট খোকার সাথে যুক্ত।",
+        "b": "Correct! ঘন মেঘ বলে ঋ দিন বড় বিশ্রী।",
+        "c": "ঔ ভাত আনার সাথে যুক্ত।",
+        "d": "ঙ রান্নার ধোঁয়ার সাথে যুক্ত।"
+      }
+    },
+    {
+      "id": "q26",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কোন বর্ণগুলির ছড়ায় জেলে ডিঙি বেয়ে চলার কথা বলা হয়েছে?",
+      "options": {
+        "a": "ক খ গ ঘ",
+        "b": "চ ছ জ ঝ",
+        "c": "ট ঠ ড ঢ",
+        "d": "ত থ দ ধ"
+      },
+      "correctAnswer": "a",
+      "explanation": "ক খ গ ঘ বর্ণগুলির পঙক্তিতে জেলে ডিঙি বেয়ে গান গাওয়ার কথা আছে।",
+      "optionExplanations": {
+        "a": "Correct! ক খ গ ঘ গান গেয়ে জেলে ডিঙি চলে বেয়ে।",
+        "b": "চ ছ জ ঝ বোঝা নিয়ে হাটে যায়।",
+        "c": "ট ঠ ড ঢ ঢাক ঢোল কাঁধে নেয়।",
+        "d": "ত থ দ ধ আম পাড়তে যায়।"
+      }
+    },
+    {
+      "id": "q27",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কোন বর্ণটির ছড়ায় খুকীর ক্ষিদে পাওয়ার কথা বলা হয়েছে?",
+      "options": {
+        "a": "ঙ",
+        "b": "ঞ",
+        "c": "ণ",
+        "d": "ন"
+      },
+      "correctAnswer": "b",
+      "explanation": "ঞ বর্ণের ছড়ায় ক্ষিদে পেলে খুকীর কিয়োঁ কিয়োঁ করে কান্নার কথা আছে।",
+      "optionExplanations": {
+        "a": "ঙ চরে বসে রান্না করে।",
+        "b": "Correct! ক্ষিদে পায় খুকী ঞ শুয়ে কাঁদে কিয়োঁ কিয়োঁ।",
+        "c": "ণ চুপ করে কথা শুনতে বলে।",
+        "d": "দন্ত্য ন কক্ষনো যাবে না বলে।"
+      }
+    },
+    {
+      "id": "q28",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কোন বর্ণগুলির ছড়ায় ছাতা কিনে ঘরে যাওয়ার কথা বলা হয়েছে?",
+      "options": {
+        "a": "য র ল ব",
+        "b": "শ ষ স",
+        "c": "হ ক্ষ",
+        "d": "প ফ ব ভ"
+      },
+      "correctAnswer": "b",
+      "explanation": "শ ষ স বর্ণের ছড়ায় বাদল দিনে ছাতা কিনে ঘরে ফেরার কথা বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "য র ল ব ঘরে বসে পড়া করে।",
+        "b": "Correct! শ ষ স বাদল দিনে ঘরে যায় ছাতা কিনে।",
+        "c": "হ ক্ষ শাল মুড়ি দিয়ে কাশে।",
+        "d": "প ফ ব ভ মাঠে ধান কাটে।"
+      }
+    },
+    {
+      "id": "q29",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কোন বর্ণটির ছড়ায় শাল মুড়ি দিয়ে কোণে বসে কাশির কথা বলা হয়েছে?",
+      "options": {
+        "a": "শ",
+        "b": "ষ",
+        "c": "স",
+        "d": "হ ক্ষ"
+      },
+      "correctAnswer": "d",
+      "explanation": "হ এবং ক্ষ বর্ণের ছড়ায় শাল মুড়ি দিয়ে কোণে বসে কাশির উল্লেখ আছে।",
+      "optionExplanations": {
+        "a": "শ বাদল দিনে ছাতা কেনে।",
+        "b": "ষ শ ষ স এর অংশ যা ছাতা কেনে।",
+        "c": "স ছাতা কেনার পঙক্তির সাথে যুক্ত।",
+        "d": "Correct! শাল মুড়ি দিয়ে হ ক্ষ কোণে বসে কাশে খ ক্ষ।"
+      }
+    },
+    {
+      "id": "q30",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Medium",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কোন বর্ণগুলির ছড়ায় এক মনে পড়া করার কথা বলা হয়েছে?",
+      "options": {
+        "a": "য র ল ব",
+        "b": "শ ষ স",
+        "c": "প ফ ব ভ",
+        "d": "ত থ দ ধ"
+      },
+      "correctAnswer": "a",
+      "explanation": "য র ল ব বর্ণগুলি ঘরে বসে এক মনে পড়া করার কথা বলে।",
+      "optionExplanations": {
+        "a": "Correct! য র ল ব বসে ঘরে এক মনে পড়া করে।",
+        "b": "শ ষ স বাদল দিনে ছাতা কেনে।",
+        "c": "প ফ ব ভ মাঠে ধান কাটে।",
+        "d": "ত থ দ ধ আম পাড়তে যায়।"
+      }
+    }
+  ]
+}

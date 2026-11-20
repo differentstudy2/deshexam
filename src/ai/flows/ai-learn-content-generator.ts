@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview Generates educational articles (Learn content) using an AI model.
@@ -19,7 +18,7 @@ export type AILearnContentGeneratorInput = z.infer<typeof AILearnContentGenerato
 const AILearnContentGeneratorOutputSchema = z.object({
   title: z.string().describe('A suitable title for the generated article.'),
   description: z.string().describe('A brief, engaging summary of the article.'),
-  body: z.string().describe('The full content of the article, written as a well-structured HTML string.'),
+  body: z.string().describe('The full content of the article, written in GitHub-flavored Markdown.'),
 });
 export type AILearnContentGeneratorOutput = z.infer<typeof AILearnContentGeneratorOutputSchema>;
 
@@ -29,24 +28,30 @@ export async function generateLearnContent(input: AILearnContentGeneratorInput):
 
 const prompt = ai.definePrompt({
   name: 'aiLearnContentGeneratorPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: { schema: AILearnContentGeneratorInputSchema },
   output: { schema: AILearnContentGeneratorOutputSchema },
   prompt: `You are an expert content writer specializing in creating stylish and engaging educational articles.
 Your task is to write a comprehensive article on the following topic: "{{topic}}".
 
+**Formatting Rules**:
+1.  **Strictly Markdown Only**: You MUST use ONLY GitHub-flavored Markdown for all text formatting (headings, lists, bold, italics). Do NOT use any HTML tags (like <div>, <span>, <p>, etc.) under any circumstances. Use simple, clear Markdown. For example, to bold a word, use **word**. Avoid putting emphasis markers right next to punctuation.
+2.  **LaTeX for Math**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). For mathematical grouping, use parentheses () or square brackets [] inside the math delimiters, not curly braces {}, unless it is part of a specific LaTeX command like \\frac{a}{b}. For symbols, use their LaTeX commands, for instance \`\\therefore\` for the 'therefore' symbol (∴).
+3.  **Images**: If an image would be helpful, you MUST add a placeholder image URL using standard Markdown image syntax. Use the format \`![Description](https://picsum.photos/seed/relevant-keyword/600/400)\` where 'relevant-keyword' is a specific, relevant term from the content.
+
 The article must be well-structured, visually appealing, and easy for students to read and understand.
 Please generate the following:
 1.  A compelling and SEO-friendly title for the article.
 2.  A short, one-paragraph description or summary to be used as a meta description.
-3.  The full body of the article as a well-formed HTML string. Do not include <html> or <body> tags.
+3.  The full body of the article as a well-formed Markdown string, strictly following the formatting rules above.
 
-For the HTML body, you must use a variety of tags to make the post stylish and organized. Specifically include:
-- A main heading using <h1>.
-- Multiple sub-sections using <h2>, <h3>, and <h4> tags to create a clear hierarchy.
-- Paragraphs using <p> tags for the main text.
-- Unordered lists (<ul> with <li>) for bullet points to break down information.
-- A data table (<table> with <thead>, <tbody>, <tr>, <th>, and <td>) to present structured information where appropriate (e.g., for comparisons, definitions, or key data).
-- Use text formatting tags like <strong> for emphasis, <em> for italics, and <blockquote> for quoting key concepts or definitions.
+For the Markdown body, you must use a variety of elements to make the post stylish and organized. Specifically include:
+- A main heading using a '#'.
+- Multiple sub-sections using '##', '###', and '####' to create a clear hierarchy.
+- Paragraphs for the main text.
+- Unordered lists (using '*') for bullet points to break down information.
+- A data table to present structured information where appropriate (e.g., for comparisons, definitions, or key data).
+- Use text formatting like **bold** for emphasis, *italics*, and > for blockquotes for quoting key concepts or definitions.
 
 Ensure the content is accurate, informative, and exceptionally well-written. The structure should be logical, flowing from an introduction to detailed sections and a concluding summary.
 `,

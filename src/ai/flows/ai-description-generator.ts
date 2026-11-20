@@ -27,6 +27,7 @@ export async function generateDescription(input: AIDescriptionGeneratorInput): P
 
 const prompt = ai.definePrompt({
   name: 'aiDescriptionGeneratorPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: { schema: AIDescriptionGeneratorInputSchema },
   output: { schema: AIDescriptionGeneratorOutputSchema },
   prompt: `You are an expert at writing compelling and concise summaries for educational content. 

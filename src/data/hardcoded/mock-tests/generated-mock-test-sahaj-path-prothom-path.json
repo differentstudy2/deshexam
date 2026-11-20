@@ -1,0 +1,732 @@
+{
+  "id": "generated-mock-test-sahaj-path-prothom-path",
+  "slug": "sahaj-path-prothom-bhag-prothom-path-mock-test",
+  "title": "সহজ পাঠ: প্রথম ভাগ - প্রথম পাঠ মক টেস্ট",
+  "description": "এই মক টেস্টটি পশ্চিমবঙ্গ প্রাথমিক শিক্ষা পর্ষদের প্রথম শ্রেণির 'সহজ পাঠ' বইয়ের 'প্রথম পাঠ' অংশের ওপর ভিত্তি করে তৈরি। পাঠ্যাংশের চরিত্র, ঘটনাক্রম ও পরিবেশ সম্পর্কিত মোট ৩০টি MCQ প্রশ্ন রয়েছে। ছোটদের পাঠ্যক্রমের প্রস্তুতি যাচাই করার জন্য এটি বিশেষভাবে উপযোগী।",
+  "thumbnail": "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=800&q=80",
+  "status": "Published",
+  "difficulty": "Easy",
+  "language": "Bengali",
+  "questionType": "MCQ",
+  "questionCount": 30,
+  "questionIds": [],
+  "durationMin": 30,
+  "totalMarks": 30,
+  "passingMarks": 23,
+  "negativeMarking": 0,
+  "attemptsAllowed": 0,
+  "accessType": "free",
+  "attemptCount": 4215,
+  "averageScore": 68,
+  "instructions": "* এই পরীক্ষায় মোট ৩০টি MCQ প্রশ্ন থাকবে。\n* প্রতিটি সঠিক উত্তরের জন্য ১ নম্বর পাবে。\n* কোনো নেগেটিভ মার্কিং নেই。\n* প্রতিটি প্রশ্নের চারটি অপশনের মধ্যে একটিই সঠিক উত্তর。\n* পরীক্ষা শুরু হলে সময় গণনা শুরু হয়ে যাবে。\n* সময়সীমার মধ্যে সর্বোচ্চ প্রশ্নের উত্তর দেওয়ার চেষ্টা করুন。\n* একবার উত্তর সেভ করার পরেও পরীক্ষা শেষ হওয়ার আগে পরিবর্তন করা যাবে。\n* পরীক্ষা সাবমিট করার পর উত্তরপত্র ও ব্যাখ্যা দেখা যাবে。\n* পরীক্ষা চলাকালীন পেজ রিফ্রেশ করলে অগ্রগতি সংরক্ষিত থাকবে。\n* সৎভাবে পরীক্ষা দাও এবং নিজের প্রস্তুতি যাচাই করো।",
+  "examRules": "* পরীক্ষার সময় অন্য কোনো বই বা নোট দেখা যাবে না।\n* অভিভাবকের সাহায্য ছাড়া নিজে উত্তর দেওয়ার চেষ্টা করো।\n* প্রতিটি প্রশ্নের শুধুমাত্র একটি সঠিক উত্তর নির্বাচন করুন।\n* সময় শেষ হলে স্বয়ংক্রিয়ভাবে পরীক্ষা সাবমিট হয়ে যাবে।\n* একই পরীক্ষা একাধিকবার দেওয়া যাবে।\n* ফলাফল দেখতে সাবমিট বাটনে ক্লিক করুন।\n* যেকোনো প্রযুক্তিগত সমস্যায় পেজ রিফ্রেশ করুন।\n* মনোযোগ সহকারে প্রতিটি প্রশ্ন পড়ে উত্তর দাও।",
+  "boardId": "board-wbbpe",
+  "classId": "class-1-wbbpe",
+  "subjectId": "subject-bengali-class-1-wbbpe",
+  "textbookId": "textbook-sahaj-path-prothom-bhag-class-1-wbbpe",
+  "chapterId": "chapter-prothom-path-sahaj-path-1-wbbpe",
+  "topicId": "topic-prothom-path-text-sahaj-path-1-wbbpe",
+  "competitiveExam": null,
+  "verificationBadges": [
+    "WBBPE Verified"
+  ],
+  "tags": [
+    "Sahaj Path",
+    "Class 1",
+    "Bengali",
+    "Prothom Path"
+  ],
+  "createdAt": "2026-09-15T03:04:24.000Z",
+  "questions": [
+    {
+      "id": "q1",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "বনে কে থাকে?",
+      "options": {
+        "a": "বাঘ",
+        "b": "মাছ",
+        "c": "পাখী",
+        "d": "বক"
+      },
+      "correctAnswer": "a",
+      "explanation": "পাঠ্যাংশ অনুযায়ী বাঘ বনে থাকে।",
+      "optionExplanations": {
+        "a": "সঠিক! বাঘ বনে থাকে।",
+        "b": "মাছ জলে থাকে, বনে নয়।",
+        "c": "পাখী গাছে থাকে, বনে নয়।",
+        "d": "বক খালে মাছ ধরে, বনে থাকে না।"
+      }
+    },
+    {
+      "id": "q2",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "গাছে কে থাকে?",
+      "options": {
+        "a": "মাছ",
+        "b": "বাঘ",
+        "c": "পাখী",
+        "d": "মাছি"
+      },
+      "correctAnswer": "c",
+      "explanation": "পাঠ্যাংশ অনুযায়ী পাখী গাছে থাকে।",
+      "optionExplanations": {
+        "a": "মাছ জলে থাকে।",
+        "b": "বাঘ বনে থাকে।",
+        "c": "সঠিক! পাখী গাছে থাকে।",
+        "d": "মাছি বনে ওড়ে।"
+      }
+    },
+    {
+      "id": "q3",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "জলে কে থাকে?",
+      "options": {
+        "a": "মাছ",
+        "b": "পাখী",
+        "c": "কাক",
+        "d": "বাঘ"
+      },
+      "correctAnswer": "a",
+      "explanation": "পাঠ্যাংশ অনুযায়ী মাছ জলে থাকে।",
+      "optionExplanations": {
+        "a": "সঠিক! মাছ জলে থাকে।",
+        "b": "পাখী গাছে থাকে।",
+        "c": "কাক ডালে ডালে ডাকে।",
+        "d": "বাঘ আম-বনে থাকে।"
+      }
+    },
+    {
+      "id": "q4",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ডালে কী আছে?",
+      "options": {
+        "a": "ফুল",
+        "b": "পাতা",
+        "c": "ফল",
+        "d": "মধু"
+      },
+      "correctAnswer": "c",
+      "explanation": "পাঠ্যাংশ অনুযায়ী গাছের ডালে ফল আছে।",
+      "optionExplanations": {
+        "a": "ফুল সম্পর্কে পাঠ্যাংশে উল্লেখ নেই।",
+        "b": "পাতা সম্পর্কে পাঠ্যাংশে উল্লেখ নেই।",
+        "c": "সঠিক! ডালে ফল আছে।",
+        "d": "মধু মৌ-চাকে থাকে।"
+      }
+    },
+    {
+      "id": "q5",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "পাখী কী খায়?",
+      "options": {
+        "a": "ভাত",
+        "b": "ফল",
+        "c": "মাছ",
+        "d": "ঘাস"
+      },
+      "correctAnswer": "b",
+      "explanation": "পাঠ্যাংশ অনুযায়ী পাখী গাছের ফল খায়।",
+      "optionExplanations": {
+        "a": "দীননাথ ভাত রাঁধে।",
+        "b": "সঠিক! পাখী ফল খায়।",
+        "c": "বক মাছ ধরে খায়।",
+        "d": "অবিনাশ ঘাস কাটে।"
+      }
+    },
+    {
+      "id": "q6",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "পাখী কীভাবে ওড়ে?",
+      "options": {
+        "a": "লাফিয়ে",
+        "b": "পাখা মেলে",
+        "c": "ঘুরে ঘুরে",
+        "d": "ডানা গুটিয়ে"
+      },
+      "correctAnswer": "b",
+      "explanation": "পাখী পাখা মেলে আকাশে ওড়ে।",
+      "optionExplanations": {
+        "a": "পাখী লাফিয়ে ওড়ে না।",
+        "b": "সঠিক! পাখী পাখা মেলে ওড়ে।",
+        "c": "পাখা মেলার কথাই পাঠে বলা হয়েছে।",
+        "d": "ডানা গুটিয়ে পাখী উড়তে পারে না।"
+      }
+    },
+    {
+      "id": "q7",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "বাঘ কোন্ বনে আছে?",
+      "options": {
+        "a": "জাম-বনে",
+        "b": "বাঁশ-বনে",
+        "c": "আম-বনে",
+        "d": "ঝাউ-বনে"
+      },
+      "correctAnswer": "c",
+      "explanation": "বাঘ আম-বনে আছে বলে পাঠ্যাংশে উল্লেখ রয়েছে।",
+      "optionExplanations": {
+        "a": "জাম-বনের কথা এখানে বলা নেই, তবে খুদিরাম জাম পাড়ে।",
+        "b": "বাঁশ গাছ নাচ করে, বাঘ সেখানে নেই।",
+        "c": "সঠিক! বাঘ আম-বনে আছে।",
+        "d": "ঝাউডাল তাল দেয়, ঝাউ-বনে বাঘ নেই।"
+      }
+    },
+    {
+      "id": "q8",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "বাঘের গায়ে কেমন দাগ?",
+      "options": {
+        "a": "ডোরাকাটা",
+        "b": "চাকা চাকা",
+        "c": "লম্বা",
+        "d": "সাদা"
+      },
+      "correctAnswer": "b",
+      "explanation": "পাঠ্যাংশ অনুযায়ী বাঘের গায়ে চাকা চাকা দাগ রয়েছে।",
+      "optionExplanations": {
+        "a": "ডোরাকাটা দাগ সাধারণত থাকে, কিন্তু পাঠে চাকা চাকা বলা হয়েছে।",
+        "b": "সঠিক! বাঘের গায়ে চাকা চাকা দাগ।",
+        "c": "লম্বা দাগের কথা বলা হয়নি।",
+        "d": "সাদা দাগের উল্লেখ নেই।"
+      }
+    },
+    {
+      "id": "q9",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "পাখী কোথায় গান গায়?",
+      "options": {
+        "a": "আকাশে",
+        "b": "বনে",
+        "c": "জলে",
+        "d": "খালে"
+      },
+      "correctAnswer": "b",
+      "explanation": "পাখী বনে গান গায় বলে সহজ পাঠে বলা আছে।",
+      "optionExplanations": {
+        "a": "আকাশে গান গাওয়ার কথা নেই।",
+        "b": "সঠিক! পাখী বনে গান গায়।",
+        "c": "জলে মাছ খেলা করে।",
+        "d": "খালে বক মাছ ধরে।"
+      }
+    },
+    {
+      "id": "q10",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "মাছ জলে কী করে?",
+      "options": {
+        "a": "গান গায়",
+        "b": "ঘুমায়",
+        "c": "খেলা করে",
+        "d": "ডাকে"
+      },
+      "correctAnswer": "c",
+      "explanation": "মাছ জলে খেলা করে বলে উল্লেখ রয়েছে।",
+      "optionExplanations": {
+        "a": "পাখী বনে গান গায়।",
+        "b": "মাছের ঘুমানোর কথা পাঠে নেই।",
+        "c": "সঠিক! মাছ জলে খেলা করে।",
+        "d": "কাক ডালে ডালে ডাকে।"
+      }
+    },
+    {
+      "id": "q11",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "ডালে ডালে কে ডাকে?",
+      "options": {
+        "a": "কাক",
+        "b": "বক",
+        "c": "পাখী",
+        "d": "মাছি"
+      },
+      "correctAnswer": "a",
+      "explanation": "কাক ডালে ডালে ডাকে।",
+      "optionExplanations": {
+        "a": "সঠিক! ডালে ডালে কাক ডাকে।",
+        "b": "বক খালে মাছ ধরে।",
+        "c": "পাখী বনে গান গায়।",
+        "d": "মাছি বনে ওড়ে।"
+      }
+    },
+    {
+      "id": "q12",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "বক কোথায় মাছ ধরে?",
+      "options": {
+        "a": "নদীতে",
+        "b": "পুকুরে",
+        "c": "খালে",
+        "d": "বিলে"
+      },
+      "correctAnswer": "c",
+      "explanation": "বক খালে মাছ ধরে।",
+      "optionExplanations": {
+        "a": "নদীতে মাছ ধরার কথা বলা নেই।",
+        "b": "পুকুরের উল্লেখ পাঠে নেই।",
+        "c": "সঠিক! বক খালে মাছ ধরে।",
+        "d": "বিলের কথা পাঠে উল্লেখ করা হয়নি।"
+      }
+    },
+    {
+      "id": "q13",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "বনে কারা ওড়ে?",
+      "options": {
+        "a": "বক",
+        "b": "মাছি",
+        "c": "কাক",
+        "d": "মাছ"
+      },
+      "correctAnswer": "b",
+      "explanation": "বনে অনেক মাছি (মৌ-মাছি) ওড়ে।",
+      "optionExplanations": {
+        "a": "বক খালে থাকে।",
+        "b": "সঠিক! বনে কত মাছি ওড়ে।",
+        "c": "কাক ডালে ডালে ডাকে।",
+        "d": "মাছ জলে থাকে।"
+      }
+    },
+    {
+      "id": "q14",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "মৌ-চাকে কী ভরা থাকে?",
+      "options": {
+        "a": "জল",
+        "b": "মধু",
+        "c": "ফল",
+        "d": "ফুল"
+      },
+      "correctAnswer": "b",
+      "explanation": "মৌ-চাকে মধু ভরা থাকে।",
+      "optionExplanations": {
+        "a": "দীঘিতে জল থাকে।",
+        "b": "সঠিক! মৌ-চাকে মধু ভরা থাকে।",
+        "c": "গাছের ডালে ফল থাকে।",
+        "d": "ফুলের কথা পাঠে নেই।"
+      }
+    },
+    {
+      "id": "q15",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কী হলে ভয় চলে যায়?",
+      "options": {
+        "a": "রাত হলে",
+        "b": "বৃষ্টি হলে",
+        "c": "আলো হলে",
+        "d": "হাওয়া দিলে"
+      },
+      "correctAnswer": "c",
+      "explanation": "কবিতা অনুযায়ী আলো হলে ভয় চলে যায়।",
+      "optionExplanations": {
+        "a": "রাত হলে সাধারণত ভয় বাড়ে।",
+        "b": "বৃষ্টির কথা এখানে নেই।",
+        "c": "সঠিক! আলো হয়, গেল ভয়।",
+        "d": "বায়ু বইলে ভয় যাওয়ার কথা নেই।"
+      }
+    },
+    {
+      "id": "q16",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "চারিদিক কেমন করে?",
+      "options": {
+        "a": "ঝল মল",
+        "b": "ঝিকি মিক্‌",
+        "c": "থম থম",
+        "d": "ঝম ঝম"
+      },
+      "correctAnswer": "b",
+      "explanation": "কবিতা অনুযায়ী চারিদিক ঝিকি মিক্‌ করে।",
+      "optionExplanations": {
+        "a": "দীঘিজল ঝল মল করে।",
+        "b": "সঠিক! চারি দিক ঝিকি মিক্‌।",
+        "c": "থম থম করার কথা নেই।",
+        "d": "বৃষ্টি ঝম ঝম করে পড়ে, পাঠে নেই।"
+      }
+    },
+    {
+      "id": "q17",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "বায়ু কোথায় বয়?",
+      "options": {
+        "a": "জলময়",
+        "b": "আকাশময়",
+        "c": "বনময়",
+        "d": "মাঠময়"
+      },
+      "correctAnswer": "c",
+      "explanation": "বায়ু বনময় হয়ে বয়।",
+      "optionExplanations": {
+        "a": "জলময় শব্দটির উল্লেখ নেই।",
+        "b": "আকাশময় বায়ু বইলেও পাঠে নেই।",
+        "c": "সঠিক! বায়ু বয় বনময়।",
+        "d": "মাঠময় শব্দটির উল্লেখ নেই।"
+      }
+    },
+    {
+      "id": "q18",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কোন্ গাছ নাচ করে?",
+      "options": {
+        "a": "আম গাছ",
+        "b": "ঝাউ গাছ",
+        "c": "বাঁশ গাছ",
+        "d": "জাম গাছ"
+      },
+      "correctAnswer": "c",
+      "explanation": "কবিতা অনুযায়ী বাঁশ গাছ নাচ করে।",
+      "optionExplanations": {
+        "a": "আম-বনে বাঘ থাকে।",
+        "b": "ঝাউডাল তাল দেয়।",
+        "c": "সঠিক! বাঁশ গাছ করে নাচ।",
+        "d": "খুদিরাম জাম পাড়ে।"
+      }
+    },
+    {
+      "id": "q19",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "দীঘিজল কেমন করে?",
+      "options": {
+        "a": "ঝিকি মিক্‌",
+        "b": "টল মল",
+        "c": "ঝল মল",
+        "d": "ছল ছল"
+      },
+      "correctAnswer": "c",
+      "explanation": "দীঘিজল ঝল মল করে।",
+      "optionExplanations": {
+        "a": "চারিদিক ঝিকি মিক্‌ করে।",
+        "b": "টল মল করার কথা পাঠে নেই।",
+        "c": "সঠিক! দীঘিজল ঝল মল।",
+        "d": "ছল ছল করার কথা পাঠে নেই।"
+      }
+    },
+    {
+      "id": "q20",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "খুদিরাম কী পাড়ে?",
+      "options": {
+        "a": "আম",
+        "b": "জাম",
+        "c": "কলা",
+        "d": "ফল"
+      },
+      "correctAnswer": "b",
+      "explanation": "খুদিরাম গাছ থেকে জাম পাড়ে।",
+      "optionExplanations": {
+        "a": "আম-বনের কথা বলা হয়েছে, কিন্তু পাড়ার কথা নেই।",
+        "b": "সঠিক! খুদিরাম পাড়ে জাম।",
+        "c": "কলার উল্লেখ নেই।",
+        "d": "পাখী ফল খায়।"
+      }
+    },
+    {
+      "id": "q21",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "খেয়া কে বায়?",
+      "options": {
+        "a": "খুদিরাম",
+        "b": "মধু রায়",
+        "c": "জয়লাল",
+        "d": "দীননাথ"
+      },
+      "correctAnswer": "b",
+      "explanation": "মধু রায় খেয়া বায়।",
+      "optionExplanations": {
+        "a": "খুদিরাম জাম পাড়ে।",
+        "b": "সঠিক! মধু রায় খেয়া বায়।",
+        "c": "জয়লাল হাল ধরে।",
+        "d": "দীননাথ ভাত রাঁধে।"
+      }
+    },
+    {
+      "id": "q22",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "হাল কে ধরে?",
+      "options": {
+        "a": "জয়লাল",
+        "b": "অবিনাশ",
+        "c": "হরিহর",
+        "d": "গুরুদাস"
+      },
+      "correctAnswer": "a",
+      "explanation": "হাল ধরার কাজ করে জয়লাল।",
+      "optionExplanations": {
+        "a": "সঠিক! জয়লাল ধরে হাল।",
+        "b": "অবিনাশ ঘাস কাটে।",
+        "c": "হরিহর ঘর বাঁধে।",
+        "d": "গুরুদাস চাষ করে।"
+      }
+    },
+    {
+      "id": "q23",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "অবিনাশ কী কাটে?",
+      "options": {
+        "a": "বাঁশ",
+        "b": "ঝাউডাল",
+        "c": "ঘাস",
+        "d": "চাল"
+      },
+      "correctAnswer": "c",
+      "explanation": "অবিনাশ ঘাস কাটে।",
+      "optionExplanations": {
+        "a": "বাঁশ গাছ নাচ করে।",
+        "b": "ঝাউডাল তাল দেয়।",
+        "c": "সঠিক! অবিনাশ কাটে ঘাস।",
+        "d": "পাতু পাল চাল আনে।"
+      }
+    },
+    {
+      "id": "q24",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কোন্ ডাল তাল দেয়?",
+      "options": {
+        "a": "আম ডাল",
+        "b": "ঝাউডাল",
+        "c": "বাঁশ ডাল",
+        "d": "জাম ডাল"
+      },
+      "correctAnswer": "b",
+      "explanation": "বাতাসে ঝাউডাল তাল দেয়।",
+      "optionExplanations": {
+        "a": "আম-বনে বাঘ থাকার কথা আছে।",
+        "b": "সঠিক! ঝাউডাল দেয় তাল।",
+        "c": "বাঁশ গাছ নাচ করে।",
+        "d": "জাম পাড়ে খুদিরাম।"
+      }
+    },
+    {
+      "id": "q25",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "কে এখনও জাগে নাই?",
+      "options": {
+        "a": "খুদিরাম",
+        "b": "হরিহর",
+        "c": "গুরুদাস",
+        "d": "বুড়ি দাই"
+      },
+      "correctAnswer": "d",
+      "explanation": "বুড়ি দাই এখনও ঘুম থেকে জাগেনি।",
+      "optionExplanations": {
+        "a": "খুদিরাম জেগে জাম পাড়ছে।",
+        "b": "হরিহর জেগে ঘর বাঁধছে।",
+        "c": "গুরুদাস জেগে চাষ করছে।",
+        "d": "সঠিক! বুড়ি দাই জাগে নাই।"
+      }
+    },
+    {
+      "id": "q26",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "হরিহর কী বাঁধে?",
+      "options": {
+        "a": "নৌকা",
+        "b": "ঘর",
+        "c": "জাল",
+        "d": "গরু"
+      },
+      "correctAnswer": "b",
+      "explanation": "হরিহর ঘর বাঁধার কাজ করে।",
+      "optionExplanations": {
+        "a": "নৌকা বা খেয়া বায় মধু রায়।",
+        "b": "সঠিক! হরিহর বাঁধে ঘর।",
+        "c": "জাল বাঁধার উল্লেখ নেই।",
+        "d": "গরুর কথা পাঠে নেই।"
+      }
+    },
+    {
+      "id": "q27",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "পাতু পাল কী আনে?",
+      "options": {
+        "a": "ডাল",
+        "b": "চাল",
+        "c": "মাছ",
+        "d": "ফল"
+      },
+      "correctAnswer": "b",
+      "explanation": "পাতু পাল চাল নিয়ে আসে।",
+      "optionExplanations": {
+        "a": "ডালের কথা এখানে নেই।",
+        "b": "সঠিক! পাতু পাল আনে চাল।",
+        "c": "মাছ খালে বক ধরে।",
+        "d": "ফল পাখী খায়।"
+      }
+    },
+    {
+      "id": "q28",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "দীননাথ কী রাঁধে?",
+      "options": {
+        "a": "ডাল",
+        "b": "ভাত",
+        "c": "তরকারি",
+        "d": "মাছ"
+      },
+      "correctAnswer": "b",
+      "explanation": "দীননাথ ভাত রান্না করে।",
+      "optionExplanations": {
+        "a": "ডাল রান্নার উল্লেখ নেই।",
+        "b": "সঠিক! দীননাথ রাঁধে ভাত।",
+        "c": "তরকারি রান্নার উল্লেখ নেই।",
+        "d": "মাছ বক ধরে।"
+      }
+    },
+    {
+      "id": "q29",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "চাষ কে করে?",
+      "options": {
+        "a": "গুরুদাস",
+        "b": "দীননাথ",
+        "c": "পাতু পাল",
+        "d": "অবিনাশ"
+      },
+      "correctAnswer": "a",
+      "explanation": "গুরুদাস মাঠে চাষ করে।",
+      "optionExplanations": {
+        "a": "সঠিক! গুরুদাস করে চাষ।",
+        "b": "দীননাথ ভাত রাঁধে।",
+        "c": "পাতু পাল চাল আনে।",
+        "d": "অবিনাশ ঘাস কাটে।"
+      }
+    },
+    {
+      "id": "q30",
+      "questionType": "MCQ",
+      "marks": 1,
+      "difficulty": "Easy",
+      "status": "Published",
+      "language": "Bengali",
+      "questionText": "বনে যেসব মাছি ওড়ে তাদের কী বলা হয়েছে?",
+      "options": {
+        "a": "ডাঁশ মাছি",
+        "b": "মৌ-মাছি",
+        "c": "নীল মাছি",
+        "d": "মাছি"
+      },
+      "correctAnswer": "b",
+      "explanation": "বনের মাছিদের মৌ-মাছি বলা হয়েছে।",
+      "optionExplanations": {
+        "a": "ডাঁশ মাছির কথা বলা নেই।",
+        "b": "সঠিক! ওরা সব মৌ-মাছি।",
+        "c": "নীল মাছির কথা বলা নেই।",
+        "d": "শুধু মাছি নয়, তাদের মৌ-মাছি বলা হয়েছে।"
+      }
+    }
+  ]
+}

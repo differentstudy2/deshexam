@@ -1,0 +1,52 @@
+export type FAQStatus = "draft" | "published" | "hidden";
+
+export interface FAQ {
+  id: string;
+
+  question: string;
+  answer: string;
+
+  categoryId: string;
+  tags: string[];
+
+  status: FAQStatus;
+
+  order: number;
+
+  seo: {
+    slug: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    schemaEnabled: boolean;
+  };
+
+  featured: boolean;
+  views: number;
+  helpfulVotes?: number;
+  unhelpfulVotes?: number;
+
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+export interface FAQFilters {
+  search?: string;
+  categoryId?: string;
+  status?: FAQStatus;
+  tag?: string;
+  sortBy?: "latest" | "oldest" | "most_viewed" | "alphabetical";
+}
+
+export type CreateFAQDTO = Omit<FAQ, "id" | "createdAt" | "updatedAt">;
+export type UpdateFAQDTO = Partial<CreateFAQDTO>;
+
+export interface FAQCategory {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface FAQTag {
+  id: string;
+  name: string;
+}
