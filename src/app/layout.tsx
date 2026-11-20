@@ -5,7 +5,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { AppProviders } from "./providers";
 import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
 import { AuthDialog } from "@/components/feature/auth-dialog";
-import { Inter, Lexend, Noto_Serif_Bengali } from 'next/font/google';
+import { Inter, Lexend } from 'next/font/google';
 import localFont from 'next/font/local';
 import { FirebaseProvider } from "@/hooks/use-firebase";
 import Script from 'next/script';
@@ -31,27 +31,17 @@ const lexend = Lexend({
   weight: ['400', '700'],
 });
 
-// Hind Siliguri self-hosted from google/fonts (ofl/hindsiliguri) — the exact
-// upstream files, converted to woff2 (Latin + Bengali + ₹ kept). No build-time
-// Google Fonts fetch, so builds never fail on the font loader.
-const hindSiliguri = localFont({
+// Tiro Bangla — the full app's font (headings + body), self-hosted from
+// google/fonts (ofl/tirobangla), converted to woff2 (Latin + Bengali + ₹ kept).
+// Note: Tiro Bangla ships only Regular 400 (+ Italic); there is no bold
+// weight, so font-bold headings render with browser-synthesised bold.
+const tiroBangla = localFont({
   src: [
-    { path: '../../public/fonts/HindSiliguri-Light.woff2', weight: '300', style: 'normal' },
-    { path: '../../public/fonts/HindSiliguri-Regular.woff2', weight: '400', style: 'normal' },
-    { path: '../../public/fonts/HindSiliguri-Medium.woff2', weight: '500', style: 'normal' },
-    { path: '../../public/fonts/HindSiliguri-SemiBold.woff2', weight: '600', style: 'normal' },
-    { path: '../../public/fonts/HindSiliguri-Bold.woff2', weight: '700', style: 'normal' },
+    { path: '../../public/fonts/TiroBangla-Regular.woff2', weight: '400', style: 'normal' },
+    { path: '../../public/fonts/TiroBangla-Italic.woff2', weight: '400', style: 'italic' },
   ],
-  variable: '--font-hind-siliguri',
+  variable: '--font-tiro-bangla',
   display: 'swap',
-});
-
-// Headings: Noto Serif Bengali (premium serif for Bengali headlines);
-// body stays Hind Siliguri.
-const notoSerifBengali = Noto_Serif_Bengali({
-  subsets: ['bengali'],
-  variable: '--font-noto-serif-bengali',
-  weight: ['400', '600', '700', '800'],
 });
 
 export default async function RootLayout({
@@ -82,7 +72,7 @@ export default async function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
-      <body className={cn("antialiased overscroll-none touch-manipulation", inter.variable, lexend.variable, hindSiliguri.variable, notoSerifBengali.variable)}>
+      <body className={cn("antialiased overscroll-none touch-manipulation", inter.variable, lexend.variable, tiroBangla.variable)}>
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-brand-gold focus:px-5 focus:py-2 focus:text-sm focus:font-bold focus:text-[#042f2e]">
             মূল কনটেন্টে যান
           </a>
