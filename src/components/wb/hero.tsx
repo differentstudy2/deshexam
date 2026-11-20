@@ -93,7 +93,7 @@ export function Hero() {
           <Link href="#demo-test" className="group relative block outline-none focus-visible:ring-2 focus-visible:ring-amber-400" aria-label="ফ্রি ডেমো টেস্ট দিন">
             <div aria-hidden="true" className="relative w-64 rounded-[2.6rem] border-[5px] border-emerald-900 bg-gradient-to-b from-emerald-700 to-emerald-950 p-1.5 shadow-[0_30px_80px_rgba(0,0,0,0.6)] ring-1 ring-emerald-400/30 transition-transform duration-300 md:rotate-[10deg] md:group-hover:rotate-[6deg]">
               <div className="absolute left-1/2 top-3 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-black" />
-              <div className="min-h-[460px] rounded-[2.1rem] bg-gradient-to-b from-emerald-900 to-slate-950 px-4 pb-5 pt-10">
+              <div className="min-h-[430px] rounded-[2.1rem] bg-gradient-to-b from-emerald-900 to-slate-950 px-4 pb-5 pt-10">
                 <div className="flex items-center justify-between">
                   <span className="rounded-full bg-emerald-300 px-2.5 py-0.5 text-xs font-bold text-emerald-950">{current.tag}</span>
                   <span className="text-sm font-bold text-slate-200">◔ {fmt(512 - step)}</span>
@@ -102,11 +102,11 @@ export function Hero() {
                 <p className="mb-2 text-right text-xs font-semibold text-slate-400">প্রশ্ন {toBn(qi + 1)} / {toBn(QUESTIONS.length)}</p>
                 <div key={qi} className="hx-up">
                   <p className="text-lg font-bold leading-relaxed text-white">{current.q}</p>
-                  <div className="mt-4 space-y-3">
+                  <div className="mt-3 space-y-2">
                     {current.options.map((opt, oi) => {
                       const isCorrect = selected && oi === current.correct;
                       return (
-                        <div key={opt} className={`flex items-center justify-between rounded-xl border px-3 py-2.5 transition-colors duration-500 ${isCorrect ? "border-emerald-300 bg-emerald-300 font-bold text-emerald-950" : "border-white/10 bg-white/5 text-slate-200"}`}>
+                        <div key={opt} className={`flex items-center justify-between rounded-xl border px-3 py-2 transition-colors duration-500 ${isCorrect ? "border-emerald-300 bg-emerald-300 font-bold text-emerald-950" : "border-white/10 bg-white/5 text-slate-200"}`}>
                           {opt} {isCorrect ? <Check className="h-5 w-5 shrink-0 rounded-full bg-emerald-950 p-0.5 text-emerald-300" /> : null}
                         </div>
                       );
@@ -118,7 +118,7 @@ export function Hero() {
           </Link>
           </div>
           {/* floating analytics card */}
-          <div aria-hidden="true" className="hx-float-b absolute -right-2 bottom-12 w-52 rounded-2xl border border-white/15 bg-slate-900/70 p-3 shadow-xl backdrop-blur-md">
+          <div aria-hidden="true" className="hx-float-b absolute -right-4 bottom-4 w-52 rounded-2xl border border-white/15 bg-slate-900/70 p-3 shadow-xl backdrop-blur-md">
             <p className="text-xs font-bold text-white">অধ্যায়ভিত্তিক বিশ্লেষণ</p>
             <div className="mt-2 flex items-center gap-3">
               <svg viewBox="0 0 52 52" className="h-14 w-14 -rotate-90">
