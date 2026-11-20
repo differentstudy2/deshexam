@@ -5386,11 +5386,11 @@ export default function PresentationOverlay({
                   {presentationStage === "outro" && (
                     <div className="w-full flex-1 h-full min-h-[70vh] overflow-y-auto px-4 py-8 flex flex-col text-center animate-in fade-in zoom-in duration-500">
                       <div className="m-auto flex flex-col items-center justify-center gap-4 sm:gap-5">
-                        <h1 className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight ${isDarkMode ? "text-white" : "text-slate-800"} drop-shadow-xl tracking-wide`}>
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight text-white drop-shadow-xl tracking-wide">
                           {uiLang === "bn" ? "কুইজ সমাপ্ত!" : "Quiz Completed!"}
                         </h1>
                         <div className="text-6xl md:text-7xl my-2 animate-bounce drop-shadow-2xl">🏆</div>
-                        <p className="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
+                        <p className="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-200 max-w-2xl leading-relaxed">
                           {uiLang === "bn" ? "অংশগ্রহণের জন্য ধন্যবাদ। ভিডিওটি ভালো লাগলে লাইক ও সাবস্ক্রাইব করতে ভুলবেন না!" : "Thank you for participating! Don't forget to like and subscribe."}
                         </p>
                         <button
