@@ -1,0 +1,37 @@
+/* DeshExam hero + section animations. Imported by hero.tsx and reveal.tsx */
+@keyframes hx-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes hx-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes hx-pulse-ring{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.05);opacity:1}}
+@keyframes hx-spin{to{transform:rotate(360deg)}}
+@keyframes hx-pop{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:none}}
+@keyframes hx-shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+@keyframes hx-shine{0%{transform:translateX(-150%) skewX(-20deg)}60%,100%{transform:translateX(350%) skewX(-20deg)}}
+@keyframes hx-glow{0%,100%{box-shadow:0 8px 30px rgba(212,175,55,.3)}50%{box-shadow:0 8px 44px rgba(212,175,55,.6)}}
+@keyframes hx-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
+@keyframes hx-draw{from{stroke-dasharray:0 138.2}to{stroke-dasharray:117.5 138.2}}
+
+.hx-up{animation:hx-up .7s cubic-bezier(.2,.7,.2,1) backwards}
+.hx-pop{animation:hx-pop .5s cubic-bezier(.3,1.4,.5,1) backwards}
+.hx-float{animation:hx-float 6s ease-in-out infinite}
+.hx-float-b{animation:hx-float 5s ease-in-out -2s infinite}
+.hx-ring{animation:hx-pulse-ring 5s ease-in-out infinite}
+.hx-spin{animation:hx-spin 60s linear infinite}
+.hx-shimmer{background-size:200% 100%;animation:hx-shimmer 6s linear infinite}
+.hx-glow{animation:hx-glow 3s ease-in-out infinite}
+.hx-dot{animation:hx-dot 2s ease-in-out infinite}
+.hx-draw{animation:hx-draw 1.8s ease-out 1.2s backwards}
+.hx-shine{position:relative;overflow:hidden}
+.hx-shine::after{content:"";position:absolute;inset:0;width:35%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:hx-shine 3.5s ease-in-out infinite;pointer-events:none}
+
+/* scroll reveal: children rise in one after another (fill-mode backwards, so hover transforms still work afterwards) */
+.hx-rv:not(.in)>*{opacity:0}
+.hx-rv.in>*{animation:hx-up .6s cubic-bezier(.2,.7,.2,1) backwards}
+.hx-rv.in>*:nth-child(2){animation-delay:.08s}.hx-rv.in>*:nth-child(3){animation-delay:.16s}
+.hx-rv.in>*:nth-child(4){animation-delay:.24s}.hx-rv.in>*:nth-child(5){animation-delay:.32s}
+.hx-rv.in>*:nth-child(n+6){animation-delay:.4s}
+
+@media (prefers-reduced-motion:reduce){
+  .hx-up,.hx-pop,.hx-float,.hx-float-b,.hx-ring,.hx-spin,.hx-shimmer,.hx-glow,.hx-dot,.hx-draw,.hx-rv.in>*{animation:none!important}
+  .hx-shine::after{display:none}
+  .hx-rv:not(.in)>*{opacity:1}
+}
