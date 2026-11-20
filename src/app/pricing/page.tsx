@@ -166,7 +166,7 @@ function ComparisonTable() {
               <tr className="border-b border-white/10">
                 <th className="min-w-[220px] p-4 text-base font-bold text-slate-200">সুবিধা</th>
                 {PLAN_FEATURES.map((p) => (
-                  <th key={p.id} className="p-4 text-center">
+                  <th key={p.id} className={`p-4 text-center ${'popular' in p && p.popular ? 'bg-amber-400/[0.08]' : ''}`}>
                     <span className="block text-lg font-extrabold text-white">{p.name}</span>
                     <span className="mt-1 block text-2xl font-extrabold text-amber-300">₹{toBn(p.price)}<span className="text-sm font-semibold text-slate-300">/মাস</span></span>
                     {'popular' in p && p.popular ? (
@@ -181,7 +181,7 @@ function ComparisonTable() {
                 <tr key={f} className="border-b border-white/5 last:border-0">
                   <td className="p-4 text-base text-slate-200">{f}</td>
                   {PLAN_FEATURES.map((p) => (
-                    <td key={p.id} className="p-4 text-center text-xl" aria-label={p.allFeatures.includes(f) ? 'আছে' : 'নেই'}>
+                    <td key={p.id} className={`p-4 text-center text-xl ${'popular' in p && p.popular ? 'bg-amber-400/[0.08]' : ''}`} aria-label={p.allFeatures.includes(f) ? 'আছে' : 'নেই'}>
                       {p.allFeatures.includes(f) ? (
                         <span className="text-emerald-400">✓</span>
                       ) : (
@@ -231,7 +231,7 @@ function ComparisonTable() {
               </ul>
               <Link
                 href={`/pricing?plan=${p.id}#plans`}
-                className={`mt-6 flex min-h-[48px] items-center justify-center rounded-full text-base font-bold ${
+                className={`mt-6 flex min-h-[48px] items-center justify-center rounded-full text-base font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400 focus-visible:outline-offset-2 ${
                   'popular' in p && p.popular ? 'bg-amber-400 text-[#042f2e]' : 'bg-emerald-600 text-white'
                 }`}
               >

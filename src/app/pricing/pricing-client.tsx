@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Input } from '@/components/ui/input';
-import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat, Loader2, Tag, Star, BrainCircuit, Search, BarChart3, Rocket, FileText } from 'lucide-react';
+import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat, Loader2, Tag, Star, BrainCircuit, Search, BarChart3, Rocket, FileText, ShieldCheck, Zap, Mail, Phone } from 'lucide-react';
 import { pricingData, faqData } from "@/lib/mock-data";
 import { cn } from '@/lib/utils';
 import { createRazorpayOrder } from '@/ai/flows/create-razorpay-order';
@@ -48,7 +49,7 @@ export default function PricingClientPage() {
     }, []);
 
     useEffect(() => {
-        document.title = "Pricing Plans | DeshExam";
+        document.title = "প্রাইসিং | DeshExam";
     }, []);
 
     useEffect(() => {
@@ -122,7 +123,7 @@ export default function PricingClientPage() {
                     toast({ title: 'Payment Successful!', description: `ID: ${response.razorpay_payment_id}` });
                 },
                 prefill: { name: user.displayName || 'Test User', email: user.email },
-                theme: { color: '#6366f1' },
+                theme: { color: '#d4af37' },
             };
             const rzp = new window.Razorpay(options);
             rzp.open();
@@ -133,299 +134,381 @@ export default function PricingClientPage() {
         }
     };
 
+    const scrollTo = (id: string) => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    };
+
     const whyMustHave = [
-        { icon: <BookCopy className="w-5 h-5 text-slate-700" />, title: "অধ্যায়ভিত্তিক MCQ অনুশীলন" },
-        { icon: <FileClock className="w-5 h-5 text-slate-700" />, title: "আগের বছরের প্রশ্নপত্র" },
-        { icon: <CircleUser className="w-5 h-5 text-slate-700" />, title: "প্রিমিয়াম প্র্যাকটিস প্রশ্ন" },
-        { icon: <Video className="w-5 h-5 text-slate-700" />, title: "ডেইলি লাইভ টেস্ট ও র‍্যাঙ্কিং" },
-        { icon: <Repeat className="w-5 h-5 text-slate-700" />, title: "আনলিমিটেড টেস্ট রি-অ্যাটেম্পট" }
+        { icon: <BookCopy className="h-5 w-5 text-amber-400" />, title: "অধ্যায়ভিত্তিক MCQ অনুশীলন" },
+        { icon: <FileClock className="h-5 w-5 text-amber-400" />, title: "আগের বছরের প্রশ্নপত্র" },
+        { icon: <CircleUser className="h-5 w-5 text-amber-400" />, title: "প্রিমিয়াম প্র্যাকটিস প্রশ্ন" },
+        { icon: <Video className="h-5 w-5 text-amber-400" />, title: "ডেইলি লাইভ টেস্ট ও র‍্যাঙ্কিং" },
+        { icon: <Repeat className="h-5 w-5 text-amber-400" />, title: "আনলিমিটেড টেস্ট রি-অ্যাটেম্পট" }
+    ];
+
+    const whyUpgrade = [
+        { title: 'আনলিমিটেড মক টেস্ট', desc: 'আনলিমিটেড মক টেস্ট, বিস্তারিত বিশ্লেষণ ও পারফরম্যান্স ট্র্যাকিং।', icon: <FileText className="h-5 w-5 text-amber-400" /> },
+        { title: 'AI বিশ্লেষণ', desc: 'বিষয়ভিত্তিক বিশ্লেষণ ও আগের বছরের প্রশ্নপত্রের ধরন বুঝুন।', icon: <BrainCircuit className="h-5 w-5 text-amber-400" /> },
+        { title: 'দুর্বল বিষয় শনাক্তকরণ', desc: 'কোন অধ্যায়ে দুর্বল, সেটা চিহ্নিত করে সেখানেই অনুশীলন করুন।', icon: <Search className="h-5 w-5 text-amber-400" /> },
+        { title: 'র‍্যাঙ্ক অনুমান', desc: 'সহপাঠীদের সঙ্গে তুলনা করে নিজের অবস্থান দেখুন।', icon: <BarChart3 className="h-5 w-5 text-amber-400" /> },
+        { title: 'আগের বছরের প্রশ্নপত্র', desc: 'আগের বছরের প্রশ্নপত্র ও ডেইলি লাইভ টেস্ট।', icon: <FileClock className="h-5 w-5 text-amber-400" /> },
+        { title: 'স্মার্ট পরামর্শ', desc: 'কী উন্নত করতে হবে, তার স্মার্ট পরামর্শ পান।', icon: <Rocket className="h-5 w-5 text-amber-400" /> },
     ];
 
   return (
-    <div className="w-full pb-12 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans">
+    <div className="w-full bg-[#040a16] font-body text-base text-slate-100">
         <Script id="razorpay-checkout-js" src="https://checkout.razorpay.com/v1/checkout.js" />
 
-        <div className="w-full max-w-[1000px] mx-auto px-4 sm:px-6 pt-6">
-
-            {/* NEW HEADER SECTION */}
-            <div className="relative w-full rounded-2xl overflow-hidden bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-700 text-white shadow-xl mb-12 border border-indigo-500/30">
-                {/* Background Glows */}
-                <div className="absolute top-0 left-0 w-64 h-64 bg-fuchsia-500/20 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-                <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-cyan-500/20 rounded-full blur-[80px] translate-y-1/2 pointer-events-none"></div>
-                <div className="absolute top-1/2 right-0 w-96 h-96 bg-indigo-500/30 rounded-full blur-[100px] translate-x-1/3 -translate-y-1/2 pointer-events-none"></div>
-
-                <div className="relative z-10 px-6 py-10 sm:px-10 sm:py-12 flex flex-col md:flex-row items-center justify-between gap-10">
-                    {/* Left Content */}
-                    <div className="flex-1 flex flex-col items-center text-center md:items-start md:text-left">
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 leading-tight tracking-tight">
-                            Unlock Premium Learning <br className="hidden md:block" /> with DeshExam
+        {/* ============ HERO ============ */}
+        <section className="section-dark-hero text-white">
+            <div className="container mx-auto max-w-6xl px-4 py-12 md:py-20">
+                <div className="flex flex-col items-center gap-10 md:flex-row md:justify-between">
+                    <div className="flex-1 text-center md:text-left">
+                        <p className="mb-3 inline-block rounded-full border border-amber-300/40 bg-white/10 px-3 py-1 text-xs font-bold tracking-wide text-amber-200">
+                            ক্লাস ৫–১২ · WBBSE ও WBCHSE
+                        </p>
+                        <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
+                            DeshExam প্রিমিয়াম প্ল্যান
                         </h1>
-
-                        <p className="text-indigo-100 text-base sm:text-lg mb-8 max-w-xl leading-relaxed">
-                            Get unlimited mock tests, AI analytics, previous year papers, premium practice sets, and advanced performance tracking.
+                        <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-slate-300 md:mx-0 md:text-lg">
+                            মক টেস্ট, সাজেশন, নোট, ভিডিও ক্লাস ও ফলাফল বিশ্লেষণ — পশ্চিমবঙ্গ বোর্ডের সম্পূর্ণ প্রস্তুতি, এক জায়গায়।
+                        </p>
+                        <p className="mt-4 text-lg font-bold text-amber-300">
+                            মাত্র ₹50/মাস থেকে শুরু
                         </p>
 
-                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4 mb-8">
-                            {['Secure Payments', 'Instant Access'].map((feat, i) => (
-                                <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm text-indigo-50 backdrop-blur-sm">
-                                    <Check className="w-3.5 h-3.5" />
-                                    <span>{feat}</span>
-                                </div>
+                        <div className="mt-6 flex flex-wrap items-center justify-center gap-3 md:justify-start">
+                            {[
+                                { icon: <ShieldCheck className="h-3.5 w-3.5" />, label: 'নিরাপদ পেমেন্ট' },
+                                { icon: <Zap className="h-3.5 w-3.5" />, label: 'সঙ্গে সঙ্গে অ্যাক্সেস' },
+                            ].map((chip) => (
+                                <span key={chip.label} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 backdrop-blur-sm sm:text-sm">
+                                    {chip.icon}
+                                    {chip.label}
+                                </span>
                             ))}
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                            <Button onClick={() => document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' })} className="bg-white text-indigo-900 hover:bg-slate-50 font-bold h-12 px-8 rounded-lg shadow-lg">
+                        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center md:justify-start">
+                            <Button
+                                onClick={() => scrollTo('plans')}
+                                className="min-h-[48px] rounded-full bg-amber-400 px-8 text-base font-bold text-[#042f2e] shadow-lg hover:bg-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-200 focus-visible:outline-offset-2"
+                            >
                                 প্ল্যান বেছে নিন
                             </Button>
-                            <Button variant="outline" onClick={() => document.getElementById('compare')?.scrollIntoView({ behavior: 'smooth' })} className="bg-white/5 border-white/20 hover:bg-white/10 text-white font-bold h-12 px-8 rounded-lg backdrop-blur-sm">
-                                Compare Plans
+                            <Button
+                                variant="outline"
+                                onClick={() => scrollTo('compare')}
+                                className="min-h-[48px] rounded-full border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-sm hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-200 focus-visible:outline-offset-2"
+                            >
+                                তুলনা করুন
                             </Button>
                         </div>
                     </div>
 
-                    {/* Right Glass Card */}
-                    <div className="shrink-0 w-full sm:w-auto">
-                        <div className="relative p-[1.5px] rounded-2xl bg-gradient-to-b from-white/40 to-white/5 shadow-2xl backdrop-blur-md">
-                            <div className="absolute inset-0 bg-cyan-400/20 blur-[50px] -z-10 rounded-2xl"></div>
-                            <div className="bg-white/10 border border-white/10 rounded-xl p-6 flex flex-col items-center justify-center text-center min-w-[240px] backdrop-blur-xl">
-                                <span className="text-indigo-100 text-sm font-medium mb-1">Starting from</span>
-                                <div className="text-5xl font-extrabold text-white mb-1">₹50</div>
-                                <div className="text-indigo-100 text-sm font-medium mb-5">per month</div>
-                                <button onClick={() => document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' })} className="w-full py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 text-sm font-bold rounded-lg shadow-sm flex items-center justify-center gap-1.5 transition-colors">
-                                    <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
-                                    Bestseller
-                                </button>
-                            </div>
+                    {/* Starting-price glass card */}
+                    <div className="w-full shrink-0 sm:w-auto">
+                        <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-6 text-center shadow-2xl backdrop-blur-md sm:min-w-[260px]">
+                            <span className="mb-1 block text-sm font-medium text-slate-300">শুরু মাত্র</span>
+                            <div className="mb-1 text-5xl font-extrabold text-white">₹50</div>
+                            <div className="mb-5 text-sm font-medium text-slate-300">/মাস</div>
+                            <button
+                                onClick={() => scrollTo('plans')}
+                                className="flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-lg bg-amber-400 py-2.5 text-sm font-bold text-[#042f2e] shadow-sm transition-colors hover:bg-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-200 focus-visible:outline-offset-2"
+                            >
+                                <Star className="h-4 w-4 fill-[#042f2e] text-[#042f2e]" />
+                                সবচেয়ে জনপ্রিয় — Plus ₹100
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <div className="mb-6" id="plans">
-                <h2 className="text-2xl font-bold">Choose a Plan</h2>
-                <p className="text-sm text-slate-500 mt-1">Unlock premium mock tests and analytics. Monthly plans — renew every month.</p>
-            </div>
+        {/* ============ PLAN SELECTOR ============ */}
+        <section id="plans" className="section-dark scroll-mt-20 py-12 md:py-16">
+            <div className="container mx-auto max-w-6xl px-4">
+                <p className="text-center text-sm font-bold tracking-wide text-amber-300">মাসিক প্ল্যান</p>
+                <h2 className="mt-2 text-center text-2xl font-extrabold text-white md:text-4xl">প্ল্যান বেছে নিন</h2>
+                <p className="mx-auto mt-3 max-w-xl text-center text-base text-slate-300">
+                    তিনটি মাসিক প্ল্যান — প্রতি মাসে নবায়ন হয়। দাম ও সুবিধা দেখে বেছে নিন।
+                </p>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-
-                {/* LEFT: Features & FAQ (Native List View) */}
-                <div className="space-y-8">
-
-                    {/* Features List */}
-                    <div>
-                        <h3 className="font-bold text-[15px] mb-3 uppercase tracking-wide text-slate-500">Features Included</h3>
-                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                            {pricingData.benefits.map((benefit, index) => {
-                                const isIncluded = benefit[selectedPlanId as keyof typeof benefit] === true;
-                                const isLast = index === pricingData.benefits.length - 1;
-
-                                return (
-                                    <div key={benefit.id} className={cn(
-                                        "flex items-center justify-between p-3.5 mx-2",
-                                        !isLast && "border-b border-slate-100 dark:border-slate-800"
-                                    )}>
-                                        <span className={cn(
-                                            "text-[13px] font-medium leading-tight",
-                                            isIncluded ? "text-slate-700 dark:text-slate-300" : "text-slate-400 line-through"
-                                        )}>
-                                            {benefit.name}
-                                        </span>
-                                        <div className="shrink-0 ml-4">
-                                            {isIncluded ? (
-                                                <Check className="w-4 h-4 text-[#6366f1]" strokeWidth={2.5} />
-                                            ) : (
-                                                <X className="w-4 h-4 text-slate-300" strokeWidth={2.5} />
-                                            )}
-                                        </div>
+                <div
+                    role="radiogroup"
+                    aria-label="প্ল্যান বেছে নিন"
+                    className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3 md:items-start"
+                >
+                    {currentPlans.map((plan) => {
+                        const isSelected = selectedPlanId === plan.id;
+                        const isPopular = plan.bestseller;
+                        return (
+                            <div
+                                key={plan.id}
+                                role="radio"
+                                aria-checked={isSelected}
+                                tabIndex={0}
+                                onClick={() => setSelectedPlanId(plan.id)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        setSelectedPlanId(plan.id);
+                                    }
+                                }}
+                                className={cn(
+                                    "relative cursor-pointer rounded-2xl border p-6 pt-8 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400 focus-visible:outline-offset-2",
+                                    isPopular
+                                        ? "border-2 border-amber-400 bg-white/[0.06] shadow-[0_20px_60px_rgba(212,175,55,0.15)] md:-translate-y-2"
+                                        : "border-white/10 bg-white/[0.04] hover:border-white/25",
+                                    isSelected && !isPopular && "border-emerald-400 bg-white/[0.06]",
+                                    isSelected && isPopular && "ring-2 ring-amber-300/60"
+                                )}
+                            >
+                                {isPopular && (
+                                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-[#042f2e]">
+                                        সবচেয়ে জনপ্রিয়
+                                    </span>
+                                )}
+                                <div className="flex items-start justify-between gap-3">
+                                    <div>
+                                        <h3 className="text-xl font-extrabold text-white">{plan.name}</h3>
+                                        <p className="mt-1 text-sm text-slate-400">মেয়াদ {plan.validity} · প্রতি মাসে নবায়ন হয়</p>
                                     </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* What you get */}
-                    <div>
-                        <h3 className="font-bold text-[15px] mb-3 uppercase tracking-wide text-slate-500">What you get</h3>
-                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                            {whyMustHave.map((item, index) => {
-                                const isLast = index === whyMustHave.length - 1;
-                                return (
-                                    <div key={item.title} className={cn(
-                                        "flex items-center gap-3 p-3.5 mx-2",
-                                        !isLast && "border-b border-slate-100 dark:border-slate-800"
-                                    )}>
-                                        <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                                            {item.icon}
-                                        </div>
-                                        <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">
-                                            {item.title}
-                                        </span>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
-
-
-
-                </div>
-
-                {/* RIGHT: Plan Selection & Checkout */}
-                <div className="space-y-6">
-                    <div>
-                        <h3 className="font-bold text-[15px] mb-3 uppercase tracking-wide text-slate-500">Select Plan</h3>
-                        <div className="space-y-3">
-                            {currentPlans.map((plan) => {
-                                const isSelected = selectedPlanId === plan.id;
-                                return (
-                                    <div
-                                        key={plan.id}
-                                        onClick={() => setSelectedPlanId(plan.id)}
+                                    <span
+                                        aria-hidden="true"
                                         className={cn(
-                                            "relative p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between",
-                                            isSelected
-                                                ? "border-[#6366f1] bg-[#6366f1]/5 dark:bg-[#6366f1]/10"
-                                                : "border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-900"
+                                            "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+                                            isSelected ? "border-amber-400 bg-amber-400" : "border-slate-500 bg-transparent"
                                         )}
                                     >
-                                        {plan.bestseller && (
-                                            <div className="absolute -top-2.5 left-4 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                                Bestseller
-                                            </div>
-                                        )}
-                                        {plan.discount && (
-                                            <div className="absolute -top-2.5 right-4 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                                {plan.discount}% OFF
-                                            </div>
-                                        )}
-
-                                        <div className="flex items-center gap-3">
-                                            <div className={cn(
-                                                "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
-                                                isSelected ? "border-[#6366f1]" : "border-slate-300"
-                                            )}>
-                                                {isSelected && <div className="w-2.5 h-2.5 bg-[#6366f1] rounded-full" />}
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-sm text-slate-900 dark:text-white">{plan.name}</h4>
-                                                <p className="text-[11px] font-medium text-slate-500">Valid for {plan.validity} · প্রতি মাসে নবায়ন হয়</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="flex items-center justify-end gap-1.5">
-                                                <span className="text-[11px] line-through text-slate-400 font-medium">₹{plan.originalPrice}</span>
-                                                <span className="font-bold text-base text-slate-900 dark:text-white">₹{plan.price}</span>
-                                                <span className="text-[11px] font-medium text-slate-500">/মাস</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Native List Style Coupon */}
-                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
-                        {appliedCoupon ? (
-                            <div className="flex items-center justify-between p-4 bg-emerald-50/50 dark:bg-emerald-900/10">
-                                <div className="flex items-center gap-2">
-                                    <Tag className="w-4 h-4 text-emerald-600" />
-                                    <p className="text-sm font-semibold text-emerald-700">Coupon "{appliedCoupon.code}" applied</p>
+                                        {isSelected && <Check className="h-4 w-4 text-[#042f2e]" strokeWidth={3} />}
+                                    </span>
                                 </div>
-                                <button onClick={removeCoupon} className="text-xs font-bold text-slate-400 hover:text-slate-600">
-                                    Remove
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="flex items-center p-2 pl-4">
-                                <Input
-                                    placeholder="Enter Coupon Code"
-                                    className="h-10 border-none shadow-none focus-visible:ring-0 px-0 text-sm font-medium"
-                                    value={couponCode}
-                                    onChange={(e) => setCouponCode(e.target.value)}
-                                />
-                                <Button onClick={handleApplyCoupon} variant="ghost" className="text-[#6366f1] font-bold hover:text-[#4f46e5] hover:bg-transparent">
-                                    Apply
-                                </Button>
-                            </div>
-                        )}
-                    </div>
 
-                    {/* Native Table View Summary */}
-                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-                        <h4 className="font-bold text-[15px] mb-3 text-slate-900 dark:text-white">Order Summary</h4>
-                        <div className="space-y-3 text-[13px]">
-                            <div className="flex justify-between text-slate-600 dark:text-slate-400 font-medium">
-                                <span>{selectedPlan?.name} (1 মাস)</span>
-                                <span>₹{originalPrice}</span>
-                            </div>
-                            <div className="flex justify-between text-emerald-600 font-medium">
-                                <span>Discount</span>
-                                <span>- ₹{(originalPrice - price).toFixed(2)}</span>
-                            </div>
-                            {couponDiscount > 0 && (
-                                <div className="flex justify-between text-emerald-600 font-medium">
-                                    <span>Coupon Discount</span>
-                                    <span>- ₹{couponDiscount.toFixed(2)}</span>
-                                </div>
-                            )}
-                            <div className="flex justify-between items-center pt-1 border-t border-slate-100 dark:border-slate-800">
-                                <span className="font-bold text-slate-900 dark:text-white">Total Amount</span>
-                                <span className="font-bold text-lg text-slate-900 dark:text-white">₹{total.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    </div>
+                                <p className="mt-5 flex items-baseline gap-2">
+                                    <span className="text-sm text-slate-400 line-through">₹{plan.originalPrice}</span>
+                                    <span className="text-5xl font-extrabold text-white">₹{plan.price}</span>
+                                    <span className="text-sm font-semibold text-slate-400">/মাস</span>
+                                </p>
+                                {plan.discount ? (
+                                    <p className="mt-1 text-sm font-bold text-emerald-400">{plan.discount}% ছাড়</p>
+                                ) : null}
 
-                    <Button
-                        onClick={handlePayment}
-                        disabled={isProcessingPayment}
-                        className="w-full h-12 rounded-[4px] text-[15px] font-bold bg-[#6064f4] hover:bg-[#4f53ec] text-white shadow-none transition-all"
-                    >
-                        {isProcessingPayment ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Processing...</> : 'Proceed to Pay'}
-                    </Button>
-                    <div className="flex items-center justify-center gap-1.5 mt-3 opacity-70">
-                        <span className="text-xs font-semibold text-slate-500">Secured by</span>
-                        <span className="text-xs font-extrabold text-[#02042B] dark:text-white tracking-tight">Razorpay</span>
-                    </div>
+                                <ul className="mt-6 space-y-2.5 border-t border-white/10 pt-5">
+                                    {pricingData.benefits.map((benefit) => {
+                                        const included = benefit[plan.id as keyof typeof benefit] === true;
+                                        return (
+                                            <li key={benefit.id} className="flex items-start gap-2 text-base">
+                                                {included ? (
+                                                    <Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" strokeWidth={2.5} aria-hidden="true" />
+                                                ) : (
+                                                    <X className="mt-0.5 h-5 w-5 shrink-0 text-slate-600" strokeWidth={2.5} aria-hidden="true" />
+                                                )}
+                                                <span className={included ? "text-slate-200" : "text-slate-500 line-through"}>{benefit.name}</span>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+
+                                <p
+                                    className={cn(
+                                        "mt-6 flex min-h-[48px] items-center justify-center rounded-full text-base font-bold transition-colors",
+                                        isSelected
+                                            ? "bg-amber-400 text-[#042f2e]"
+                                            : "bg-white/[0.07] text-white hover:bg-white/[0.12]"
+                                    )}
+                                >
+                                    {isSelected ? "✓ নির্বাচিত" : "বেছে নিন"}
+                                </p>
+                            </div>
+                        );
+                    })}
                 </div>
-
             </div>
+        </section>
 
-            {/* Why Upgrade to Premium */}
-            <div className="mt-16 mb-8">
-                <h2 className="text-2xl font-bold text-center text-slate-900 dark:text-white mb-8">Why Upgrade to Premium?</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[
-                        { title: 'Unlimited Mock Tests', desc: 'Unlimited Mock tests, in-depth analytics and advanced performance tracking.', icon: <FileText className="w-5 h-5 text-[#6366f1]" /> },
-                        { title: 'AI Insights', desc: 'AI Insights generate topic by topic analytics and previous year paper costs.', icon: <BrainCircuit className="w-5 h-5 text-[#6366f1]" /> },
-                        { title: 'Weak Topic Detection', desc: 'Weak topic detectors in context, recognize weak topic elimination.', icon: <Search className="w-5 h-5 text-[#6366f1]" /> },
-                        { title: 'Rank Prediction', desc: 'Rank Prediction compares with peers to focus on speed analytics.', icon: <BarChart3 className="w-5 h-5 text-[#6366f1]" /> },
-                        { title: 'Previous Year Papers', desc: 'Previous Year Papers combining including daily live Tests.', icon: <FileClock className="w-5 h-5 text-[#6366f1]" /> },
-                        { title: 'Smart Recommendations', desc: 'Smart recommendations on what to enhance and communications.', icon: <Rocket className="w-5 h-5 text-[#6366f1]" /> },
-                    ].map((feature, idx) => (
-                        <div key={idx} className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-indigo-50 dark:border-slate-800">
-                            <div className="mb-3 w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center">
+        {/* ============ FEATURES + STICKY ORDER SUMMARY ============ */}
+        <section className="section-dark-blue py-12 md:py-16">
+            <div className="container mx-auto max-w-6xl px-4">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_380px] lg:gap-12">
+
+                    {/* LEFT: features included + what you get */}
+                    <div className="space-y-8">
+                        <div>
+                            <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-400">
+                                {selectedPlan?.name} প্ল্যানে যা যা পাবেন
+                            </h3>
+                            <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
+                                {pricingData.benefits.map((benefit, index) => {
+                                    const isIncluded = benefit[selectedPlanId as keyof typeof benefit] === true;
+                                    const isLast = index === pricingData.benefits.length - 1;
+                                    return (
+                                        <div
+                                            key={benefit.id}
+                                            className={cn(
+                                                "mx-2 flex items-center justify-between p-3.5",
+                                                !isLast && "border-b border-white/5"
+                                            )}
+                                        >
+                                            <span className={cn(
+                                                "text-sm font-medium leading-tight",
+                                                isIncluded ? "text-slate-200" : "text-slate-500 line-through"
+                                            )}>
+                                                {benefit.name}
+                                            </span>
+                                            {isIncluded ? (
+                                                <Check className="h-4 w-4 shrink-0 text-emerald-400" strokeWidth={2.5} aria-hidden="true" />
+                                            ) : (
+                                                <X className="h-4 w-4 shrink-0 text-slate-600" strokeWidth={2.5} aria-hidden="true" />
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-400">আরও যা পাবেন</h3>
+                            <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
+                                {whyMustHave.map((item, index) => {
+                                    const isLast = index === whyMustHave.length - 1;
+                                    return (
+                                        <div
+                                            key={item.title}
+                                            className={cn(
+                                                "mx-2 flex items-center gap-3 p-3.5",
+                                                !isLast && "border-b border-white/5"
+                                            )}
+                                        >
+                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.07]">
+                                                {item.icon}
+                                            </div>
+                                            <span className="text-sm font-medium text-slate-200">{item.title}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* RIGHT: sticky order summary */}
+                    <div className="lg:sticky lg:top-24 lg:self-start">
+                        <div className="space-y-6">
+                            {/* Coupon */}
+                            <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
+                                {appliedCoupon ? (
+                                    <div className="flex min-h-[56px] items-center justify-between gap-3 bg-emerald-500/10 p-4">
+                                        <div className="flex items-center gap-2">
+                                            <Tag className="h-4 w-4 shrink-0 text-emerald-400" aria-hidden="true" />
+                                            <p className="text-sm font-semibold text-emerald-300">Coupon &ldquo;{appliedCoupon.code}&rdquo; applied</p>
+                                        </div>
+                                        <button
+                                            onClick={removeCoupon}
+                                            className="min-h-[44px] px-2 text-xs font-bold text-slate-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 p-2 pl-4">
+                                        <Input
+                                            placeholder="কুপন কোড লিখুন"
+                                            aria-label="কুপন কোড"
+                                            className="h-11 border-none bg-transparent px-0 text-sm font-medium text-white placeholder:text-slate-500 shadow-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                                            value={couponCode}
+                                            onChange={(e) => setCouponCode(e.target.value)}
+                                        />
+                                        <Button
+                                            onClick={handleApplyCoupon}
+                                            variant="ghost"
+                                            className="min-h-[44px] font-bold text-amber-300 hover:bg-white/5 hover:text-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
+                                        >
+                                            Apply
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Order summary */}
+                            <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-5 shadow-xl backdrop-blur-md">
+                                <h3 className="mb-4 text-base font-bold text-white">Order Summary</h3>
+                                <div className="space-y-3 text-sm">
+                                    <div className="flex justify-between font-medium text-slate-300">
+                                        <span>{selectedPlan?.name} (১ মাস)</span>
+                                        <span>₹{originalPrice}</span>
+                                    </div>
+                                    <div className="flex justify-between font-medium text-emerald-400">
+                                        <span>ছাড়</span>
+                                        <span>- ₹{(originalPrice - price).toFixed(2)}</span>
+                                    </div>
+                                    {couponDiscount > 0 && (
+                                        <div className="flex justify-between font-medium text-emerald-400">
+                                            <span>কুপন ছাড়</span>
+                                            <span>- ₹{couponDiscount.toFixed(2)}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex items-center justify-between border-t border-white/10 pt-3">
+                                        <span className="font-bold text-white">মোট দাম</span>
+                                        <span className="text-xl font-extrabold text-amber-300">₹{total.toFixed(2)}</span>
+                                    </div>
+                                </div>
+
+                                <Button
+                                    onClick={handlePayment}
+                                    disabled={isProcessingPayment}
+                                    className="mt-5 h-12 w-full rounded-full bg-amber-400 text-base font-bold text-[#042f2e] shadow-lg transition-colors hover:bg-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-200 focus-visible:outline-offset-2 disabled:opacity-60"
+                                >
+                                    {isProcessingPayment ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> Processing...</> : 'পেমেন্ট করুন'}
+                                </Button>
+                                <p className="mt-3 text-center text-xs leading-relaxed text-slate-400">
+                                    UPI · কার্ড · নেট ব্যাংকিং — পেমেন্টের আগে প্ল্যান, দাম ও মেয়াদ দেখে নিন।
+                                </p>
+                                <div className="mt-3 flex items-center justify-center gap-1.5 opacity-80">
+                                    <span className="text-xs font-semibold text-slate-400">Secured by</span>
+                                    <span className="text-xs font-extrabold tracking-tight text-white">Razorpay</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        {/* ============ WHY UPGRADE ============ */}
+        <section className="section-dark-teal py-12 md:py-16">
+            <div className="container mx-auto max-w-6xl px-4">
+                <h2 className="text-center text-2xl font-extrabold text-white md:text-4xl">কেন প্রিমিয়াম নেবেন?</h2>
+                <p className="mx-auto mt-3 max-w-xl text-center text-base text-slate-300">
+                    পরীক্ষার প্রস্তুতির জন্য যা যা দরকার — একটাই প্ল্যানে।
+                </p>
+                <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {whyUpgrade.map((feature) => (
+                        <div key={feature.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+                            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.07]">
                                 {feature.icon}
                             </div>
-                            <h3 className="font-bold text-[15px] text-slate-900 dark:text-white mb-2">{feature.title}</h3>
-                            <p className="text-[13px] text-slate-500 leading-relaxed">{feature.desc}</p>
+                            <h3 className="mb-2 text-base font-bold text-white">{feature.title}</h3>
+                            <p className="text-sm leading-relaxed text-slate-300">{feature.desc}</p>
                         </div>
                     ))}
                 </div>
             </div>
+        </section>
 
-            {/* Native Accordion FAQ - Single Panel */}
-            <div className="mt-12">
-                <h3 className="font-bold text-[15px] mb-3 uppercase tracking-wide text-slate-500">FAQ</h3>
-                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden px-4">
+        {/* ============ FAQ ============ */}
+        <section className="section-dark py-12 md:py-16">
+            <div className="container mx-auto max-w-4xl px-4">
+                <p className="text-center text-sm font-bold tracking-wide text-amber-300">জিজ্ঞাসা</p>
+                <h2 className="mt-2 text-center text-2xl font-extrabold text-white md:text-4xl">সচরাচর জিজ্ঞাসা</h2>
+                <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] px-4">
                     <Accordion type="single" collapsible className="w-full">
                         {faqData.map((faq, index) => (
-                            <AccordionItem value={`item-${index}`} key={index} className="border-slate-100 dark:border-slate-800">
-                                <AccordionTrigger className="text-left font-medium text-[13px] hover:no-underline py-4">
+                            <AccordionItem value={`item-${index}`} key={index} className="border-white/10">
+                                <AccordionTrigger className="min-h-[48px] py-4 text-left text-base font-semibold text-white hover:no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400">
                                     {faq.question}
                                 </AccordionTrigger>
-                                <AccordionContent className="text-[12px] text-slate-500 leading-relaxed pb-4">
+                                <AccordionContent className="pb-4 text-sm leading-relaxed text-slate-300">
                                     {faq.answer}
                                 </AccordionContent>
                             </AccordionItem>
@@ -433,74 +516,70 @@ export default function PricingClientPage() {
                     </Accordion>
                 </div>
             </div>
+        </section>
 
-            {/* SEO Content Section */}
-            <div className="mt-16 mb-12 text-left bg-white dark:bg-slate-900 rounded-3xl p-8 sm:p-12 shadow-sm border border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400 space-y-8 prose dark:prose-invert max-w-none">
-                <div className="max-w-4xl mx-auto">
-                    <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">Why Choose DeshExam for Your Exam Preparation?</h2>
-                    <p className="mb-4 leading-relaxed">
-                        When you are preparing for highly competitive exams, every single mark counts. The difference between success and failure often comes down to the quality of your practice. That is exactly why students trust DeshExam. We don&apos;t just provide questions; we provide a comprehensive ecosystem designed to identify your weaknesses and transform them into strengths. By leveraging advanced AI analytics and a large repository of mock tests, we ensure that you are always exam-ready. <a href="/features" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">Explore all premium features</a> to see exactly how our platform can revolutionize your learning journey.
-                    </p>
-                    <p className="mb-6 leading-relaxed">
-                        Our platform is built by top educators and industry experts who understand the exact patterns, difficulty levels, and nuances of various state and national level examinations. From real-time ranking to detailed solutions, we simulate the actual exam environment so that on the final day, you experience zero surprises.
-                    </p>
+        {/* ============ ABOUT THE PLANS (honest, Bengali) ============ */}
+        <section className="section-dark-blue py-12 md:py-16">
+            <div className="container mx-auto max-w-4xl px-4 text-slate-300">
+                <h2 className="text-2xl font-extrabold text-white md:text-3xl">কেন DeshExam?</h2>
+                <p className="mt-4 leading-relaxed">
+                    DeshExam পশ্চিমবঙ্গ বোর্ডের ছাত্রছাত্রীদের জন্য তৈরি — ক্লাস ৫–১২, WBBSE (মাধ্যমিক) ও WBCHSE (উচ্চমাধ্যমিক)। অধ্যায়ভিত্তিক MCQ, আগের বছরের প্রশ্নপত্র, মক টেস্ট, নোট ও ভিডিও ক্লাস — সব এক জায়গায়, যাতে পরীক্ষার প্রস্তুতি গোছানোভাবে করা যায়।
+                </p>
+                <p className="mt-4 leading-relaxed">
+                    প্রিমিয়াম প্ল্যানে নিজের দুর্বল অধ্যায় খুঁজে বের করে সেখানেই অনুশীলন করা যায়, আর ফলাফল বিশ্লেষণ দেখে বোঝা যায় কোথায় উন্নতি দরকার। <Link href="/features" className="font-semibold text-amber-300 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400">সব প্রিমিয়াম সুবিধা দেখুন</Link>।
+                </p>
 
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 mt-10">The Power of Premium Learning</h2>
-                    <p className="mb-4 leading-relaxed">
-                        While basic practice is good, premium structured learning is essential for guaranteed success. Upgrading to our premium subscription unlocks a suite of elite tools. You gain unrestricted access to our extensive <a href="/question-bank" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">Question Bank</a>, allowing you to practice specific topics endlessly.
-                    </p>
-                    <p className="mb-6 leading-relaxed">
-                        Furthermore, the premium tier activates our proprietary AI insights engine. This engine doesn&apos;t just tell you that you scored 75%; it tells you *why* you lost 25%. It pinpoints exact sub-topics where you spent too much time or made conceptual errors. You can even generate custom practice sets targeting specifically those weak areas. It&apos;s like having a personalized digital tutor available 24/7.
-                    </p>
+                <h2 className="mt-10 text-2xl font-extrabold text-white md:text-3xl">কার জন্য এই প্ল্যান?</h2>
+                <p className="mt-4 leading-relaxed">
+                    এই প্ল্যান পশ্চিমবঙ্গ বোর্ডের ছাত্রছাত্রীদের জন্য — ক্লাস ৫–১২:
+                </p>
+                <ul className="mt-4 list-disc space-y-3 pl-6">
+                    <li><strong className="text-white">স্কুল ও বোর্ডের ছাত্রছাত্রী:</strong> বোর্ডের সিলেবাস অনুযায়ী <Link href="/mock-tests" className="font-semibold text-amber-300 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400">ফ্রি মক টেস্ট</Link> দিয়ে শুরু করে প্রিমিয়ামে পুরো প্রস্তুতি নিতে পারবেন।</li>
+                    <li><strong className="text-white">অভিভাবক:</strong> সন্তানের অগ্রগতি দেখতে পারবেন — কোন অধ্যায়ে ভালো, কোথায় আরও অনুশীলন দরকার।</li>
+                </ul>
+                <p className="mt-6 leading-relaxed">
+                    পেমেন্ট, অ্যাক্সেস বা সুবিধা নিয়ে কোনো প্রশ্ন থাকলে <Link href="/faqs" className="font-semibold text-amber-300 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400">বিস্তারিত FAQ দেখুন</Link> অথবা <Link href="/contact" className="font-semibold text-amber-300 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400">যোগাযোগ করুন</Link>।
+                </p>
+            </div>
+        </section>
 
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 mt-10">কার জন্য এই প্ল্যান?</h2>
-                    <p className="mb-4 leading-relaxed">
-                        Our platform is made for West Bengal Board students — Class 5–12, WBBSE (Madhyamik) and WBCHSE (Higher Secondary):
-                    </p>
-                    <ul className="list-disc pl-6 space-y-3 mb-6">
-                        <li><strong>School &amp; Board Students:</strong> Build a fundamentally strong base. <a href="/mock-tests" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">Practice free mock tests</a> designed strictly according to the latest board syllabi.</li>
-                        <li><strong>Parents:</strong> Track your child&apos;s exact progress through our intuitive parental dashboard. Stop guessing and start seeing tangible performance metrics.</li>
-                    </ul>
-
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 mt-10">Why DeshExam Premium is the Ultimate Choice</h2>
-                    <p className="mb-4 leading-relaxed">
-                        You might wonder, why specifically choose the premium plan over standard plans or competing platforms? The answer lies in the sheer volume and quality of content combined with cutting-edge technology. With a single subscription, you eliminate the need to buy dozens of expensive physical test series books. You get instant updates whenever an exam pattern changes. You get video solutions for complex problems.
-                    </p>
-                    <p className="mb-4 leading-relaxed">
-                        We are continuously adding new exams and updating our <a href="/exams" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">exams library</a> to ensure you are never left behind. Don&apos;t leave your career to chance. If you still have questions about billing, access, or features, please <a href="/faqs" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">see detailed FAQ</a>. Make the smart choice today and join the ranks of toppers who trusted DeshExam.
-                    </p>
+        {/* ============ FINAL CTA + REASSURANCE ============ */}
+        <section className="section-dark-hero py-12 text-white md:py-16">
+            <div className="container mx-auto max-w-6xl px-4 text-center">
+                <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
+                    আজই প্রিমিয়াম শুরু করুন
+                </h2>
+                <p className="mx-auto mt-4 max-w-xl text-base text-slate-300 sm:text-lg">
+                    মাত্র ₹50/মাস থেকে — মক টেস্ট, নোট ও ভিডিও ক্লাস, এক জায়গায়।
+                </p>
+                <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                    <Button
+                        onClick={() => scrollTo('plans')}
+                        className="min-h-[48px] rounded-full bg-amber-400 px-8 text-base font-bold text-[#042f2e] shadow-lg hover:bg-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-200 focus-visible:outline-offset-2"
+                    >
+                        এখনই কিনুন
+                    </Button>
+                    <Link
+                        href="/contact"
+                        className="flex min-h-[48px] items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-200 focus-visible:outline-offset-2"
+                    >
+                        সাপোর্টের সঙ্গে কথা বলুন
+                    </Link>
+                </div>
+                <div className="mx-auto mt-10 flex max-w-2xl flex-col items-center justify-center gap-3 border-t border-white/10 pt-6 text-sm text-slate-300 sm:flex-row sm:gap-6">
+                    <span>ডিজিটাল কনটেন্ট কেনার পর অ্যাক্সেস পেলে সাধারণত রিফান্ড হয় না — <Link href="/refund-policy" className="font-semibold text-amber-300 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400">Refund Policy</Link></span>
+                    <span className="flex items-center gap-1.5">
+                        <Mail className="h-4 w-4 text-amber-300" aria-hidden="true" />
+                        <a href="mailto:support@deshexam.com" className="font-semibold text-amber-300 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400">support@deshexam.com</a>
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                        <Phone className="h-4 w-4 text-amber-300" aria-hidden="true" />
+                        <a href="tel:+916294006590" className="font-semibold text-amber-300 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400">+91 62940 06590</a>
+                    </span>
                 </div>
             </div>
+        </section>
 
-            {/* FINAL CTA */}
-
-            <div className="mt-16 mb-8 text-center">
-                <div className="text-xs font-bold tracking-widest text-slate-500 uppercase mb-4">FINAL CTA</div>
-                <div className="relative w-full rounded-3xl overflow-hidden bg-gradient-to-r from-emerald-500 via-indigo-500 to-purple-600 text-white shadow-xl">
-                    {/* Glowing orbs */}
-                    <div className="absolute top-0 left-0 w-64 h-64 bg-emerald-400/40 rounded-full blur-[60px] -translate-x-1/4 -translate-y-1/4 pointer-events-none"></div>
-                    <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-400/40 rounded-full blur-[60px] translate-x-1/4 translate-y-1/4 pointer-events-none"></div>
-
-                    <div className="relative z-10 px-6 py-16 sm:py-20 flex flex-col items-center text-center">
-                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
-                            Start Your Premium Learning <br className="hidden md:block"/> Journey Today
-                        </h2>
-                        <p className="text-indigo-50 text-base sm:text-lg mb-8 max-w-xl">
-                            Join students preparing smarter with DeshExam
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                            <Button onClick={() => document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' })} className="bg-white text-indigo-900 hover:bg-slate-50 font-bold h-12 px-8 rounded-lg shadow-lg">
-                                Buy Now
-                            </Button>
-                            <Button variant="outline" onClick={() => document.getElementById('compare')?.scrollIntoView({ behavior: 'smooth' })} className="bg-white/10 border-white/30 hover:bg-white/20 text-white font-bold h-12 px-8 rounded-lg backdrop-blur-sm">
-                                Contact Support
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
     </div>
   );
 }
