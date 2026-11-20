@@ -15,11 +15,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Assessment Center | Master Your Exams | DeshExam',
     description: 'Boost your exam preparation with our comprehensive Assessment Center. Access thousands of verified practice sets, interactive quizzes, full-length mock tests, and official previous year papers.',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/assessment`,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/assessment`,
     siteName: 'DeshExam',
     images: [
       {
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-assessment.png`,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/og-assessment.png`,
         width: 1200,
         height: 630,
         alt: 'DeshExam Assessment Center',
@@ -32,10 +32,10 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Assessment Center | Master Your Exams | DeshExam',
     description: 'Access thousands of verified practice sets, interactive quizzes, full-length mock tests, and official previous year papers.',
-    images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-assessment.png`],
+    images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/og-assessment.png`],
   },
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/assessment`,
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/assessment`,
   },
   robots: {
     index: true,

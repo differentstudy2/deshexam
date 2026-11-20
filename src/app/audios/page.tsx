@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Headphones, Clock, User, Search, Filter, PlayCircle } from 'lucide-react';
@@ -119,10 +120,12 @@ export default function AudiosPage() {
                 {/* Thumbnail Header Area */}
                 <div className="relative h-32 bg-slate-100 dark:bg-slate-800 overflow-hidden">
                   {audio.thumbnail ? (
-                    <img
+                    <Image
                       src={audio.thumbnail}
                       alt={audio.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-90 blur-[2px] group-hover:blur-0 group-hover:opacity-100"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300 opacity-90 blur-[2px] group-hover:blur-0 group-hover:opacity-100"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/20 dark:to-purple-900/20">

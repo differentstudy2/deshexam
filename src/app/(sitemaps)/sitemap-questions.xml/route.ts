@@ -5,7 +5,7 @@ export const dynamic = 'force-static';
 export const revalidate = 86400; // Cache for 24 hours (1 day)
 
 export async function GET() {
-  const baseUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`;
+  const baseUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`;
   const allRoutes: { url: string; lastModified: Date | string }[] = [];
 
   try {

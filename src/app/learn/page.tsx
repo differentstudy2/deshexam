@@ -18,7 +18,7 @@ export async function generateMetadata(
       description: 'Expand your knowledge with expertly written articles and tutorials.',
       images: ['https://picsum.photos/seed/learn-og/1200/630', ...previousImages],
       type: 'website',
-      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/learn`,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/learn`,
     },
     twitter: {
       card: 'summary_large_image',

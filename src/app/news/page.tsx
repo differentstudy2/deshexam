@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'DeshExam News – Educational News & Updates',
   description: 'Get the latest news on education policies, board results, university admissions, and exam schedules.',
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/news`,
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/news`,
   },
   robots: {
     index: true,

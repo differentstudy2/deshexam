@@ -868,7 +868,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             <div
               className="absolute inset-0 z-0"
               style={{
-                backgroundImage: "url('/image/logo.png')",
+                backgroundImage: "url('/image/logo.webp')",
                 backgroundSize: '150px',
                 backgroundRepeat: 'repeat',
                 opacity: 0.08,

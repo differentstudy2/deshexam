@@ -448,7 +448,7 @@ export default async function AnswerSheetPage(
                                 <td className="p-0 border-b border-blue-200">
                                     <div className="bg-[#eef6ff] py-3 px-12 flex justify-between items-center w-full print:[print-color-adjust:exact]">
                                         <div className="flex items-center gap-3">
-                                            <img src="/image/logo.png" alt="DeshExam" className="h-6 w-auto object-contain" />
+                                            <img src="/image/logo.webp" alt="DeshExam" className="h-6 w-auto object-contain" />
                                             <div className="font-bold text-[18px] text-[#1e4b85] tracking-tight">DeshExam</div>
                                         </div>
                                         <div className="text-right">
@@ -491,7 +491,7 @@ export default async function AnswerSheetPage(
                                             {/* Left: QR and Marks */}
                                             <div className="flex flex-col gap-2">
                                                 <div className="border border-gray-300 p-1 w-fit bg-white">
-                                                    <QRCodeSVG value={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${params.type}/${params.slug}`} size={64} />
+                                                    <QRCodeSVG value={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/${params.type}/${params.slug}`} size={64} />
                                                 </div>
                                                 <div className="flex border border-black w-fit h-6">
                                                     <div className="bg-black text-white text-xs px-2 py-1 font-bold flex items-center">Marks</div>
@@ -604,7 +604,7 @@ export default async function AnswerSheetPage(
                                                         {/* Presentation Header */}
                                                         <div className="presentation-header hidden absolute top-0 left-0 right-0 bg-transparent py-3 px-10 justify-between items-center w-full print:[print-color-adjust:exact] [html[data-layout='presentation']_&]:flex">
                                                             <div className="flex items-center gap-3">
-                                                                <img src="/image/logo.png" alt="DeshExam" className="h-6 w-auto object-contain" />
+                                                                <img src="/image/logo.webp" alt="DeshExam" className="h-6 w-auto object-contain" />
                                                                 <div className="font-bold text-[18px] text-[#1e4b85] tracking-tight">DeshExam</div>
                                                             </div>
                                                             <div className="text-right">

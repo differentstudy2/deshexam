@@ -96,7 +96,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const keywords = seoInfo.seoKeywords || [seoInfo.focusKeyword || institution.title, `${institution.title} admission`, `${institution.title} fees`];
 
   const ogImage = seoInfo.ogImage || (institution as any).featureImage || (institution.galleryImages && institution.galleryImages[0]) || '';
-  const canonicalUrl = seoInfo.canonicalUrl || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${slug}`;
+  const canonicalUrl = seoInfo.canonicalUrl || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions/${slug}`;
 
   return {
     title,
@@ -254,7 +254,7 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
     "@context": "https://schema.org",
     "@type": "CollegeOrUniversity",
     "name": institution.title,
-    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${slug}`,
+    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions/${slug}`,
     "telephone": institution.phoneNumber || "",
     "image": institution.logoUrl || institution.featureImage || coverImage,
     "address": {
@@ -299,11 +299,11 @@ export default async function InstitutionDetailsPage({ params }: { params: Promi
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/` },
-      { "@type": "ListItem", "position": 2, "name": "Institutions", "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions` },
-      { "@type": "ListItem", "position": 3, "name": stateStr, "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}` },
-      { "@type": "ListItem", "position": 4, "name": cityStr, "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}/${cityStr.toLowerCase().replace(/\s+/g, '-')}` },
-      { "@type": "ListItem", "position": 5, "name": institution.title, "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions/${slug}` }
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/` },
+      { "@type": "ListItem", "position": 2, "name": "Institutions", "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions` },
+      { "@type": "ListItem", "position": 3, "name": stateStr, "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}` },
+      { "@type": "ListItem", "position": 4, "name": cityStr, "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions/${stateStr.toLowerCase().replace(/\s+/g, '-')}/${cityStr.toLowerCase().replace(/\s+/g, '-')}` },
+      { "@type": "ListItem", "position": 5, "name": institution.title, "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions/${slug}` }
     ]
   };
 

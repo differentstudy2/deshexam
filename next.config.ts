@@ -8,6 +8,8 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   /* config options here */
+  // Phase 6: gzip/brotli compression for HTML + assets served by Next.
+  compress: true,
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -23,6 +25,9 @@ const nextConfig: NextConfig = {
   },
 
   images: {
+    // Phase 6: serve modern formats first; keep the default responsive sizes.
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days for optimised images
     remotePatterns: [
       {
         protocol: 'https',
@@ -79,6 +84,32 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+  },
+  // Phase 9: security headers. No CSP is set on purpose — a strict CSP
+  // would break inline scripts, AdSense and the Razorpay checkout script;
+  // CSP is a follow-up that needs allow-listing those first.
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
+      },
+    ];
   },
   async rewrites() {
     return [

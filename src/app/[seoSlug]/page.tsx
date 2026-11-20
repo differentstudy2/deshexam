@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: { params: Promise<{ seoSlug: 
     title: `Top ${prefixName}${typeName} in ${locName} 2026 | DeshExam`,
     description: `Explore verified ${prefixName.toLowerCase()}${typeName.toLowerCase()} in ${locName}. Compare courses, fees, admissions, facilities and reviews on DeshExam.`,
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${resolvedParams.seoSlug}`,
+      canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/${resolvedParams.seoSlug}`,
     },
   };
 }
@@ -85,33 +85,33 @@ export default async function SeoDirectoryPage({ params }: { params: Promise<{ s
     "@graph": [
       {
         "@type": "CollectionPage",
-        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${resolvedParams.seoSlug}/#webpage`,
-        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${resolvedParams.seoSlug}`,
+        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/${resolvedParams.seoSlug}/#webpage`,
+        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/${resolvedParams.seoSlug}`,
         "name": `${prefixName}${typeName} in ${locName}`,
         "description": `Explore verified ${prefixName.toLowerCase()}${typeName.toLowerCase()} in ${locName}.`,
         "inLanguage": "en-US"
       },
       {
         "@type": "BreadcrumbList",
-        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${resolvedParams.seoSlug}/#breadcrumb`,
+        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/${resolvedParams.seoSlug}/#breadcrumb`,
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Institutions",
-            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/institutions`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/institutions`
           },
           {
             "@type": "ListItem",
             "position": 3,
             "name": `${prefixName}${typeName} in ${locName}`,
-            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${resolvedParams.seoSlug}`
+            "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/${resolvedParams.seoSlug}`
           }
         ]
       }

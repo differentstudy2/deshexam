@@ -545,6 +545,8 @@ export const deleteContent = async (contentId: string) => {
 }
 
 export const getAllContent = async (type?: string) => {
+    // Without Firebase configured (e.g. Vercel Preview), degrade to empty.
+    if (!db) return [];
     try {
         let allContents: any[] = [];
         const contentRef = collection(db, "content");
@@ -607,6 +609,7 @@ export const getContentById = async (contentId: string) => {
     if (!contentId) {
         return null;
     }
+    if (!db) return null;
     try {
         let docSnap = await getDoc(doc(db, "content", contentId));
         
@@ -1877,6 +1880,7 @@ export const getEarningStats = async (): Promise<EarningStats> => {
 };
 
 export const getAllTextbooks = async () => {
+    if (!db) return [];
     try {
         const q = query(collection(db, "textbooks"), orderBy("title"));
         const querySnapshot = await getDocs(q);

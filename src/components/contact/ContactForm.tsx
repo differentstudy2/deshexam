@@ -53,7 +53,7 @@ export function ContactForm() {
             });
             toast({
                 title: 'Message Sent Successfully!',
-                description: "Our support team will get back to you within 2 hours.",
+                description: "Our support team will get back to you soon.",
             });
             form.reset();
         } catch (error) {
@@ -65,15 +65,20 @@ export function ContactForm() {
         }
     };
 
-    const inputClasses = "w-full bg-white border border-[#E2E8F0] rounded-md px-10 py-2 text-sm text-[#0F172A] focus:outline-none focus:ring-1 focus:ring-[#16A34A] focus:border-[#16A34A] transition-colors h-10";
-    const labelClasses = "text-xs font-semibold text-[#0F172A] mb-1 block";
-    const iconClasses = "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]";
+    // Solid dark input bg (not translucent white): readable whatever wraps
+    // the form, and labels are white for contrast on dark.
+    const inputClasses = "w-full bg-[#0d1b2e] border border-white/15 rounded-md px-10 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors h-10";
+    const labelClasses = "text-xs font-semibold text-white mb-1 block";
+    const iconClasses = "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400";
 
   return (
-    <div className="w-full">
+    // Self-contained dark card: the form carries its own solid dark
+    // background (class + inline style) so its white labels stay readable
+    // even if the wrapping card's generated CSS is stale/cached.
+    <div className="w-full rounded-2xl bg-[#0a1626]" style={{ backgroundColor: '#0a1626' }}>
         <div className="mb-8">
-            <h2 className="text-2xl font-extrabold text-[#0F172A] mb-1">Send Us a Message</h2>
-            <p className="text-[#64748B] text-sm">Fill out the form and our team will contact you soon.</p>
+            <h2 className="text-2xl font-extrabold text-white mb-1">Send Us a Message</h2>
+            <p className="text-slate-300 text-sm">Fill out the form and our team will contact you soon.</p>
         </div>
 
         <Form {...form}>
@@ -125,14 +130,14 @@ export function ContactForm() {
                             <FormLabel className={labelClasses}>Category <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger className="w-full h-10 bg-white border border-[#E2E8F0] rounded-md px-3 text-sm text-[#0F172A] focus:ring-1 focus:ring-[#16A34A] focus:border-[#16A34A] transition-colors">
+                                    <SelectTrigger className="w-full h-10 bg-[#0d1b2e] border border-white/15 rounded-md px-3 text-sm text-white focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors">
                                         <SelectValue placeholder="Select Category" />
                                     </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Technical Issue">Technical Issue</SelectItem>
-                                        <SelectItem value="Payment Issue">Payment Issue</SelectItem>
-                                        <SelectItem value="Subscription">Subscription</SelectItem>
-                                        <SelectItem value="Other">Other</SelectItem>
+                                    <SelectContent className="bg-[#0a1626] text-white border-white/10">
+                                        <SelectItem value="Technical Issue" className="text-slate-200 focus:bg-white/10 focus:text-white">Technical Issue</SelectItem>
+                                        <SelectItem value="Payment Issue" className="text-slate-200 focus:bg-white/10 focus:text-white">Payment Issue</SelectItem>
+                                        <SelectItem value="Subscription" className="text-slate-200 focus:bg-white/10 focus:text-white">Subscription</SelectItem>
+                                        <SelectItem value="Other" className="text-slate-200 focus:bg-white/10 focus:text-white">Other</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </FormControl>
@@ -146,7 +151,7 @@ export function ContactForm() {
                         <FormLabel className={labelClasses}>Subject</FormLabel>
                         <FormControl>
                             <div className="relative">
-                                <input {...field} className="w-full bg-white border border-[#E2E8F0] rounded-md px-3 py-2 text-sm text-[#0F172A] focus:outline-none focus:ring-1 focus:ring-[#16A34A] focus:border-[#16A34A] transition-colors h-10" />
+                                <input {...field} className="w-full bg-[#0d1b2e] border border-white/15 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors h-10" />
                             </div>
                         </FormControl>
                         <FormMessage className="text-xs" />
@@ -157,7 +162,7 @@ export function ContactForm() {
                     <FormItem>
                         <FormLabel className={labelClasses}>Message</FormLabel>
                         <FormControl>
-                            <textarea {...field} className="w-full bg-white border border-[#E2E8F0] rounded-md px-3 py-3 text-sm text-[#0F172A] focus:outline-none focus:ring-1 focus:ring-[#16A34A] focus:border-[#16A34A] transition-colors min-h-[120px] resize-y" />
+                            <textarea {...field} className="w-full bg-[#0d1b2e] border border-white/15 rounded-md px-3 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-colors min-h-[120px] resize-y" />
                         </FormControl>
                         <FormMessage className="text-xs" />
                     </FormItem>
@@ -167,7 +172,7 @@ export function ContactForm() {
                     <FormItem>
                         <FormLabel className={labelClasses}>Attachment upload</FormLabel>
                         <FormControl>
-                            <div className="relative flex items-center w-max bg-white border border-[#E2E8F0] rounded-md px-4 py-2 hover:bg-slate-50 transition-colors cursor-pointer text-sm font-medium text-[#64748B]">
+                            <div className="relative flex items-center w-max bg-[#0d1b2e] border border-white/15 rounded-md px-4 py-2 hover:bg-white/10 transition-colors cursor-pointer text-sm font-medium text-slate-300">
                                 <UploadCloud className="h-4 w-4 mr-2" />
                                 <span>{value ? (value as FileList)[0]?.name || 'File selected' : 'Upload file'}</span>
                                 <input 
@@ -182,7 +187,7 @@ export function ContactForm() {
                     </FormItem>
                 )}/>
 
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-[#E2E8F0]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
                     <FormField control={form.control} name="privacyPolicy" render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-2 space-y-0">
                             <FormControl>
@@ -193,7 +198,7 @@ export function ContactForm() {
                                 />
                             </FormControl>
                             <div className="space-y-1 leading-none">
-                                <FormLabel className="text-xs font-medium text-[#64748B] cursor-pointer">
+                                <FormLabel className="text-xs font-medium text-slate-300 cursor-pointer">
                                     I agree to <a href="#" className="text-[#16A34A] hover:underline">privacy policy</a>
                                 </FormLabel>
                             </div>

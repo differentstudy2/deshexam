@@ -20,14 +20,14 @@ export const metadata: Metadata = {
     'deshexam boards'
   ],
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/boards`
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/boards`
   },
   openGraph: {
     title: 'All Education Boards in India | DeshExam',
     description: 'Explore CBSE, ICSE and state boards. Access comprehensive study materials and mock tests.',
     type: 'website',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/boards`,
-    images: [{ url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-boards.jpg` }],
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/boards`,
+    images: [{ url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/og-boards.jpg` }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -46,7 +46,7 @@ export default function BoardsDirectoryPage() {
     "itemListElement": indianBoards.map((board, index) => ({
       "@type": "ListItem",
       "position": index + 1,
-      "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/guide/${board.slug}`,
+      "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/guide/${board.slug}`,
       "name": board.acronym
     }))
   };
@@ -56,7 +56,7 @@ export default function BoardsDirectoryPage() {
     "@type": "WebPage",
     "name": "Explore Boards & Institutions",
     "description": "Directory of education boards in India including central and state boards.",
-    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/boards`
+    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/boards`
   };
 
   const breadcrumbSchema = {
@@ -67,13 +67,13 @@ export default function BoardsDirectoryPage() {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Boards",
-        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/boards`
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/boards`
       }
     ]
   };
@@ -82,8 +82,8 @@ export default function BoardsDirectoryPage() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "DeshExam",
-    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
-    "logo": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`
+    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`,
+    "logo": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/logo.png`
   };
 
   const faqSchema = {

@@ -41,7 +41,7 @@ export default function LearningGamesPage() {
         <div 
             className="absolute inset-0 z-0"
             style={{
-                backgroundImage: "url(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/image/logo.png`)",
+                backgroundImage: "url(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/image/logo.webp`)",
                 backgroundSize: '150px',
                 backgroundRepeat: 'repeat',
                 opacity: 0.05,

@@ -53,3 +53,4 @@ public/workbox-*.js.map
 # Temp files
 temp_*.json
 generated-mock-test-*.json
+bun.lock

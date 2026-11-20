@@ -16,7 +16,7 @@ export function getItemListSchema(questions: any[]) {
     itemListElement: questions.map((q, i) => ({
       "@type": "ListItem",
       position: i + 1,
-      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/question/${q.slug || q.id}`
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/question/${q.slug || q.id}`
     }))
   };
 }
@@ -53,10 +53,10 @@ export function getSearchActionSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`,
     potentialAction: {
       "@type": "SearchAction",
-      target: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/questions?q={search_term_string}`,
+      target: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/questions?q={search_term_string}`,
       "query-input": "required name=search_term_string"
     }
   };
@@ -67,8 +67,8 @@ export function getOrganizationSchema() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "DeshExam",
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`,
-    logo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/logo.png`
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`,
+    logo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/logo.png`
   };
 }
 
@@ -76,10 +76,10 @@ export function getQuestionSchema(questionText: string, answerText: string, url?
   const author = {
     "@type": "Organization",
     name: "DeshExam",
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`
   };
   const publishedDate = datePublished || "2024-01-01T00:00:00Z";
-  const questionUrl = url || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`;
+  const questionUrl = url || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`;
 
   return {
     "@context": "https://schema.org",
@@ -113,7 +113,7 @@ export function getCourseSchema(courseName: string, description: string, url: st
     provider: {
       "@type": "Organization",
       name: providerName,
-      sameAs: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
+      sameAs: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`
     }
   };
 }

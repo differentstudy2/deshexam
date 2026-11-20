@@ -43,19 +43,29 @@ export const FirebaseProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
-    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    const auth = getAuth(app);
-    let db: Firestore;
-    try {
-      db = getFirestore(app, "deshexam");
-    } catch (e) {
-      console.error("Error getting Firestore instance", e);
-      db = getFirestore(app, "deshexam");
+    // Guarded: with no Firebase keys (e.g. Vercel Preview), skip init and
+    // leave the context nulls — Firebase features degrade gracefully.
+    if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+      console.warn('[firebase] NEXT_PUBLIC_FIREBASE_* keys are missing — Firebase is disabled.');
+      return;
     }
-    const storage = getStorage(app);
-    const messaging = typeof window !== 'undefined' ? getMessaging(app) : null;
-    
-    setFirebase({ app, auth, db, storage, messaging });
+    let auth: Auth | null = null;
+    try {
+      const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+      auth = getAuth(app);
+      let db: Firestore;
+      try {
+        db = getFirestore(app, "deshexam");
+      } catch (e) {
+        console.error("Error getting Firestore instance", e);
+        db = getFirestore(app);
+      }
+      const storage = getStorage(app);
+      const messaging = typeof window !== 'undefined' ? getMessaging(app) : null;
+      setFirebase({ app, auth, db, storage, messaging });
+    } catch (e) {
+      console.warn('[firebase] Firebase init failed — running without Firebase.', e);
+    }
   }, []);
 
   return (

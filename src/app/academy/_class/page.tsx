@@ -16,7 +16,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   const title = `${formattedClass} Academy – Textbooks, Guides, MCQ & Practice | DeshExam`;
   const description = `Access ${formattedClass} textbooks, chapter-wise notes, MCQs, SAQ, LAQ, mock tests, and practice materials for better exam preparation.`;
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy/${classSlug}`;
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/academy/${classSlug}`;
 
   return {
     title,
@@ -36,7 +36,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       siteName: 'DeshExam',
       images: [
         {
-          url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-academy.png`, 
+          url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/og-academy.png`, 
           width: 1200,
           height: 630,
           alt: `DeshExam ${formattedClass} Academy`,
@@ -49,7 +49,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title,
       description,
-      images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-academy.png`],
+      images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/og-academy.png`],
     },
     alternates: {
       canonical: url,
@@ -75,7 +75,7 @@ export default async function ClassAcademyPage(props: Props) {
     .split('-')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy/${classSlug}`;
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/academy/${classSlug}`;
 
   const collectionSchema = {
     "@context": "https://schema.org",
@@ -93,13 +93,13 @@ export default async function ClassAcademyPage(props: Props) {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/`
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/`
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Academy",
-        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy`
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/academy`
       },
       {
         "@type": "ListItem",
@@ -117,7 +117,7 @@ export default async function ClassAcademyPage(props: Props) {
     "provider": {
       "@type": "Organization",
       "name": "DeshExam",
-      "sameAs": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
+      "sameAs": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`
     }
   };
 

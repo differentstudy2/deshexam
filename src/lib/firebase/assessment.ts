@@ -15,6 +15,7 @@ export type AssessmentCollectionType = keyof typeof ASSESSMENT_COLLECTIONS;
 
 // Generic Fetch All
 export async function getAssessments(collectionName: AssessmentCollectionType) {
+    if (!db) return [];
     const colRef = collection(db, ASSESSMENT_COLLECTIONS[collectionName]);
     const snapshot = await getDocs(colRef);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a: any, b: any) => {
@@ -26,6 +27,7 @@ export async function getAssessments(collectionName: AssessmentCollectionType) {
 
 // Fetch by Node (Board, Class, Subject, Textbook, Chapter, or Topic)
 export async function getAssessmentsByNode(collectionName: AssessmentCollectionType, level: 'board' | 'class' | 'subject' | 'textbook' | 'chapter' | 'topic', nodeId: string) {
+  if (!db) return [];
   const colRef = collection(db, ASSESSMENT_COLLECTIONS[collectionName]);
   const fieldToMatch = `${level}Id`;
   const q = query(colRef, where(fieldToMatch, '==', nodeId));
@@ -41,6 +43,7 @@ export async function getAssessmentsByNode(collectionName: AssessmentCollectionT
 
 // Generic Fetch Single
 export async function getAssessment(collectionName: AssessmentCollectionType, id: string) {
+  if (!db) return null;
   const docRef = doc(db, ASSESSMENT_COLLECTIONS[collectionName], id);
   const snap = await getDoc(docRef);
   if (!snap.exists()) return null;
@@ -49,6 +52,7 @@ export async function getAssessment(collectionName: AssessmentCollectionType, id
 
 // Fetch by Slug
 export async function getAssessmentBySlug(collectionName: AssessmentCollectionType, slug: string) {
+  if (!db) return null;
   const colRef = collection(db, ASSESSMENT_COLLECTIONS[collectionName]);
   const q = query(colRef, where('slug', '==', slug));
   const snapshot = await getDocs(q);
@@ -59,6 +63,7 @@ export async function getAssessmentBySlug(collectionName: AssessmentCollectionTy
 
 // Generic Create/Update
 export async function saveAssessment(collectionName: AssessmentCollectionType, id: string, data: any) {
+  if (!db) throw new Error('Firebase is not configured — cannot save assessment.');
   const docRef = doc(db, ASSESSMENT_COLLECTIONS[collectionName], id);
   const isUpdate = (await getDoc(docRef)).exists();
   
@@ -76,11 +81,13 @@ export async function saveAssessment(collectionName: AssessmentCollectionType, i
 
 // Generic Delete
 export async function deleteAssessment(collectionName: AssessmentCollectionType, id: string) {
+  if (!db) throw new Error('Firebase is not configured — cannot delete assessment.');
   await deleteDoc(doc(db, ASSESSMENT_COLLECTIONS[collectionName], id));
 }
 
 // Generic Bulk Update
 export async function bulkUpdateAssessments(collectionName: AssessmentCollectionType, ids: string[], data: any) {
+    if (!db) throw new Error('Firebase is not configured — cannot update assessments.');
     const batch = writeBatch(db);
     ids.forEach(id => {
         const ref = doc(db, ASSESSMENT_COLLECTIONS[collectionName], id);
@@ -94,6 +101,7 @@ export async function bulkUpdateAssessments(collectionName: AssessmentCollection
 
 // Generic Bulk Delete
 export async function bulkDeleteAssessments(collectionName: AssessmentCollectionType, ids: string[]) {
+    if (!db) throw new Error('Firebase is not configured — cannot delete assessments.');
     const batch = writeBatch(db);
     ids.forEach(id => {
         const ref = doc(db, ASSESSMENT_COLLECTIONS[collectionName], id);

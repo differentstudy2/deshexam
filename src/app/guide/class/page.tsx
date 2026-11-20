@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: 'Explore class-wise study materials on DeshExam Academy. Access textbooks, subjects, notes, MCQ practice, mock tests, previous year questions and smart learning resources for all boards and classes.',
   keywords: 'deshexam classes, online class textbooks, class wise study materials, board exam preparation, mcq practice, online academy india, class 10 textbook, wbchse study material, wbbse notes, competitive exam learning',
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy/classes`,
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/academy/classes`,
   },
   robots: {
     index: true,
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: 'Classes & Study Materials for All Boards | DeshExam',
     description: 'Browse classes, subjects and textbooks with smart learning resources.',
     type: 'website',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy/classes`,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/academy/classes`,
     images: [
       {
         url: '/og/academy-classes.png',
@@ -49,7 +49,7 @@ export default async function GuideClassPage() {
     "@type": "CollectionPage",
     "name": "Classes on DeshExam Academy",
     "description": "Browse classes and study materials",
-    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy/classes`
+    "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/academy/classes`
   };
 
   const itemListSchema = {
@@ -59,7 +59,7 @@ export default async function GuideClassPage() {
       "@type": "ListItem",
       "position": index + 1,
       "name": c.title,
-      "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy/classes/${c.slug || c.id}`
+      "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/academy/classes/${c.slug || c.id}`
     }))
   };
 
@@ -71,19 +71,19 @@ export default async function GuideClassPage() {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}`
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}`
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Academy",
-        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy`
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/academy`
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": "Classes",
-        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/academy/classes`
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/academy/classes`
       }
     ]
   };

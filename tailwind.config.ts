@@ -19,10 +19,17 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['var(--font-inter)', 'sans-serif'],
-        headline: ['var(--font-lexend)', 'sans-serif'],
+        body: ['var(--font-hind-siliguri)', 'var(--font-inter)', 'sans-serif'],
+        headline: ['var(--font-noto-serif-bengali)', 'var(--font-hind-siliguri)', 'var(--font-lexend)', 'serif'],
       },
       colors: {
+        brand: {
+          green: '#15803d',
+          deep: '#042f2e',
+          teal: '#0b3b39',
+          gold: '#d4af37',
+          golddark: '#7c5e10',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
