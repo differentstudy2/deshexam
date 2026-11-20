@@ -15,6 +15,14 @@ const CLASSES: { n: number; label?: string }[] = [
   { n: 10, label: "মাধ্যমিক" }, { n: 11 }, { n: 12, label: "উচ্চমাধ্যমিক" },
 ];
 
+const QUESTIONS: { tag: string; q: string; options: string[]; correct: number }[] = [
+  { tag: "ক্লাস ১০ · জীবনবিজ্ঞান", q: "১. সালোকসংশ্লেষের প্রধান উপজাত গ্যাসটি কী?", options: ["ক) কার্বন ডাই-অক্সাইড", "খ) অক্সিজেন", "গ) নাইট্রোজেন"], correct: 1 },
+  { tag: "ক্লাস ৯ · গণিত", q: "২. পিথাগোরাসের উপপাদ্য কোন ত্রিভুজের ক্ষেত্রে প্রযোজ্য?", options: ["ক) সমবাহু ত্রিভুজ", "খ) সমকোণী ত্রিভুজ", "গ) বিষমবাহু ত্রিভুজ"], correct: 1 },
+  { tag: "ক্লাস ৮ · বিজ্ঞান", q: "৩. জলের রাসায়নিক সংকেত কোনটি?", options: ["ক) CO₂", "খ) H₂O", "গ) O₂"], correct: 1 },
+  { tag: "ক্লাস ৬ · পরিবেশ", q: "৪. ভারতের জাতীয় পাখি কোনটি?", options: ["ক) ময়ূর", "খ) টিয়া", "গ) কাক"], correct: 0 },
+  { tag: "ক্লাস ৫ · বাংলা", q: "৫. বাংলা নববর্ষের প্রথম মাস কোনটি?", options: ["ক) বৈশাখ", "খ) জ্যৈষ্ঠ", "গ) আষাঢ়"], correct: 0 },
+];
+
 export function Hero() {
   const [step, setStep] = useState(0);
   useEffect(() => {
@@ -22,10 +30,12 @@ export function Hero() {
       setStep(2);
       return;
     }
-    const id = setInterval(() => setStep((s) => (s + 1) % 6), 1000);
+    const id = setInterval(() => setStep((s) => (s + 1) % (QUESTIONS.length * 6)), 1000);
     return () => clearInterval(id);
   }, []);
-  const selected = step >= 2;
+  const qi = Math.floor(step / 6) % QUESTIONS.length;
+  const current = QUESTIONS[qi];
+  const selected = step % 6 >= 2;
 
   return (
     <section className="section-dark-hero relative overflow-hidden text-white">
@@ -40,7 +50,7 @@ export function Hero() {
           </p>
           <h1 style={{ animationDelay: "0.1s" }} className="hx-up mt-5 text-4xl font-bold leading-snug tracking-normal md:text-4xl lg:text-[3.25rem] lg:leading-[1.3]">
             <span className="lg:whitespace-nowrap">পশ্চিমবঙ্গ বোর্ডের প্রস্তুতি,</span>
-            <span className="hx-shimmer block bg-gradient-to-r from-amber-300 via-amber-500 to-amber-300 bg-clip-text text-transparent">ক্লাস ৫ থেকে ১২</span>
+            <span className="hx-shimmer block bg-[linear-gradient(90deg,#fbbf24,#fef3c7,#f59e0b,#fbbf24)] bg-clip-text text-transparent">ক্লাস ৫ থেকে ১২</span>
           </h1>
           <p style={{ animationDelay: "0.2s" }} className="hx-up mt-5 max-w-xl text-base leading-relaxed text-teal-50 md:text-lg">
             অভিজ্ঞ শিক্ষকদের লাইভ ক্লাস, মক টেস্ট এবং সম্পূর্ণ অধ্যায়ভিত্তিক আলোচনার মাধ্যমে পরীক্ষার সেরা প্রস্তুতি নাও।
@@ -86,17 +96,23 @@ export function Hero() {
               <div className="absolute left-1/2 top-3 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-black" />
               <div className="min-h-[460px] rounded-[2.1rem] bg-gradient-to-b from-emerald-900 to-slate-950 px-4 pb-5 pt-10">
                 <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-emerald-300 px-2.5 py-0.5 text-xs font-bold text-emerald-950">ক্লাস ১০ · জীবনবিজ্ঞান</span>
+                  <span className="rounded-full bg-emerald-300 px-2.5 py-0.5 text-xs font-bold text-emerald-950">{current.tag}</span>
                   <span className="text-sm font-bold text-slate-200">◔ {fmt(512 - step)}</span>
                 </div>
                 <hr className="my-3 border-white/10" />
-                <p className="text-lg font-bold leading-relaxed text-white">১. সালোকসংশ্লেষের প্রধান উপজাত গ্যাসটি কী?</p>
-                <div className="mt-4 space-y-3">
-                  <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-slate-200">ক) কার্বন ডাই-অক্সাইড</div>
-                  <div className={`flex items-center justify-between rounded-xl border px-3 py-2.5 transition-colors duration-500 ${selected ? "border-emerald-300 bg-emerald-300 font-bold text-emerald-950" : "border-white/10 bg-white/5 text-slate-200"}`}>
-                    খ) অক্সিজেন {selected ? <Check className="h-5 w-5 rounded-full bg-emerald-950 p-0.5 text-emerald-300" /> : null}
+                <div key={qi} className="hx-up">
+                  <p className="text-lg font-bold leading-relaxed text-white">{current.q}</p>
+                  <div className="mt-4 space-y-3">
+                    {current.options.map((opt, oi) => {
+                      const isCorrect = selected && oi === current.correct;
+                      return (
+                        <div key={opt} className={`flex items-center justify-between rounded-xl border px-3 py-2.5 transition-colors duration-500 ${isCorrect ? "border-emerald-300 bg-emerald-300 font-bold text-emerald-950" : "border-white/10 bg-white/5 text-slate-200"}`}>
+                          {opt} {isCorrect ? <Check className="h-5 w-5 shrink-0 rounded-full bg-emerald-950 p-0.5 text-emerald-300" /> : null}
+                        </div>
+                      );
+                    })}
                   </div>
-                  <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-slate-200">গ) নাইট্রোজেন</div>
+                  <p className="mt-4 text-center text-xs font-semibold text-slate-400">প্রশ্ন {toBn(qi + 1)} / {toBn(QUESTIONS.length)}</p>
                 </div>
               </div>
             </div>

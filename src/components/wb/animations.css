@@ -15,8 +15,8 @@
 .hx-float{animation:hx-float 6s ease-in-out infinite}
 .hx-float-b{animation:hx-float 5s ease-in-out -2s infinite}
 .hx-ring{animation:hx-pulse-ring 5s ease-in-out infinite}
-.hx-spin{animation:hx-spin 60s linear infinite}
-.hx-shimmer{background-size:200% 100%;animation:hx-shimmer 6s linear infinite}
+.hx-spin{animation:hx-spin 24s linear infinite}
+.hx-shimmer{background-size:200% 100%;animation:hx-shimmer 3.5s linear infinite}
 .hx-glow{animation:hx-glow 3s ease-in-out infinite}
 .hx-dot{animation:hx-dot 2s ease-in-out infinite}
 .hx-draw{animation:hx-draw 1.8s ease-out 1.2s backwards}
