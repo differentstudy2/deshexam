@@ -19,8 +19,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['var(--font-hind-siliguri)', 'var(--font-inter)', 'sans-serif'],
-        headline: ['var(--font-noto-serif-bengali)', 'var(--font-hind-siliguri)', 'var(--font-lexend)', 'serif'],
+        body: ['var(--font-tiro-bangla)', 'var(--font-inter)', 'sans-serif'],
+        headline: ['var(--font-tiro-bangla)', 'serif'],
       },
       colors: {
         brand: {
