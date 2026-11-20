@@ -26,10 +26,9 @@ const QUESTIONS: { tag: string; q: string; options: string[]; correct: number }[
 export function Hero() {
   const [step, setStep] = useState(0);
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setStep(2);
-      return;
-    }
+    // Quiz demo chalbei — reduced-motion thakleo proshno ghurbe; sudhu
+    // decorative CSS animation (float/shimmer/spin) animations.css-er
+    // media query diye bondho thakbe.
     const id = setInterval(() => setStep((s) => (s + 1) % (QUESTIONS.length * 6)), 1000);
     return () => clearInterval(id);
   }, []);
@@ -100,6 +99,7 @@ export function Hero() {
                   <span className="text-sm font-bold text-slate-200">◔ {fmt(512 - step)}</span>
                 </div>
                 <hr className="my-3 border-white/10" />
+                <p className="mb-2 text-right text-xs font-semibold text-slate-400">প্রশ্ন {toBn(qi + 1)} / {toBn(QUESTIONS.length)}</p>
                 <div key={qi} className="hx-up">
                   <p className="text-lg font-bold leading-relaxed text-white">{current.q}</p>
                   <div className="mt-4 space-y-3">
@@ -112,7 +112,6 @@ export function Hero() {
                       );
                     })}
                   </div>
-                  <p className="mt-4 text-center text-xs font-semibold text-slate-400">প্রশ্ন {toBn(qi + 1)} / {toBn(QUESTIONS.length)}</p>
                 </div>
               </div>
             </div>
