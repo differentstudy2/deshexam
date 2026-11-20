@@ -17,7 +17,7 @@ const CLASSES: { n: number; label?: string }[] = [
 
 const QUESTIONS: { tag: string; q: string; options: string[]; correct: number }[] = [
   { tag: "ক্লাস ১০ · জীবনবিজ্ঞান", q: "১. সালোকসংশ্লেষের প্রধান উপজাত গ্যাসটি কী?", options: ["ক) কার্বন ডাই-অক্সাইড", "খ) অক্সিজেন", "গ) নাইট্রোজেন"], correct: 1 },
-  { tag: "ক্লাস ৯ · গণিত", q: "২. পিথাগোরাসের উপপাদ্য কোন ত্রিভুজের ক্ষেত্রে প্রযোজ্য?", options: ["ক) সমবাহু ত্রিভুজ", "খ) সমকোণী ত্রিভুজ", "গ) বিষমবাহু ত্রিভুজ"], correct: 1 },
+  { tag: "ক্লাস ৯ · গণিত", q: "২. পিথাগোরাসের উপপাদ্য কোন ত্রিভুজে প্রযোজ্য?", options: ["ক) সমবাহু ত্রিভুজ", "খ) সমকোণী ত্রিভুজ", "গ) বিষমবাহু ত্রিভুজ"], correct: 1 },
   { tag: "ক্লাস ৮ · বিজ্ঞান", q: "৩. জলের রাসায়নিক সংকেত কোনটি?", options: ["ক) CO₂", "খ) H₂O", "গ) O₂"], correct: 1 },
   { tag: "ক্লাস ৬ · পরিবেশ", q: "৪. ভারতের জাতীয় পাখি কোনটি?", options: ["ক) ময়ূর", "খ) টিয়া", "গ) কাক"], correct: 0 },
   { tag: "ক্লাস ৫ · বাংলা", q: "৫. বাংলা নববর্ষের প্রথম মাস কোনটি?", options: ["ক) বৈশাখ", "খ) জ্যৈষ্ঠ", "গ) আষাঢ়"], correct: 0 },
@@ -118,7 +118,7 @@ export function Hero() {
           </Link>
           </div>
           {/* floating analytics card */}
-          <div aria-hidden="true" className="hx-float-b absolute -right-4 bottom-4 w-52 rounded-2xl border border-white/15 bg-slate-900/70 p-3 shadow-xl backdrop-blur-md">
+          <div aria-hidden="true" className="hx-float-b absolute -right-6 bottom-1 w-52 rounded-2xl border border-white/15 bg-slate-900/70 p-3 shadow-xl backdrop-blur-md">
             <p className="text-xs font-bold text-white">অধ্যায়ভিত্তিক বিশ্লেষণ</p>
             <div className="mt-2 flex items-center gap-3">
               <svg viewBox="0 0 52 52" className="h-14 w-14 -rotate-90">
