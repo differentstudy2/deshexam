@@ -1,10 +1,10 @@
 import React from 'react';
 import { Metadata } from 'next';
 import PresentationClient from '@/app/presentation/PresentationClient';
-import { getAllHardcodedMockTests, getAllHardcodedQuizzes, getAllHardcodedPracticeSets } from '@/lib/hardcoded-loader';
-import { getAssessments } from '@/lib/firebase/assessment';
+import { getAllHardcodedMockTests, getAllHardcodedQuizzes, getAllHardcodedPracticeSets, getHardcodedMockTest, getHardcodedQuiz, getHardcodedPracticeSet } from '@/lib/hardcoded-loader';
+import { getAssessments, getAssessment, getAssessmentBySlug } from '@/lib/firebase/assessment';
+import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { serializeTimestamps } from '@/lib/utils';
-import { Monitor, Sparkles, Tv, HelpCircle, CheckCircle2, Award, BookOpen } from 'lucide-react';
 
 export const metadata: Metadata = {
     title: 'Presentation & Smartboard Mode | DeshExam',
@@ -12,6 +12,55 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = 'force-dynamic';
+
+const FIREBASE_COLLECTIONS = [
+    { name: 'mockTests', type: 'Mock Test' },
+    { name: 'quizzes', type: 'Quiz' },
+    { name: 'practiceSets', type: 'Practice Set' },
+] as const;
+
+/**
+ * Resolve the featured launch test exactly the way the single
+ * /presentation/[slug] page does (hardcoded first, then Firebase by
+ * slug, then by id) so the hero shows the same live record that the
+ * presentation itself opens — not a different record that happens to
+ * share the slug in the list.
+ */
+async function resolveFeatured(slug: string): Promise<any | null> {
+    const hardcoded =
+        getHardcodedMockTest(slug) ? { ...getHardcodedMockTest(slug), type: 'Mock Test' } :
+        getHardcodedQuiz(slug) ? { ...getHardcodedQuiz(slug), type: 'Quiz' } :
+        getHardcodedPracticeSet(slug) ? { ...getHardcodedPracticeSet(slug), type: 'Practice Set' } :
+        null;
+    if (hardcoded) return hardcoded;
+
+    for (const col of FIREBASE_COLLECTIONS) {
+        try {
+            const bySlug = await getAssessmentBySlug(col.name as any, slug);
+            if (bySlug) return { ...bySlug, type: col.type };
+            const byId = await getAssessment(col.name as any, slug);
+            if (byId) return { ...byId, type: col.type };
+        } catch (_) {
+            // Continue to next collection
+        }
+    }
+    return null;
+}
+
+async function resolveQuestionCount(test: any): Promise<number> {
+    if (test.questions && Array.isArray(test.questions) && test.questions.length > 0) {
+        return test.questions.length;
+    }
+    if (test.questionIds && Array.isArray(test.questionIds) && test.questionIds.length > 0) {
+        try {
+            const questions = await getQuestionsByIds(test.questionIds);
+            return questions.length;
+        } catch (_) {
+            return test.questionIds.length;
+        }
+    }
+    return test.questionCount || test.totalQuestions || 0;
+}
 
 export default async function PresentationPage() {
     // 1. Fetch hardcoded tests
@@ -76,49 +125,36 @@ export default async function PresentationPage() {
     // 4. Serialize timestamps for Next.js Server-to-Client component boundary
     const serializedAssessments = JSON.parse(JSON.stringify(serializeTimestamps(allAssessments)));
 
+    // 5. Featured launch test ("copy-of") — resolved the same way the single
+    // presentation page resolves it, with only live scalar fields passed on.
+    let featured: any = null;
+    try {
+        const test = await resolveFeatured('copy-of');
+        if (test) {
+            const questionCount = await resolveQuestionCount(test);
+            if (questionCount > 0) {
+                featured = {
+                    title: test.title,
+                    slug: test.slug || test.id,
+                    type: test.type || 'Mock Test',
+                    classId: test.classId || null,
+                    language: test.language || null,
+                    questionCount,
+                    durationMin: test.durationMin ?? test.timeLimitMin ?? null,
+                    totalMarks: test.totalMarks ?? null,
+                    negativeMarking: test.negativeMarking ?? null,
+                };
+            }
+        }
+    } catch (e) {
+        console.error('Failed to load featured presentation:', e);
+    }
+
     return (
         <div className="min-h-screen bg-slate-50/50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
-                {/* Modern Hero Section */}
-                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-900 via-indigo-800 to-violet-900 text-white p-8 sm:p-12 mb-10 shadow-xl border border-indigo-700/40">
-                    {/* Background decorative glows */}
-                    <div className="absolute -right-20 -top-20 w-80 h-80 bg-violet-500/20 rounded-full blur-3xl pointer-events-none" />
-                    <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-
-                    <div className="relative z-10 flex flex-col items-center text-center max-w-3xl mx-auto">
-                        {/* Pill Badge */}
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold tracking-wide text-indigo-100 mb-5 shadow-inner">
-                            <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-                            Smartboard & Projector Ready
-                        </div>
-
-                        {/* Heading */}
-                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight mb-4">
-                            Interactive <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-sky-200 to-indigo-200">Presentation Mode</span>
-                        </h1>
-
-                        {/* Description */}
-                        <p className="text-base sm:text-lg text-indigo-100/90 leading-relaxed mb-6 max-w-2xl font-normal">
-                            Teach, explain, and engage students on smartboards and large screens. Display questions one by one with immersive layouts, live timers, and instant answer reveals.
-                        </p>
-
-                        {/* Features Badges */}
-                        <div className="flex flex-wrap justify-center items-center gap-2.5 sm:gap-3 text-xs sm:text-sm font-medium text-indigo-100">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10">
-                                <Monitor className="w-4 h-4 text-emerald-400" /> Fullscreen Display
-                            </span>
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10">
-                                <CheckCircle2 className="w-4 h-4 text-amber-300" /> Instant Solution Reveal
-                            </span>
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10">
-                                <Tv className="w-4 h-4 text-sky-400" /> Classroom Smartboards
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Cards and Controls */}
-                <PresentationClient assessments={serializedAssessments} />
+                {/* Cards and Controls — launch hero lives at the top of PresentationClient */}
+                <PresentationClient assessments={serializedAssessments} featured={featured} />
             </div>
         </div>
     );

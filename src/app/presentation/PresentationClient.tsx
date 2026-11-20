@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Play, BookOpen, Clock, Award, ChevronRight, Search, Layers, CheckCircle2, Eye, Printer, FileEdit, Users, Target, Unlock, Lock } from 'lucide-react';
 import PresentationOverlay from '@/components/assessment/PresentationOverlay';
+import PresentationLaunchHero, { LaunchHeroData } from '@/components/wb/presentation-launch-hero';
 import { getHardcodedTaxonomyNodes } from '@/data/hardcoded/taxonomy';
 
 export interface Assessment {
@@ -26,6 +27,8 @@ export interface Assessment {
     difficulty?: string;
     durationMin?: number;
     totalMarks?: number;
+    negativeMarking?: number;
+    passingMarks?: number;
     language?: string;
     thumbnail?: string;
     tags?: string[];
@@ -60,7 +63,19 @@ function getQuestionCount(t: Assessment): number {
     return (t.questions && t.questions.length) || (t.questionIds && t.questionIds.length) || t.questionCount || t.totalQuestions || 0;
 }
 
-export default function PresentationClient({ assessments }: { assessments: Assessment[] }) {
+export interface FeaturedPresentation {
+    title: string;
+    slug: string;
+    type: string;
+    classId?: string | null;
+    language?: string | null;
+    questionCount: number;
+    durationMin?: number | null;
+    totalMarks?: number | null;
+    negativeMarking?: number | null;
+}
+
+export default function PresentationClient({ assessments, featured }: { assessments: Assessment[]; featured?: FeaturedPresentation | null }) {
     const router = useRouter();
     const [search, setSearch] = useState('');
     const [selectedType, setSelectedType] = useState<string>('all');
@@ -196,8 +211,25 @@ export default function PresentationClient({ assessments }: { assessments: Asses
         }
     };
 
+    // Launch hero data — live values from the featured presentation only.
+    const launchHeroData: LaunchHeroData | null = featured
+        ? {
+              title: featured.title,
+              slug: featured.slug,
+              typeLabel: featured.type || 'Mock Test',
+              classTitle: getTaxonomyTitle(featured.classId ?? undefined, featured.language ?? undefined),
+              questionCount: featured.questionCount,
+              durationMin: featured.durationMin ?? null,
+              totalMarks: featured.totalMarks ?? null,
+              negativeMarking: featured.negativeMarking ?? null,
+          }
+        : null;
+
     return (
         <div className="w-full relative">
+            {/* Launch hero — same design as the supplied launch screen, live data */}
+            {launchHeroData && <PresentationLaunchHero data={launchHeroData} />}
+
             {/* Loading Overlay */}
             {isLoadingOverlay && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
