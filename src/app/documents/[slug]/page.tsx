@@ -96,7 +96,7 @@ export default async function DocumentReaderPage({ params }: { params: Promise<{
       "name": "DeshExam",
       "logo": {
         "@type": "ImageObject",
-        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/image/logo.png`
+        "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshexam.vercel.app'}/image/logo.webp`
       }
     },
     "datePublished": item.createdAt ? new Date(item.createdAt.toMillis?.() || Date.now()).toISOString() : new Date().toISOString(),

@@ -38,7 +38,7 @@ export function ClassPicker() {
   return (
     <div>
       <div className="mb-6 flex flex-col items-center gap-3">
-        <div className="inline-flex rounded-full border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-slate-900" role="group" aria-label="মাধ্যম বেছে নিন">
+        <div className="inline-flex rounded-full border border-white/10 bg-white/[0.05] p-1" role="group" aria-label="মাধ্যম বেছে নিন">
           {MEDIUMS.map((m) => (
             <button
               key={m.id}
@@ -48,7 +48,7 @@ export function ClassPicker() {
               className={`min-h-[44px] rounded-full px-5 text-sm font-bold transition-colors ${
                 medium === m.id
                   ? "bg-brand-green text-white"
-                  : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                  : "text-slate-300 hover:bg-white/10"
               }`}
             >
               {m.label}
@@ -56,9 +56,9 @@ export function ClassPicker() {
           ))}
         </div>
         {lastClass ? (
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            শেষবার আপনি <strong className="text-slate-900 dark:text-white">ক্লাস {toBn(lastClass)}</strong> দেখছিলেন —{" "}
-            <Link href={`/class/${lastClass}?medium=${medium}`} className="font-bold text-brand-green hover:underline dark:text-emerald-400">
+          <p className="text-sm text-slate-400">
+            শেষবার আপনি <strong className="text-white">ক্লাস {toBn(lastClass)}</strong> দেখছিলেন —{" "}
+            <Link href={`/class/${lastClass}?medium=${medium}`} className="font-bold text-emerald-400 hover:underline">
               যেখানে থেমেছিলেন, সেখান থেকে শুরু করুন →
             </Link>
           </p>
@@ -70,12 +70,12 @@ export function ClassPicker() {
             key={n}
             href={`/class/${n}?medium=${medium}`}
             onClick={() => window.localStorage.setItem(CLASS_KEY, String(n))}
-            className="group flex min-h-[96px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-gold hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
+            className="group flex min-h-[96px] flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-center shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-gold hover:shadow-md"
           >
-            <span className="text-2xl font-extrabold text-slate-900 group-hover:text-brand-green dark:text-white md:text-3xl">
+            <span className="text-2xl font-extrabold text-white group-hover:text-emerald-400 md:text-3xl">
               ক্লাস {toBn(n)}
             </span>
-            <span className="mt-1 text-sm font-semibold text-slate-600 dark:text-slate-400">
+            <span className="mt-1 text-sm font-semibold text-slate-300">
               {boardForClass(n) === "WBBSE" ? "WBBSE" : "WBCHSE"}
             </span>
             {n === 10 ? (
@@ -87,7 +87,7 @@ export function ClassPicker() {
           </Link>
         ))}
       </div>
-      <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
+      <p className="mt-4 text-center text-sm text-slate-400">
         ক্লাস ৫–১০: WBBSE (মাধ্যমিক) · ক্লাস ১১–১২: WBCHSE (উচ্চমাধ্যমিক)
       </p>
     </div>

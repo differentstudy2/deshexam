@@ -12,7 +12,11 @@ function formatTime(s: number) {
   return `${toBn(m)}:${String(r).padStart(2, "0")}`;
 }
 
-export function DemoTest() {
+export function DemoTest({ tone = "light" }: { tone?: "light" | "dark" }) {
+  const dark = tone === "dark";
+  const tTitle = dark ? "text-white" : "text-slate-900 dark:text-white";
+  const tBody = dark ? "text-slate-300" : "text-slate-600 dark:text-slate-400";
+  const tMuted = dark ? "text-slate-400" : "text-slate-500 dark:text-slate-400";
   const [started, setStarted] = useState(false);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
@@ -66,13 +70,17 @@ export function DemoTest() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900 md:p-8">
+    <div
+      className={`mx-auto max-w-2xl rounded-2xl border p-5 shadow-sm md:p-8 ${
+        dark ? "border-white/10 bg-white/[0.05]" : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
+      }`}
+    >
       <div className="mb-4 flex items-center justify-between gap-3">
         <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
           নমুনা টেস্ট · লগইন লাগবে না
         </span>
         {started && !done ? (
-          <span className="text-base font-bold text-slate-900 dark:text-white" aria-live="polite">
+          <span className={`text-base font-bold ${tTitle}`} aria-live="polite">
             ⏱ {formatTime(seconds)}
           </span>
         ) : null}
@@ -80,8 +88,8 @@ export function DemoTest() {
 
       {!started ? (
         <div className="text-center">
-          <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">৫টি নমুনা প্রশ্ন, ৫ মিনিট</h3>
-          <p className="mt-2 text-base text-slate-600 dark:text-slate-400">
+          <h3 className={`text-xl font-extrabold ${tTitle}`}>৫টি নমুনা প্রশ্ন, ৫ মিনিট</h3>
+          <p className={`mt-2 text-base ${tBody}`}>
             ক্লাস ৫–১২-এর নমুনা প্রশ্ন দিয়ে দেখে নিন — উত্তর দিলেই সঙ্গে সঙ্গে ফলাফল পাবেন।
           </p>
           <button
@@ -94,11 +102,17 @@ export function DemoTest() {
         </div>
       ) : done ? (
         <div className="text-center" aria-live="polite">
-          <p className="text-sm font-bold uppercase tracking-wider text-brand-golddark dark:text-amber-400">আপনার ফলাফল</p>
-          <p className="mt-2 text-4xl font-extrabold text-slate-900 dark:text-white">
+          <p
+            className={`text-sm font-bold uppercase tracking-wider ${
+              dark ? "text-amber-400" : "text-brand-golddark dark:text-amber-400"
+            }`}
+          >
+            আপনার ফলাফল
+          </p>
+          <p className={`mt-2 text-4xl font-extrabold ${tTitle}`}>
             {toBn(score)} / {toBn(DEMO_QUESTIONS.length)}
           </p>
-          <p className="mt-2 text-base text-slate-600 dark:text-slate-400">
+          <p className={`mt-2 text-base ${tBody}`}>
             {score === DEMO_QUESTIONS.length
               ? "দারুণ! সবগুলো সঠিক হয়েছে।"
               : score >= 3
@@ -107,11 +121,16 @@ export function DemoTest() {
           </p>
           <div className="mt-4 space-y-2 text-left">
             {DEMO_QUESTIONS.map((item, i) => (
-              <div key={i} className="rounded-xl border border-slate-200 p-3 text-sm dark:border-slate-700">
-                <p className="font-semibold text-slate-900 dark:text-white">
+              <div
+                key={i}
+                className={`rounded-xl border p-3 text-sm ${
+                  dark ? "border-white/10 bg-white/[0.03]" : "border-slate-200 dark:border-slate-700"
+                }`}
+              >
+                <p className={`font-semibold ${tTitle}`}>
                   {answers[i] === item.answer ? "✓ " : "✗ "}{item.q}
                 </p>
-                <p className="mt-1 text-slate-600 dark:text-slate-400">সঠিক উত্তর: {item.options[item.answer]} — {item.explain}</p>
+                <p className={`mt-1 ${tBody}`}>সঠিক উত্তর: {item.options[item.answer]} — {item.explain}</p>
               </div>
             ))}
           </div>
@@ -125,7 +144,11 @@ export function DemoTest() {
             <button
               type="button"
               onClick={restart}
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-slate-300 px-8 text-base font-bold text-slate-800 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+              className={`inline-flex min-h-[48px] items-center justify-center rounded-full border px-8 text-base font-bold ${
+                dark
+                  ? "border-white/20 text-slate-100 hover:bg-white/10"
+                  : "border-slate-300 text-slate-800 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+              }`}
             >
               আবার দিন
             </button>
@@ -133,10 +156,10 @@ export function DemoTest() {
         </div>
       ) : (
         <div>
-          <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
+          <p className={`text-sm font-semibold ${tMuted}`}>
             প্রশ্ন {toBn(idx + 1)} / {toBn(DEMO_QUESTIONS.length)} · {q.subject}
           </p>
-          <h3 className="mt-2 text-lg font-bold leading-relaxed text-slate-900 dark:text-white md:text-xl">{q.q}</h3>
+          <h3 className={`mt-2 text-lg font-bold leading-relaxed md:text-xl ${tTitle}`}>{q.q}</h3>
           <div className="mt-4 space-y-2" role="group" aria-label="উত্তর বেছে নিন">
             {q.options.map((opt, i) => {
               const isAnswer = i === q.answer;
@@ -149,15 +172,33 @@ export function DemoTest() {
                   disabled={picked !== null}
                   className={`flex min-h-[48px] w-full items-center rounded-xl border px-4 py-3 text-left text-base font-medium transition-colors ${
                     picked === null
-                      ? "border-slate-300 hover:border-brand-green hover:bg-emerald-50 dark:border-slate-600 dark:hover:bg-emerald-950/40"
+                      ? dark
+                        ? "border-white/20 hover:border-emerald-400 hover:bg-emerald-500/10"
+                        : "border-slate-300 hover:border-brand-green hover:bg-emerald-50 dark:border-slate-600 dark:hover:bg-emerald-950/40"
                       : isAnswer
                         ? "border-emerald-600 bg-emerald-50 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200"
                         : isPicked
                           ? "border-red-500 bg-red-50 text-red-900 dark:bg-red-950/40 dark:text-red-200"
+                          : dark
+                          ? "border-white/10 text-slate-400"
+                          : dark
+                          ? "border-white/10 text-slate-400"
+                          : dark
+                          ? "border-white/10 text-slate-400"
+                          : dark
+                          ? "border-white/10 text-slate-400"
+                          : dark
+                          ? "border-white/10 text-slate-400"
+                          : dark
+                          ? "border-white/10 text-slate-400"
                           : "border-slate-200 text-slate-500 dark:border-slate-700 dark:text-slate-400"
                   }`}
                 >
-                  <span className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold dark:bg-slate-800">
+                  <span
+                    className={`mr-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                      dark ? "bg-white/10" : "bg-slate-100 dark:bg-slate-800"
+                    }`}
+                  >
                     {["ক", "খ", "গ", "ঘ"][i]}
                   </span>
                   {opt}
@@ -169,7 +210,11 @@ export function DemoTest() {
           </div>
           {picked !== null ? (
             <div className="mt-4">
-              <p className="rounded-xl bg-slate-50 p-3 text-sm text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+              <p
+                className={`rounded-xl p-3 text-sm ${
+                  dark ? "bg-white/[0.06] text-slate-300" : "bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                }`}
+              >
                 {q.explain}
               </p>
               <button

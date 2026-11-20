@@ -72,27 +72,49 @@ export function SectionHeader({
   subtitle,
   href,
   linkLabel,
+  tone = "light",
 }: {
   eyebrow: string;
   title: string;
   subtitle?: string;
   href?: string;
   linkLabel?: string;
+  tone?: "light" | "dark";
 }) {
+  const dark = tone === "dark";
   return (
     <div className="mb-8 text-center md:mb-10">
-      <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-golddark dark:text-amber-400">
+      <p
+        className={`mb-2 text-xs font-bold uppercase tracking-[0.2em] ${
+          dark ? "text-amber-400" : "text-brand-golddark dark:text-amber-400"
+        }`}
+      >
         {eyebrow}
       </p>
-      <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
+      <h2
+        className={`text-2xl font-extrabold tracking-tight md:text-4xl ${
+          dark ? "text-white" : "text-slate-900 dark:text-white"
+        }`}
+      >
         {title}
       </h2>
       <span aria-hidden className="mx-auto mt-3 block h-1 w-12 rounded-full bg-brand-gold" />
       {subtitle ? (
-        <p className="mx-auto mt-3 max-w-2xl text-base text-slate-600 dark:text-slate-400">{subtitle}</p>
+        <p
+          className={`mx-auto mt-3 max-w-2xl text-base ${
+            dark ? "text-slate-300" : "text-slate-600 dark:text-slate-400"
+          }`}
+        >
+          {subtitle}
+        </p>
       ) : null}
       {href && linkLabel ? (
-        <a href={href} className="mt-3 inline-block text-sm font-semibold text-brand-green hover:underline dark:text-emerald-400">
+        <a
+          href={href}
+          className={`mt-3 inline-block text-sm font-semibold hover:underline ${
+            dark ? "text-emerald-400" : "text-brand-green dark:text-emerald-400"
+          }`}
+        >
           {linkLabel} →
         </a>
       ) : null}
@@ -100,18 +122,35 @@ export function SectionHeader({
   );
 }
 
-export function PriceTag({ price, oldPrice }: { price: number; oldPrice?: number }) {
+export function PriceTag({
+  price,
+  oldPrice,
+  tone = "light",
+}: {
+  price: number;
+  oldPrice?: number;
+  tone?: "light" | "dark";
+}) {
+  const dark = tone === "dark";
   if (price === 0) {
-    return <span className="text-lg font-extrabold text-brand-green dark:text-emerald-400">ফ্রি</span>;
+    return (
+      <span
+        className={`text-lg font-extrabold ${dark ? "text-emerald-400" : "text-brand-green dark:text-emerald-400"}`}
+      >
+        ফ্রি
+      </span>
+    );
   }
   return (
     <span className="flex items-baseline gap-2">
       {oldPrice ? (
-        <span className="text-sm text-slate-500 line-through dark:text-slate-400">
+        <span className={`text-sm line-through ${dark ? "text-slate-400" : "text-slate-500 dark:text-slate-400"}`}>
           <span className="sr-only">আগের দাম </span>₹{oldPrice}
         </span>
       ) : null}
-      <span className="text-lg font-extrabold text-slate-900 dark:text-white">₹{price}</span>
+      <span className={`text-lg font-extrabold ${dark ? "text-white" : "text-slate-900 dark:text-white"}`}>
+        ₹{price}
+      </span>
     </span>
   );
 }
@@ -121,16 +160,32 @@ export function EmptyState({
   body,
   actionLabel,
   actionHref,
+  tone = "light",
 }: {
   title: string;
   body: string;
   actionLabel?: string;
   actionHref?: string;
+  tone?: "light" | "dark";
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center dark:border-slate-700 dark:bg-slate-900">
-      <p className="text-lg font-bold text-slate-900 dark:text-white">{title}</p>
-      <p className="mx-auto mt-2 max-w-md text-base text-slate-600 dark:text-slate-400">{body}</p>
+    <div
+      className={`rounded-2xl border border-dashed p-8 text-center ${
+        tone === "dark"
+          ? "border-white/15 bg-white/[0.04]"
+          : "border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900"
+      }`}
+    >
+      <p className={`text-lg font-bold ${tone === "dark" ? "text-white" : "text-slate-900 dark:text-white"}`}>
+        {title}
+      </p>
+      <p
+        className={`mx-auto mt-2 max-w-md text-base ${
+          tone === "dark" ? "text-slate-300" : "text-slate-600 dark:text-slate-400"
+        }`}
+      >
+        {body}
+      </p>
       {actionLabel && actionHref ? (
         <a
           href={actionHref}

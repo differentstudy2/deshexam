@@ -33,6 +33,8 @@
     --brand-green: 158 3 61;
     --brand-deep: 4 47 46;
     --brand-gold: 212 175 55;
+    /* Headings: Noto Serif Bengali, Hind Siliguri fallback */
+    --font-headline: var(--font-noto-serif-bengali), var(--font-hind-siliguri), serif;
   }
 
   .dark {
@@ -824,10 +826,45 @@ textarea,
 
 /* .rounded-2xl border-radius intentionally kept as Tailwind default (1rem) */
 
-/* Solution card question headers — margin 0.2rem top/bottom */
-.not-prose h3 {
-  margin-top: 0.2rem;
-  margin-bottom: 0.2rem;
+/* Premium dark section backgrounds (homepage) — luxury navy/black with
+   electric-blue glow + thin gold hairline, in the style of the reference
+   product shots. CSS gradients only: no photos, no blur, no animation,
+   so low-end phones stay fast. */
+.section-dark,
+.section-dark-teal,
+.section-dark-blue,
+.section-dark-hero {
+  position: relative;
+  color: #f1f5f9;
+  border-top: 1px solid rgba(212, 175, 55, 0.22);
+}
+.section-dark {
+  background-color: #050d1a;
+  background-image:
+    radial-gradient(720px 340px at 12% 0%, rgba(37, 99, 235, 0.3) 0%, rgba(37, 99, 235, 0) 70%),
+    radial-gradient(560px 320px at 96% 108%, rgba(14, 165, 233, 0.16) 0%, rgba(14, 165, 233, 0) 70%),
+    linear-gradient(180deg, #071224 0%, #040a16 100%);
+}
+.section-dark-teal {
+  background-color: #04161a;
+  background-image:
+    radial-gradient(680px 320px at 88% 0%, rgba(13, 148, 136, 0.32) 0%, rgba(13, 148, 136, 0) 70%),
+    radial-gradient(520px 300px at 4% 108%, rgba(37, 99, 235, 0.18) 0%, rgba(37, 99, 235, 0) 70%),
+    linear-gradient(180deg, #052027 0%, #031318 100%);
+}
+.section-dark-blue {
+  background-color: #060b1f;
+  background-image:
+    radial-gradient(760px 380px at 90% 100%, rgba(29, 78, 216, 0.34) 0%, rgba(29, 78, 216, 0) 70%),
+    radial-gradient(520px 300px at 8% 0%, rgba(56, 189, 248, 0.16) 0%, rgba(56, 189, 248, 0) 70%),
+    linear-gradient(180deg, #081230 0%, #04081a 100%);
+}
+.section-dark-hero {
+  background-color: #042f2e;
+  background-image:
+    radial-gradient(820px 420px at 85% -10%, rgba(37, 99, 235, 0.38) 0%, rgba(37, 99, 235, 0) 70%),
+    radial-gradient(560px 340px at 0% 110%, rgba(212, 175, 55, 0.14) 0%, rgba(212, 175, 55, 0) 70%),
+    linear-gradient(160deg, #07312e 0%, #042f2e 45%, #031b2b 100%);
 }
 
 @media print {

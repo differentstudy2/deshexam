@@ -90,11 +90,11 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex flex-col overflow-x-hidden bg-slate-50 font-body text-base dark:bg-slate-950">
+    <div className="flex flex-col overflow-x-hidden bg-[#040a16] font-body text-base text-slate-100">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
 
       {/* 4.2 Hero */}
-      <section className="bg-brand-deep text-white">
+      <section className="section-dark-hero text-white">
         <div className="container mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-2 md:items-center md:py-14">
           <div>
             <p className="mb-3 inline-block rounded-full border border-amber-300/40 bg-white/10 px-3 py-1 text-xs font-bold tracking-wide text-amber-200">
@@ -149,34 +149,36 @@ export default function Home() {
       </section>
 
       {/* 4.3 Class picker */}
-      <section id="class-picker" className="container mx-auto max-w-6xl scroll-mt-20 px-4 py-12 md:py-16">
-        <SectionHeader
+      <section id="class-picker" className="section-dark scroll-mt-20 py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+        <SectionHeader tone="dark"
           eyebrow="ক্লাস বেছে নিন"
           title="আপনার ক্লাস কোনটি?"
           subtitle="ক্লাস বেছে নিলে সেই ক্লাসের বিষয়, মক টেস্ট, নোট ও আগের বছরের প্রশ্নপত্র দেখতে পাবেন।"
         />
-        <Suspense fallback={<div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500 dark:border-slate-700 dark:bg-slate-900">ক্লাস লোড হচ্ছে…</div>}>
+        <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-white/[0.05] p-8 text-center text-slate-400">ক্লাস লোড হচ্ছে…</div>}>
           <ClassPicker />
         </Suspense>
+        </div>
       </section>
 
       {/* 4.4 Features — only the 6 that exist */}
-      <section className="bg-white py-12 dark:bg-slate-900 md:py-16">
-        <div className="container mx-auto max-w-6xl px-4">
-          <SectionHeader eyebrow="সুবিধা" title="যা যা পাবেন" subtitle="শুধু সেগুলোই, যা আজই কাজ করে।" />
+      <section className="section-dark-teal py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+          <SectionHeader tone="dark" eyebrow="সুবিধা" title="যা যা পাবেন" subtitle="শুধু সেগুলোই, যা আজই কাজ করে।" />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f) => (
               <Link
                 key={f.title}
                 href={f.href}
-                className="group rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-gold hover:shadow-md dark:border-slate-700 dark:bg-slate-950"
+                className="group rounded-2xl border border-white/10 bg-white/[0.05] p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-gold hover:shadow-md"
               >
                 <span className="inline-flex rounded-xl bg-brand-green/10 p-3 text-brand-green dark:text-emerald-400">
                   <f.icon className="h-6 w-6" />
                 </span>
-                <h3 className="mt-3 text-lg font-bold text-slate-900 dark:text-white">{f.title}</h3>
-                <p className="mt-1 text-base text-slate-600 dark:text-slate-400">{f.benefit}</p>
-                <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-brand-green dark:text-emerald-400">
+                <h3 className="mt-3 text-lg font-bold text-white">{f.title}</h3>
+                <p className="mt-1 text-base text-slate-300">{f.benefit}</p>
+                <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-emerald-400">
                   দেখুন <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </span>
               </Link>
@@ -186,19 +188,21 @@ export default function Home() {
       </section>
 
       {/* 4.5 Free demo test */}
-      <section id="demo-test" className="container mx-auto max-w-6xl scroll-mt-20 px-4 py-12 md:py-16">
-        <SectionHeader
+      <section id="demo-test" className="section-dark-blue scroll-mt-20 py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+        <SectionHeader tone="dark"
           eyebrow="ফ্রি ডেমো টেস্ট"
           title="আগে চেষ্টা করে দেখুন, তারপর সিদ্ধান্ত নিন"
           subtitle="৫টি নমুনা প্রশ্ন — কোনো লগইন লাগবে না, ফলাফল সঙ্গে সঙ্গে।"
         />
-        <DemoTest />
+        <DemoTest tone="dark" />
+        </div>
       </section>
 
       {/* 4.6 Mock tests preview */}
-      <section className="bg-white py-12 dark:bg-slate-900 md:py-16">
-        <div className="container mx-auto max-w-6xl px-4">
-          <SectionHeader
+      <section className="section-dark-blue py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+          <SectionHeader tone="dark"
             eyebrow="মক টেস্ট"
             title="মক টেস্ট ও কুইজ"
             subtitle="নমুনা টেস্ট — আসল প্রশ্নভান্ডার ক্লাস অনুযায়ী তৈরি হচ্ছে।"
@@ -207,20 +211,20 @@ export default function Home() {
           />
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {SAMPLE_MOCK_TESTS.slice(0, 4).map((t) => (
-              <article key={t.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-950">
+              <article key={t.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
                 <Thumbnail classNo={t.class} subject={t.subject} title={t.title} type="মক টেস্ট" />
                 <div className="p-5">
                   <div className="mb-2 flex flex-wrap gap-2">
                     <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">নমুনা</span>
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">{t.difficulty}</span>
+                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-semibold text-slate-300">{t.difficulty}</span>
                   </div>
-                  <h3 className="min-h-[3rem] text-base font-bold leading-snug text-slate-900 dark:text-white">{t.title}</h3>
-                  <p className="mt-2 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                  <h3 className="min-h-[3rem] text-base font-bold leading-snug text-white">{t.title}</h3>
+                  <p className="mt-2 flex items-center gap-2 text-sm text-slate-300">
                     <FileQuestion className="h-4 w-4" /> {toBn(t.questions ?? 0)}টি প্রশ্ন
                     <Timer className="ml-2 h-4 w-4" /> {toBn(t.minutes ?? 0)} মিনিট
                   </p>
-                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
-                    <PriceTag price={t.price ?? 0} />
+                  <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
+                    <PriceTag tone="dark" price={t.price ?? 0} />
                     <Link
                       href={`/mock-tests?class=${t.class}`}
                       className="inline-flex min-h-[40px] items-center rounded-full bg-brand-green px-5 text-sm font-bold text-white hover:bg-emerald-800"
@@ -236,37 +240,39 @@ export default function Home() {
       </section>
 
       {/* 4.7 Exam notices — honest empty state, no hardcoded dates */}
-      <section className="container mx-auto max-w-6xl px-4 py-12 md:py-16">
-        <SectionHeader eyebrow="পরীক্ষার নোটিশ" title="মাধ্যমিক ও উচ্চমাধ্যমিক নোটিশ" subtitle="রুটিন ও ফলাফলের খবর — অফিসিয়াল সূত্রসহ।" />
-        <EmptyState
+      <section className="section-dark-teal px-4 py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+        <SectionHeader tone="dark" eyebrow="পরীক্ষার নোটিশ" title="মাধ্যমিক ও উচ্চমাধ্যমিক নোটিশ" subtitle="রুটিন ও ফলাফলের খবর — অফিসিয়াল সূত্রসহ।" />
+        <EmptyState tone="dark"
           title="এখনো কোনো নোটিশ যোগ করা হয়নি"
           body="পরীক্ষার রুটিন ও ফলাফলের নোটিশ এখানে আসবে। পরীক্ষার তারিখ অফিসিয়াল বোর্ডের ঘোষণা যাচাই করে তবেই যোগ করা হবে।"
         />
-        <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-4 text-center text-sm text-slate-400">
           অফিসিয়াল তথ্যের জন্য:{" "}
-          <a href="https://wbbse.wb.gov.in" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-green hover:underline dark:text-emerald-400">WBBSE</a>
+          <a href="https://wbbse.wb.gov.in" target="_blank" rel="noopener noreferrer" className="font-semibold text-emerald-400 hover:underline">WBBSE</a>
           {" "}ও{" "}
-          <a href="https://wbchse.wb.gov.in" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-green hover:underline dark:text-emerald-400">WBCHSE</a>
+          <a href="https://wbchse.wb.gov.in" target="_blank" rel="noopener noreferrer" className="font-semibold text-emerald-400 hover:underline">WBCHSE</a>
           -এর ওয়েবসাইট দেখুন।
         </p>
+        </div>
       </section>
 
       {/* 4.8 Courses + Notes/Books preview */}
-      <section className="bg-white py-12 dark:bg-slate-900 md:py-16">
-        <div className="container mx-auto max-w-6xl px-4">
-          <SectionHeader eyebrow="কোর্স ও নোট" title="কোর্স ও অধ্যায়ভিত্তিক নোট" subtitle="নমুনা কনটেন্ট — আসল কোর্স ও নোট ক্লাস অনুযায়ী তৈরি হচ্ছে।" />
-          <h3 className="mb-4 text-xl font-bold text-slate-900 dark:text-white">কোর্স</h3>
+      <section className="section-dark py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+          <SectionHeader tone="dark" eyebrow="কোর্স ও নোট" title="কোর্স ও অধ্যায়ভিত্তিক নোট" subtitle="নমুনা কনটেন্ট — আসল কোর্স ও নোট ক্লাস অনুযায়ী তৈরি হচ্ছে।" />
+          <h3 className="mb-4 text-xl font-bold text-white">কোর্স</h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {SAMPLE_COURSES.map((c) => (
-              <article key={c.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-950">
+              <article key={c.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
                 <Thumbnail classNo={c.class} subject={c.subject} title={c.title} type="কোর্স" />
                 <div className="p-5">
                   <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">নমুনা</span>
-                  <h3 className="mt-2 min-h-[3rem] text-base font-bold leading-snug text-slate-900 dark:text-white">{c.title}</h3>
-                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">শিক্ষক: DeshExam Faculty · {toBn(c.lessons ?? 0)}টি পাঠ</p>
-                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
-                    <PriceTag price={c.price ?? 0} />
-                    <Link href="/course" className="inline-flex min-h-[40px] items-center rounded-full border border-brand-green px-5 text-sm font-bold text-brand-green hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/40">
+                  <h3 className="mt-2 min-h-[3rem] text-base font-bold leading-snug text-white">{c.title}</h3>
+                  <p className="mt-2 text-sm text-slate-300">শিক্ষক: DeshExam Faculty · {toBn(c.lessons ?? 0)}টি পাঠ</p>
+                  <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
+                    <PriceTag tone="dark" price={c.price ?? 0} />
+                    <Link href="/course" className="inline-flex min-h-[40px] items-center rounded-full border border-emerald-500/60 px-5 text-sm font-bold text-emerald-400 hover:bg-emerald-500/10">
                       বিস্তারিত
                     </Link>
                   </div>
@@ -274,17 +280,17 @@ export default function Home() {
               </article>
             ))}
           </div>
-          <h3 className="mb-4 mt-10 text-xl font-bold text-slate-900 dark:text-white">নোট ও বই</h3>
+          <h3 className="mb-4 mt-10 text-xl font-bold text-white">নোট ও বই</h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {SAMPLE_NOTES.map((n) => (
-              <article key={n.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-950">
+              <article key={n.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
                 <Thumbnail classNo={n.class} subject={n.subject} title={n.title} type="নোট" />
                 <div className="p-5">
                   <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">নমুনা</span>
-                  <h3 className="mt-2 min-h-[3rem] text-base font-bold leading-snug text-slate-900 dark:text-white">{n.title}</h3>
-                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
-                    <PriceTag price={n.price ?? 0} />
-                    <Link href="/book" className="inline-flex min-h-[40px] items-center rounded-full border border-brand-green px-5 text-sm font-bold text-brand-green hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/40">
+                  <h3 className="mt-2 min-h-[3rem] text-base font-bold leading-snug text-white">{n.title}</h3>
+                  <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
+                    <PriceTag tone="dark" price={n.price ?? 0} />
+                    <Link href="/book" className="inline-flex min-h-[40px] items-center rounded-full border border-emerald-500/60 px-5 text-sm font-bold text-emerald-400 hover:bg-emerald-500/10">
                       বিস্তারিত
                     </Link>
                   </div>
@@ -296,8 +302,9 @@ export default function Home() {
       </section>
 
       {/* 4.9 Pricing — no yearly toggle: no yearly pricing exists in the repo */}
-      <section className="container mx-auto max-w-6xl px-4 py-12 md:py-16">
-        <SectionHeader
+      <section className="section-dark-blue px-4 py-12 md:py-16">
+        <div className="dark container mx-auto max-w-6xl px-4">
+        <SectionHeader tone="dark"
           eyebrow="প্রাইসিং"
           title="আপনার জন্য সঠিক প্ল্যান বেছে নিন"
           subtitle="মাসিক প্ল্যান — UPI, কার্ড ও নেট ব্যাংকিংয়ে পেমেন্ট করা যায়।"
@@ -308,10 +315,10 @@ export default function Home() {
           {PLANS.map((p) => (
             <div
               key={p.id}
-              className={`relative rounded-2xl border bg-white p-6 shadow-sm dark:bg-slate-900 ${
+              className={`relative rounded-2xl border p-6 shadow-sm ${
                 "popular" in p && p.popular
-                  ? "border-2 border-brand-gold shadow-lg md:-translate-y-2"
-                  : "border-slate-200 dark:border-slate-700"
+                  ? "border-2 border-brand-gold bg-white/[0.06] shadow-lg md:-translate-y-2"
+                  : "border-white/10 bg-white/[0.04]"
               }`}
             >
               {"popular" in p && p.popular ? (
@@ -319,18 +326,18 @@ export default function Home() {
                   সবচেয়ে জনপ্রিয়
                 </span>
               ) : null}
-              <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">{p.name}</h3>
+              <h3 className="text-xl font-extrabold text-white">{p.name}</h3>
               <p className="mt-3 flex items-baseline gap-2">
-                <span className="text-sm text-slate-500 line-through dark:text-slate-400">
+                <span className="text-sm text-slate-400 line-through">
                   <span className="sr-only">আগের দাম </span>₹{p.oldPrice}
                 </span>
-                <span className="text-4xl font-extrabold text-slate-900 dark:text-white">₹{p.price}</span>
-                <span className="text-sm text-slate-500 dark:text-slate-400">/মাস</span>
+                <span className="text-4xl font-extrabold text-white">₹{p.price}</span>
+                <span className="text-sm text-slate-400">/মাস</span>
               </p>
               <ul className="mt-5 space-y-2">
                 {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-base text-slate-700 dark:text-slate-300">
-                    <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-brand-green" /> {f}
+                  <li key={f} className="flex items-start gap-2 text-base text-slate-300">
+                    <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-emerald-400" /> {f}
                   </li>
                 ))}
               </ul>
@@ -347,29 +354,30 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
+        <p className="mt-6 text-center text-sm text-slate-400">
           পেমেন্ট: UPI · কার্ড · নেট ব্যাংকিং। ডিজিটাল কনটেন্ট কেনার পর অ্যাক্সেস পেলে সাধারণত রিফান্ড হয় না — বিস্তারিত{" "}
-          <Link href="/refund-policy" className="font-semibold text-brand-green hover:underline dark:text-emerald-400">
+          <Link href="/refund-policy" className="font-semibold text-emerald-400 hover:underline">
             Refund Policy
           </Link>{" "}
           দেখুন।
         </p>
+        </div>
       </section>
 
       {/* 4.10 Social proof — hidden: no real testimonials exist yet. */}
 
       {/* 4.11 FAQ */}
-      <section className="bg-white py-12 dark:bg-slate-900 md:py-16">
-        <div className="container mx-auto max-w-3xl px-4">
-          <SectionHeader eyebrow="জিজ্ঞাসা" title="সচরাচর জিজ্ঞাসা" />
+      <section className="section-dark-teal py-12 md:py-16">
+        <div className="dark container mx-auto max-w-3xl px-4">
+          <SectionHeader tone="dark" eyebrow="জিজ্ঞাসা" title="সচরাচর জিজ্ঞাসা" />
           <div className="space-y-3">
             {FAQS.map((f) => (
-              <details key={f.q} className="group rounded-2xl border border-slate-200 bg-slate-50 p-4 open:bg-white dark:border-slate-700 dark:bg-slate-950 dark:open:bg-slate-900">
-                <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-base font-bold text-slate-900 dark:text-white">
+              <details key={f.q} className="group rounded-2xl border border-white/10 bg-white/[0.04] p-4 open:bg-white/[0.07]">
+                <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-base font-bold text-white">
                   {f.q}
-                  <span className="shrink-0 text-xl text-brand-green transition-transform group-open:rotate-45">+</span>
+                  <span className="shrink-0 text-xl text-amber-400 transition-transform group-open:rotate-45">+</span>
                 </summary>
-                <p className="mt-2 text-base leading-relaxed text-slate-600 dark:text-slate-400">{f.a}</p>
+                <p className="mt-2 text-base leading-relaxed text-slate-300">{f.a}</p>
               </details>
             ))}
           </div>
@@ -377,7 +385,7 @@ export default function Home() {
       </section>
 
       {/* 4.12 Final CTA */}
-      <section className="bg-brand-deep py-12 text-white md:py-16">
+      <section className="section-dark-hero py-12 text-white md:py-16">
         <div className="container mx-auto max-w-3xl px-4 text-center">
           <h2 className="text-2xl font-extrabold md:text-4xl">আজই ফ্রি টেস্ট দিয়ে শুরু করুন</h2>
           <p className="mx-auto mt-3 max-w-xl text-base text-teal-100">

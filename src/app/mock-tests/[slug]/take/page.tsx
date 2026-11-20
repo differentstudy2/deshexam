@@ -54,5 +54,14 @@ import { GlobalTakePage } from '@/components/assessment/GlobalTakePage';
 
 export default async function TakeMockTestPage({ params }: { params: Promise<{ slug: string }> }) {
   const unwrappedParams = await params;
-  return <GlobalTakePage collectionName="mockTests" slug={unwrappedParams.slug} />;
+  return (
+    // Premium dark page backdrop (matches the homepage sections). The exam
+    // itself renders as a fixed fullscreen overlay inside ExamClient
+    // (shared with the quiz / practice / exams take pages), so its timer,
+    // question navigation, scoring and result screen are intentionally
+    // untouched here — see the handoff note on ExamClient.
+    <div className="section-dark min-h-screen">
+      <GlobalTakePage collectionName="mockTests" slug={unwrappedParams.slug} />
+    </div>
+  );
 }

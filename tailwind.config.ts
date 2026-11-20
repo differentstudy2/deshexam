@@ -20,7 +20,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['var(--font-hind-siliguri)', 'var(--font-inter)', 'sans-serif'],
-        headline: ['var(--font-hind-siliguri)', 'var(--font-lexend)', 'sans-serif'],
+        headline: ['var(--font-noto-serif-bengali)', 'var(--font-hind-siliguri)', 'var(--font-lexend)', 'serif'],
       },
       colors: {
         brand: {

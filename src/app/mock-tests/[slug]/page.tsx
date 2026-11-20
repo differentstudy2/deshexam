@@ -45,11 +45,17 @@ export default async function MockTestLandingPage({ params }: Props) {
   if (!test) notFound();
 
   return (
-    <AssessmentLandingPage 
-      test={test}
-      collectionName="mockTests"
-      basePath="/mock-tests"
-      titlePrefix="Mock Test"
-    />
+    // Dark premium page backdrop (matches the homepage sections). The
+    // landing content itself is rendered by the shared
+    // AssessmentLandingPage component, which is intentionally untouched
+    // here — it is shared with the quiz / practice landing pages.
+    <div className="section-dark">
+      <AssessmentLandingPage
+        test={test}
+        collectionName="mockTests"
+        basePath="/mock-tests"
+        titlePrefix="Mock Test"
+      />
+    </div>
   );
 }

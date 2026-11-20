@@ -269,7 +269,7 @@ export const NotificationBell = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 rounded-full">
+        <Button variant="ghost" size="icon" className="relative text-slate-300 hover:text-white hover:bg-white/10 rounded-full">
           <Bell className="h-[1.2rem] w-[1.2rem]" />
           {unreadCount > 0 && (
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
@@ -277,36 +277,36 @@ export const NotificationBell = () => {
           <span className="sr-only">Notifications</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80" align="end">
+      <DropdownMenuContent className="w-80 bg-[#0a1626] border-white/10 text-slate-200" align="end">
         <DropdownMenuLabel className="font-bold flex justify-between items-center">
           <span>Notifications</span>
-          {unreadCount > 0 && <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">{unreadCount} new</span>}
+          {unreadCount > 0 && <span className="text-xs bg-red-500/20 text-red-300 px-2 py-0.5 rounded-full">{unreadCount} new</span>}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         {notificationPermissionStatus === 'default' && (
-          <div className="p-3 m-2 bg-blue-50 border border-blue-100 rounded-lg text-center flex flex-col gap-2">
-            <p className="text-xs text-blue-700 font-medium">Turn on push notifications to never miss an update!</p>
-            <Button size="sm" variant="outline" className="bg-white hover:bg-blue-100 text-blue-600 h-7" onClick={(e) => { e.preventDefault(); requestPermission(); }}>
+          <div className="p-3 m-2 bg-blue-500/10 border border-blue-400/20 rounded-lg text-center flex flex-col gap-2">
+            <p className="text-xs text-blue-200 font-medium">Turn on push notifications to never miss an update!</p>
+            <Button size="sm" variant="outline" className="bg-white/10 hover:bg-white/20 text-blue-100 border-white/20 h-7" onClick={(e) => { e.preventDefault(); requestPermission(); }}>
               Enable Push
             </Button>
           </div>
         )}
         {notificationPermissionStatus === 'denied' && (
-          <div className="p-2 mx-2 mb-2 bg-red-50 text-red-600 text-[10px] rounded text-center">
+          <div className="p-2 mx-2 mb-2 bg-red-500/10 text-red-300 text-[10px] rounded text-center">
             Push notifications blocked by browser.
           </div>
         )}
 
         <ScrollArea className="h-80">
           {notifications.length === 0 ? (
-            <div className="p-4 text-center text-sm text-slate-500">No notifications yet.</div>
+            <div className="p-4 text-center text-sm text-slate-400">No notifications yet.</div>
           ) : (
             <div className="flex flex-col gap-1 p-1">
               {notifications.map((notif, i) => (
-                <div key={notif.id || i} className={`p-3 text-sm rounded-md flex flex-col gap-1 ${!notif.read ? 'bg-amber-50 dark:bg-amber-900/10 border-l-2 border-amber-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
-                  <div className="font-semibold text-slate-800 dark:text-slate-200">{notif.title}</div>
-                  <div className="text-slate-600 dark:text-slate-400 text-xs">{notif.desc}</div>
+                <div key={notif.id || i} className={`p-3 text-sm rounded-md flex flex-col gap-1 ${!notif.read ? 'bg-amber-500/10 border-l-2 border-[#d4af37]' : 'hover:bg-white/5'}`}>
+                  <div className="font-semibold text-white">{notif.title}</div>
+                  <div className="text-slate-400 text-xs">{notif.desc}</div>
                 </div>
               ))}
             </div>
@@ -350,7 +350,7 @@ const UserNav = () => {
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuContent className="w-56 bg-[#0a1626] border-white/10 text-slate-200" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">{user.displayName || "Test User"}</p>
@@ -400,13 +400,13 @@ const UserNav = () => {
   return (
     <>
       <div className="hidden md:flex items-center gap-2">
-        <Button variant="ghost" onClick={() => openAuthDialog('sign-in')}>
+        <Button variant="ghost" className="text-slate-200 hover:bg-white/10 hover:text-white" onClick={() => openAuthDialog('sign-in')}>
           <LogIn className="mr-2 h-4 w-4" />
           Sign In
         </Button>
       </div>
       <div className="md:hidden">
-        <Button variant="ghost" size="icon" onClick={() => openAuthDialog('sign-in')}>
+        <Button variant="ghost" size="icon" className="text-slate-200 hover:bg-white/10 hover:text-white" onClick={() => openAuthDialog('sign-in')}>
           <UserIcon />
           <span className="sr-only">Sign In</span>
         </Button>
@@ -422,10 +422,10 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
       href={href}
       onClick={onLinkClick}
       className={cn(
-        "transition-colors flex items-center hover:text-[#00a651] text-base font-medium",
+        "transition-colors flex items-center hover:text-[#d4af37] text-base font-medium",
         pathname === href
-          ? "text-[#00a651] font-bold"
-          : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white",
+          ? "text-[#d4af37] font-bold"
+          : "text-slate-300 hover:text-white",
         isMobile && "text-lg py-2 gap-4"
       )}
     >
@@ -446,7 +446,7 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
           if (isMobile) {
             return (
               <div key={link.label} className="flex flex-col w-full space-y-1">
-                <div className="flex items-center gap-4 text-slate-800 dark:text-slate-200 font-medium text-lg py-2">
+                <div className="flex items-center gap-4 text-slate-100 font-medium text-lg py-2">
                   {link.icon}
                   <span>{link.label}</span>
                 </div>
@@ -461,16 +461,16 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
           return (
             <DropdownMenu key={link.label}>
               <DropdownMenuTrigger className={cn(
-                "flex items-center gap-1 transition-colors hover:text-[#00a651] text-base font-medium outline-none",
-                "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                "flex items-center gap-1 transition-colors hover:text-[#d4af37] text-base font-medium outline-none",
+                "text-slate-300 hover:text-white"
               )}>
                 <span>{link.label}</span>
                 <ChevronDown className="h-3 w-3 opacity-50" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuContent align="start" className="w-48 bg-[#0a1626] border-white/10 text-slate-200">
                 {link.subItems.map(subItem => (
                   <DropdownMenuItem key={subItem.href} asChild>
-                    <Link href={subItem.href} onClick={onLinkClick} className="w-full cursor-pointer flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+                    <Link href={subItem.href} onClick={onLinkClick} className="w-full cursor-pointer flex items-center gap-2 text-sm text-slate-300 hover:text-white">
                       {subItem.icon}
                       {subItem.label}
                     </Link>
@@ -499,17 +499,17 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 text-slate-700 border-r border-slate-200/60 shadow-[4px_0_24px_rgba(0,0,0,0.02)] overflow-hidden relative selection:bg-indigo-500/30 dark:bg-slate-900/95 dark:border-slate-800/60 dark:text-slate-300">
+    <div className="flex flex-col h-full bg-[#040a16] text-slate-300 border-r border-white/10 shadow-[4px_0_24px_rgba(0,0,0,0.4)] overflow-hidden relative selection:bg-[#d4af37]/30">
       {/* Subtle premium background glow */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-br from-indigo-50 via-white to-transparent dark:from-indigo-900/20 dark:via-transparent dark:to-transparent pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-full h-[300px] bg-gradient-to-tl from-teal-50 to-transparent dark:from-teal-900/10 dark:to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-br from-blue-600/20 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-full h-[300px] bg-gradient-to-tl from-[#d4af37]/10 to-transparent pointer-events-none" />
 
-      <div className="p-4 group-data-[collapsible=icon]:p-2 flex items-center h-16 shrink-0 border-b border-slate-200/50 dark:border-white/5 bg-transparent relative z-10">
+      <div className="p-4 group-data-[collapsible=icon]:p-2 flex items-center h-16 shrink-0 border-b border-white/10 bg-transparent relative z-10">
         <Link href="/admin" onClick={onLinkClick} className="flex items-center gap-3 group-data-[collapsible=icon]:gap-0 w-full group-data-[collapsible=icon]:justify-center">
           <img src="/icons/icon-192x192.png" alt="DeshExam Logo" className="h-8 w-8 object-contain shrink-0 drop-shadow-md" />
           <div className="font-extrabold text-xl tracking-tighter flex items-baseline group-data-[collapsible=icon]:hidden whitespace-nowrap">
-            <span className="bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent drop-shadow-sm">DESH</span>
-            <span className="text-slate-800 dark:text-white drop-shadow-sm">EXAM</span>
+            <span className="bg-gradient-to-r from-[#d4af37] to-amber-200 bg-clip-text text-transparent drop-shadow-sm">DESH</span>
+            <span className="text-white drop-shadow-sm">EXAM</span>
           </div>
         </Link>
       </div>
@@ -521,7 +521,7 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
               <div key={idx} className="space-y-2">
                 <button
                   onClick={() => toggleGroup(group.title)}
-                  className="w-full flex items-center justify-between px-3 py-1 text-[13px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-slate-200 transition-colors uppercase tracking-[0.2em] group-data-[collapsible=icon]:hidden focus:outline-none"
+                  className="w-full flex items-center justify-between px-3 py-1 text-[13px] font-bold text-slate-400 hover:text-[#d4af37] transition-colors uppercase tracking-[0.2em] group-data-[collapsible=icon]:hidden focus:outline-none"
                 >
                   <span>{group.title}</span>
                   {isOpen ? <ChevronDown className="w-4 h-4 opacity-70" /> : <ChevronRight className="w-4 h-4 opacity-70" />}
@@ -538,12 +538,12 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                             className={cn(
                               "justify-start w-full h-9 px-3 py-1.5 text-sm rounded-lg transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 border",
                               isActive
-                                ? "bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 font-semibold shadow-sm border-indigo-100 dark:border-indigo-500/30 hover:bg-indigo-50 dark:hover:bg-indigo-900/50"
-                                : "bg-transparent text-slate-600 dark:text-slate-400 border-transparent hover:bg-white/60 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-100 font-medium"
+                                ? "bg-white/10 text-[#d4af37] font-semibold shadow-sm border-[#d4af37]/30 hover:bg-white/10"
+                                : "bg-transparent text-slate-400 border-transparent hover:bg-white/5 hover:text-white font-medium"
                             )}
                           >
                             <Link href={item.href} onClick={onLinkClick}>
-                              <span className={cn("transition-colors flex-shrink-0 drop-shadow-sm", isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300", "group-data-[collapsible=icon]:mx-auto")}>
+                              <span className={cn("transition-colors flex-shrink-0 drop-shadow-sm", isActive ? "text-[#d4af37]" : "text-slate-500 group-hover:text-slate-300", "group-data-[collapsible=icon]:mx-auto")}>
                                 {React.cloneElement(item.icon as React.ReactElement, { className: "w-4 h-4" })}
                               </span>
                               <span className="ml-3 group-data-[collapsible=icon]:hidden whitespace-nowrap tracking-wide">{item.label}</span>
@@ -562,7 +562,7 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
             <Button
               asChild
               variant="ghost"
-              className="justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-lg border border-transparent bg-transparent hover:bg-white/60 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+              className="justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-lg border border-transparent bg-transparent hover:bg-white/5 text-slate-400 hover:text-white transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
             >
               <Link href="/dashboard" onClick={onLinkClick}>
                 <LayoutGrid className="h-4 w-4 text-slate-400 dark:text-slate-500 flex-shrink-0 group-data-[collapsible=icon]:mx-auto" />
@@ -572,7 +572,7 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
           </div>
         </div>
       </ScrollArea>
-      <div className="p-4 border-t border-slate-200/50 dark:border-white/10 bg-white/50 dark:bg-slate-950/50 backdrop-blur-md shrink-0 group-data-[collapsible=icon]:p-2 flex flex-col items-center relative z-10">
+      <div className="p-4 border-t border-white/10 bg-white/5 backdrop-blur-md shrink-0 group-data-[collapsible=icon]:p-2 flex flex-col items-center relative z-10">
         <Button variant="ghost" className="w-full justify-start text-rose-500 dark:text-rose-400 hover:text-rose-600 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:border-rose-100 dark:hover:border-rose-500/20 border border-transparent rounded-lg transition-all duration-300 h-9 px-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 font-medium tracking-wide" onClick={logOut}>
           <LogOut className="mr-3 h-4 w-4 flex-shrink-0 group-data-[collapsible=icon]:mr-0" />
           <span className="group-data-[collapsible=icon]:hidden whitespace-nowrap">Logout</span>
@@ -602,13 +602,13 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
   }, [user]);
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-800 transition-colors duration-300 overflow-hidden">
-      <div className="p-4 flex items-center h-16 shrink-0 border-b border-slate-100 dark:border-slate-800">
+    <div className="flex flex-col h-full bg-[#040a16] text-slate-200 border-r border-white/10 transition-colors duration-300 overflow-hidden">
+      <div className="p-4 flex items-center h-16 shrink-0 border-b border-white/10">
         <Link href="/dashboard" onClick={onLinkClick} className="flex items-center gap-2 w-full group-data-[collapsible=icon]:justify-center">
           <div className="font-extrabold text-2xl tracking-tighter flex items-center group-data-[collapsible=icon]:hidden">
             <img src="/icons/icon-192x192.png" alt="DeshExam" className="w-8 h-8 object-contain mr-2" />
-            <span className="text-green-600">DESH </span>
-            <span className="text-slate-800 dark:text-slate-100 ml-1">EXAM</span>
+            <span className="text-[#d4af37]">DESH </span>
+            <span className="text-white ml-1">EXAM</span>
           </div>
           <div className="hidden items-center justify-center group-data-[collapsible=icon]:flex">
             <img src="/icons/icon-192x192.png" alt="DeshExam" className="w-8 h-8 object-contain" />
@@ -626,8 +626,8 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
                     className="flex justify-between items-center px-4 mb-2 cursor-pointer group group-data-[collapsible=icon]:hidden"
                     onClick={() => setOpenGroups(prev => ({ ...prev, [group.title]: !prev[group.title] }))}
                   >
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 group-hover:text-slate-600 transition-colors whitespace-nowrap truncate">{group.title}</h4>
-                    {isOpen ? <ChevronDown className="w-3.5 h-3.5 flex-shrink-0 text-slate-300 group-hover:text-slate-500 transition-colors" /> : <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-slate-300 group-hover:text-slate-500 transition-colors" />}
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 group-hover:text-slate-300 transition-colors whitespace-nowrap truncate">{group.title}</h4>
+                    {isOpen ? <ChevronDown className="w-3.5 h-3.5 flex-shrink-0 text-slate-500 group-hover:text-slate-300 transition-colors" /> : <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-slate-500 group-hover:text-slate-300 transition-colors" />}
                   </div>
                 )}
                 <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'} group-data-[collapsible=icon]:max-h-none group-data-[collapsible=icon]:opacity-100`}>
@@ -640,12 +640,12 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
                           className={cn(
                             "justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
                             pathname === item.href
-                              ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold"
-                              : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100"
+                              ? "bg-white/10 text-white font-semibold"
+                              : "text-slate-400 hover:bg-white/5 hover:text-white"
                           )}
                         >
                           <Link href={item.href} onClick={onLinkClick}>
-                            <span className={cn("flex-shrink-0", pathname === item.href ? "text-green-600" : "text-slate-400 dark:text-slate-500", "group-data-[collapsible=icon]:mx-auto")}>{item.icon}</span>
+                            <span className={cn("flex-shrink-0", pathname === item.href ? "text-[#d4af37]" : "text-slate-500", "group-data-[collapsible=icon]:mx-auto")}>{item.icon}</span>
                             <span className="ml-3 group-data-[collapsible=icon]:hidden whitespace-nowrap">{item.label}</span>
                           </Link>
                         </Button>
@@ -664,11 +664,11 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
                 variant="ghost"
                 className={cn(
                   "justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
-                  "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100"
+                  "text-slate-400 hover:bg-white/5 hover:text-white"
                 )}
               >
                 <Link href="/admin" onClick={onLinkClick}>
-                  <ShieldCheck className="h-4 w-4 flex-shrink-0 text-slate-400 dark:text-slate-500 group-data-[collapsible=icon]:mx-auto" />
+                  <ShieldCheck className="h-4 w-4 flex-shrink-0 text-slate-500 group-data-[collapsible=icon]:mx-auto" />
                   <span className="ml-3 group-data-[collapsible=icon]:hidden whitespace-nowrap">Admin Dashboard</span>
                 </Link>
               </Button>
@@ -677,7 +677,7 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
         </div>
       </ScrollArea>
       <div className="p-4 group-data-[collapsible=icon]:p-2 border-t border-slate-100 dark:border-slate-800 space-y-3 shrink-0 flex flex-col items-center">
-        <Button variant="outline" className="w-full group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:px-0 justify-between group-data-[collapsible=icon]:justify-center rounded-full bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 h-10" asChild>
+        <Button variant="outline" className="w-full group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:px-0 justify-between group-data-[collapsible=icon]:justify-center rounded-full bg-white/5 shadow-sm border-white/10 text-slate-200 h-10" asChild>
           <Link href="/pricing">
             <span className="group-data-[collapsible=icon]:hidden whitespace-nowrap">Upgrade Plan</span>
             <ChevronRight className="h-4 w-4 text-slate-400 flex-shrink-0 group-data-[collapsible=icon]:hidden" />
@@ -685,15 +685,15 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
           </Link>
         </Button>
 
-        <div className="flex items-center justify-between p-2 group-data-[collapsible=icon]:p-0 w-full rounded-xl bg-slate-50 dark:bg-slate-800/50 group-data-[collapsible=icon]:bg-transparent border border-slate-100 dark:border-slate-800 group-data-[collapsible=icon]:border-transparent cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group-data-[collapsible=icon]:justify-center">
+        <div className="flex items-center justify-between p-2 group-data-[collapsible=icon]:p-0 w-full rounded-xl bg-white/5 group-data-[collapsible=icon]:bg-transparent border border-white/10 group-data-[collapsible=icon]:border-transparent cursor-pointer hover:bg-white/10 transition-colors group-data-[collapsible=icon]:justify-center">
           <div className="flex items-center gap-3 group-data-[collapsible=icon]:gap-0">
-            <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700 shrink-0">
+            <Avatar className="h-9 w-9 border border-white/20 shrink-0">
               <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/40/40`} />
               <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden overflow-hidden">
-              <span className="text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight truncate">{user?.displayName || "User"}</span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5 truncate">Free Plan</span>
+              <span className="text-sm font-bold text-white leading-tight truncate">{user?.displayName || "User"}</span>
+              <span className="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">Free Plan</span>
             </div>
           </div>
           <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50 group-data-[collapsible=icon]:hidden" onClick={logOut}>
@@ -726,7 +726,7 @@ export const ClearCacheButton = () => {
   };
 
   return (
-    <Button variant="ghost" size="icon" onClick={handleClearCache} disabled={isClearing} title="Clear Global Cache">
+    <Button variant="ghost" size="icon" className="text-slate-300 hover:bg-white/10 hover:text-white" onClick={handleClearCache} disabled={isClearing} title="Clear Global Cache">
       <Trash2 className={`h-4 w-4 ${isClearing ? 'animate-spin' : ''}`} />
     </Button>
   );
@@ -753,10 +753,10 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300 border-b",
+        "section-dark sticky top-0 z-50 w-full transition-all duration-300 border-b border-[#d4af37]/20 text-slate-200",
         isScrolled
-          ? "bg-white border-slate-200 shadow-sm text-slate-800 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-200"
-          : "bg-white border-slate-200 text-slate-800 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-200"
+          ? "shadow-lg shadow-black/40 backdrop-blur-md"
+          : "backdrop-blur-md"
       )}
     >
       <div className="container flex h-16 items-center">
@@ -790,7 +790,7 @@ export function Header() {
                   <span className="sr-only">Toggle Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="p-0">
+              <SheetContent side="right" className="p-0 bg-[#040a16] text-slate-200 border-white/10">
                 <SheetHeader className="sr-only">
                   <SheetTitle>Menu</SheetTitle>
                 </SheetHeader>

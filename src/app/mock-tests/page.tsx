@@ -7,6 +7,27 @@ import { getTaxonomyNodesByType } from '@/lib/firebase/taxonomy';
 import { serializeTimestamps } from '@/lib/utils';
 import { MockTest } from '@/lib/assessment-types';
 import { getAllHardcodedMockTests } from '@/lib/hardcoded-loader';
+import {
+  CLASSES,
+  MEDIUMS,
+  SAMPLE_MOCK_TESTS,
+  SUBJECTS_BY_CLASS,
+  classLabel,
+  toBn,
+} from '@/lib/wb-board';
+
+const WB_PAGE_SIZE = 12;
+
+type WbFilters = { class?: string; subject?: string; medium?: string; wbpage?: string };
+
+function wbHref(patch: Partial<WbFilters>, current: WbFilters) {
+  const next: Record<string, string> = {};
+  for (const [k, v] of Object.entries({ ...current, ...patch })) {
+    if (v !== undefined && v !== '' && v !== 'all') next[k] = v;
+  }
+  const qs = new URLSearchParams(next).toString();
+  return qs ? `/mock-tests?${qs}#wb-mock-tests` : '/mock-tests#wb-mock-tests';
+}
 
 export const metadata: Metadata = {
   title: 'DeshExam Mock Tests – Free Online Practice Tests & Test Series',
@@ -151,7 +172,39 @@ const jsonLdSoftwareApp = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function MockTestsListingPage() {
+export default async function MockTestsListingPage({
+  searchParams,
+}: {
+  searchParams: Promise<WbFilters>;
+}) {
+  const wbParams = await searchParams;
+  const wbClassNum = wbParams.class ? Number(wbParams.class) : undefined;
+  const wbClass =
+    wbClassNum !== undefined && (CLASSES as readonly number[]).includes(wbClassNum)
+      ? wbClassNum
+      : undefined;
+  const wbMedium =
+    wbParams.medium === 'bn' || wbParams.medium === 'en' ? wbParams.medium : undefined;
+  const wbSubjectOptions = wbClass
+    ? SUBJECTS_BY_CLASS[wbClass]
+    : [...new Set(Object.values(SUBJECTS_BY_CLASS).flat())];
+  const wbSubject =
+    wbParams.subject && wbSubjectOptions.includes(wbParams.subject)
+      ? wbParams.subject
+      : undefined;
+  const wbFiltered = SAMPLE_MOCK_TESTS.filter(
+    (t) =>
+      (wbClass === undefined || t.class === wbClass) &&
+      (wbMedium === undefined || t.medium === wbMedium) &&
+      (wbSubject === undefined || t.subject === wbSubject),
+  );
+  const wbTotalPages = Math.max(1, Math.ceil(wbFiltered.length / WB_PAGE_SIZE));
+  const wbPage = Math.min(wbTotalPages, Math.max(1, Number(wbParams.wbpage) || 1));
+  const wbPageItems = wbFiltered.slice(
+    (wbPage - 1) * WB_PAGE_SIZE,
+    wbPage * WB_PAGE_SIZE,
+  );
+
   const [data, lbData, chData, boards, classes, subjects] = await Promise.all([
     getAssessments('mockTests'),
     getTopLeaderboard(4),
@@ -183,7 +236,104 @@ export default async function MockTestsListingPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFAQ) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftwareApp) }} />
-      
+
+      {/* WB Board — নমুনা মক টেস্ট: class / subject / medium ফিল্টার + পেজিনেশন (URL-synced) */}
+      <section id="wb-mock-tests" className="scroll-mt-20 bg-[#040d1a] py-12 text-slate-100 md:py-16">
+        <div className="container mx-auto max-w-6xl px-4">
+          <div className="mb-6">
+            <p className="text-xs font-bold tracking-wide text-amber-300">WBBSE · WBCHSE · ক্লাস ৫–১২</p>
+            <h2 className="mt-1 font-headline text-2xl font-extrabold text-white md:text-3xl">
+              পশ্চিমবঙ্গ বোর্ড — নমুনা মক টেস্ট
+            </h2>
+            <p className="mt-2 max-w-2xl text-base text-slate-300">
+              ক্লাস, বিষয় ও মাধ্যম বেছে নিন। এগুলো নমুনা টেস্ট — আসল প্রশ্নভান্ডার ক্লাস অনুযায়ী তৈরি হচ্ছে।
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 md:p-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-sm font-bold text-amber-200">ক্লাস:</span>
+              <Link href={wbHref({ class: undefined, subject: undefined, wbpage: undefined }, wbParams)} className={`inline-flex min-h-[40px] items-center rounded-full px-4 text-sm font-bold ${wbClass === undefined ? 'bg-amber-400 text-[#042f2e]' : 'border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10'}`}>সব ক্লাস</Link>
+              {CLASSES.map((n) => (
+                <Link key={n} href={wbHref({ class: String(n), subject: undefined, wbpage: undefined }, wbParams)} className={`inline-flex min-h-[40px] items-center rounded-full px-4 text-sm font-bold ${wbClass === n ? 'bg-amber-400 text-[#042f2e]' : 'border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10'}`}>{toBn(n)}</Link>
+              ))}
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-sm font-bold text-amber-200">মাধ্যম:</span>
+              <Link href={wbHref({ medium: undefined, wbpage: undefined }, wbParams)} className={`inline-flex min-h-[40px] items-center rounded-full px-4 text-sm font-bold ${wbMedium === undefined ? 'bg-amber-400 text-[#042f2e]' : 'border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10'}`}>সব মাধ্যম</Link>
+              {MEDIUMS.map((m) => (
+                <Link key={m.id} href={wbHref({ medium: m.id, wbpage: undefined }, wbParams)} className={`inline-flex min-h-[40px] items-center rounded-full px-4 text-sm font-bold ${wbMedium === m.id ? 'bg-amber-400 text-[#042f2e]' : 'border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10'}`}>{m.label}</Link>
+              ))}
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-sm font-bold text-amber-200">বিষয়:</span>
+              <Link href={wbHref({ subject: undefined, wbpage: undefined }, wbParams)} className={`inline-flex min-h-[40px] items-center rounded-full px-4 text-sm font-bold ${wbSubject === undefined ? 'bg-amber-400 text-[#042f2e]' : 'border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10'}`}>সব বিষয়</Link>
+              {wbSubjectOptions.map((s) => (
+                <Link key={s} href={wbHref({ subject: s, wbpage: undefined }, wbParams)} className={`inline-flex min-h-[40px] items-center rounded-full px-4 text-sm font-bold ${wbSubject === s ? 'bg-amber-400 text-[#042f2e]' : 'border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10'}`}>{s}</Link>
+              ))}
+            </div>
+            {(wbClass !== undefined || wbMedium !== undefined || wbSubject !== undefined) && (
+              <Link href="/mock-tests#wb-mock-tests" className="mt-4 inline-flex min-h-[40px] items-center rounded-full border border-amber-300/50 px-4 text-sm font-bold text-amber-200 hover:bg-white/10">✕ ফিল্টার মুছুন</Link>
+            )}
+          </div>
+
+          <p className="mt-6 text-sm text-slate-400">
+            {toBn(wbFiltered.length)}টি নমুনা টেস্ট পাওয়া গেছে
+            {wbClass !== undefined ? ` · ${classLabel(wbClass)}` : ''}
+            {wbSubject ? ` · ${wbSubject}` : ''}
+          </p>
+
+          {wbPageItems.length === 0 ? (
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.05] p-10 text-center">
+              <p className="text-lg font-bold text-white">কোনো নমুনা টেস্ট পাওয়া যায়নি</p>
+              <p className="mt-2 text-sm text-slate-400">ফিল্টার বদলে আবার দেখুন।</p>
+              <Link href="/mock-tests#wb-mock-tests" className="mt-4 inline-flex min-h-[44px] items-center rounded-full bg-amber-400 px-6 text-sm font-bold text-[#042f2e]">সব টেস্ট দেখুন</Link>
+            </div>
+          ) : (
+            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {wbPageItems.map((t) => (
+                <article key={t.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] transition-all hover:-translate-y-1 hover:border-amber-300/40 hover:shadow-lg">
+                  <div className="bg-[linear-gradient(135deg,#0b3b39,#042f2e)] p-5">
+                    <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-xs font-bold text-amber-200">নমুনা · মক টেস্ট</span>
+                    <h3 className="mt-3 min-h-[3rem] font-headline text-lg font-bold leading-snug text-white">{t.title}</h3>
+                  </div>
+                  <div className="p-5">
+                    <p className="text-sm text-slate-300">
+                      {classLabel(t.class)} · {t.subject} · {t.medium === 'bn' ? 'বাংলা মাধ্যম' : 'English Medium'}
+                    </p>
+                    <p className="mt-1 text-sm text-slate-400">
+                      {toBn(t.questions ?? 0)}টি প্রশ্ন · {toBn(t.minutes ?? 0)} মিনিট · {t.difficulty ?? ''}
+                    </p>
+                    <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
+                      <span className="text-lg font-extrabold text-white">{t.price === 0 ? 'ফ্রি' : `₹${t.price}`}</span>
+                      <Link href={`/mock-tests?class=${t.class}#wb-mock-tests`} className="inline-flex min-h-[40px] items-center rounded-full bg-amber-400 px-5 text-sm font-bold text-[#042f2e] hover:bg-amber-300">শুরু করুন</Link>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {wbTotalPages > 1 && (
+            <nav className="mt-10 flex items-center justify-center gap-2" aria-label="পৃষ্ঠা">
+              {wbPage > 1 ? (
+                <Link href={wbHref({ wbpage: String(wbPage - 1) }, wbParams)} className="inline-flex min-h-[44px] items-center rounded-full border border-white/15 bg-white/5 px-5 text-sm font-bold text-slate-200 hover:bg-white/10">← আগের</Link>
+              ) : (
+                <span className="inline-flex min-h-[44px] cursor-not-allowed items-center rounded-full border border-white/5 px-5 text-sm font-bold text-slate-600">← আগের</span>
+              )}
+              {Array.from({ length: wbTotalPages }, (_, i) => i + 1).map((n) => (
+                <Link key={n} href={wbHref({ wbpage: String(n) }, wbParams)} aria-current={n === wbPage ? 'page' : undefined} className={`inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full px-4 text-sm font-bold ${n === wbPage ? 'bg-amber-400 text-[#042f2e]' : 'border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10'}`}>{toBn(n)}</Link>
+              ))}
+              {wbPage < wbTotalPages ? (
+                <Link href={wbHref({ wbpage: String(wbPage + 1) }, wbParams)} className="inline-flex min-h-[44px] items-center rounded-full border border-white/15 bg-white/5 px-5 text-sm font-bold text-slate-200 hover:bg-white/10">পরের →</Link>
+              ) : (
+                <span className="inline-flex min-h-[44px] cursor-not-allowed items-center rounded-full border border-white/5 px-5 text-sm font-bold text-slate-600">পরের →</span>
+              )}
+            </nav>
+          )}
+        </div>
+      </section>
+
       <AssessmentClient 
         initialAssessments={initialAssessments}
         initialLeaderboard={initialLeaderboard}

@@ -5,7 +5,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { AppProviders } from "./providers";
 import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
 import { AuthDialog } from "@/components/feature/auth-dialog";
-import { Inter, Lexend, Hind_Siliguri } from 'next/font/google';
+import { Inter, Lexend, Hind_Siliguri, Noto_Serif_Bengali } from 'next/font/google';
 import { FirebaseProvider } from "@/hooks/use-firebase";
 import Script from 'next/script';
 import { ConditionalHeader, ConditionalFooter } from "@/components/layout/ConditionalLayout";
@@ -36,6 +36,14 @@ const hindSiliguri = Hind_Siliguri({
   weight: ['400', '600', '700'],
 });
 
+// Headings: Noto Serif Bengali (premium serif for Bengali headlines);
+// body stays Hind Siliguri.
+const notoSerifBengali = Noto_Serif_Bengali({
+  subsets: ['bengali'],
+  variable: '--font-noto-serif-bengali',
+  weight: ['400', '600', '700', '800'],
+});
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -64,14 +72,17 @@ export default async function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
-      <body className={cn("antialiased overscroll-none touch-manipulation", inter.variable, lexend.variable, hindSiliguri.variable)}>
+      <body className={cn("antialiased overscroll-none touch-manipulation", inter.variable, lexend.variable, hindSiliguri.variable, notoSerifBengali.variable)}>
+          <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-brand-gold focus:px-5 focus:py-2 focus:text-sm focus:font-bold focus:text-[#042f2e]">
+            মূল কনটেন্টে যান
+          </a>
           <FirebaseProvider>
             <AppProviders>
               <AuthProvider>
                 <AuthDialogProvider>
                   <div className="flex flex-col min-h-screen">
                     <ConditionalHeader />
-                    <main className="flex-grow">{children}</main>
+                    <main id="main-content" className="flex-grow">{children}</main>
                     <ConditionalFooter />
                   </div>
                   <AuthDialog />
