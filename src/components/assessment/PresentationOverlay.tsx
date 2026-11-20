@@ -5384,20 +5384,22 @@ export default function PresentationOverlay({
                   )}
 
                   {presentationStage === "outro" && (
-                    <div className="w-full flex flex-col items-center justify-center flex-1 h-full min-h-[70vh] gap-6 text-center animate-in fade-in zoom-in duration-500">
-                      <h1 className={`text-5xl md:text-7xl lg:text-9xl font-black ${isDarkMode ? "text-white" : "text-slate-800"} drop-shadow-xl uppercase tracking-wider`}>
-                        {uiLang === "bn" ? "কুইজ সমাপ্ত!" : "Quiz Completed!"}
-                      </h1>
-                      <div className="text-8xl md:text-9xl my-4 animate-bounce drop-shadow-2xl">🏆</div>
-                      <p className="text-xl md:text-3xl font-extrabold text-slate-600 dark:text-slate-300 max-w-3xl mt-4 leading-relaxed">
-                        {uiLang === "bn" ? "অংশগ্রহণের জন্য ধন্যবাদ। ভিডিওটি ভালো লাগলে লাইক ও সাবস্ক্রাইব করতে ভুলবেন না!" : "Thank you for participating! Don't forget to like and subscribe."}
-                      </p>
-                      <button
-                        onClick={closePresentation}
-                        className="mt-8 px-10 py-5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-2xl rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.5)] hover:scale-105 active:scale-95 transition-all border-4 border-white/20"
-                      >
-                        {uiLang === "bn" ? "ফিরে যান" : "Finish & Exit"}
-                      </button>
+                    <div className="w-full flex-1 h-full min-h-[70vh] overflow-y-auto px-4 py-8 flex flex-col text-center animate-in fade-in zoom-in duration-500">
+                      <div className="m-auto flex flex-col items-center justify-center gap-4 sm:gap-5">
+                        <h1 className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight ${isDarkMode ? "text-white" : "text-slate-800"} drop-shadow-xl tracking-wide`}>
+                          {uiLang === "bn" ? "কুইজ সমাপ্ত!" : "Quiz Completed!"}
+                        </h1>
+                        <div className="text-6xl md:text-7xl my-2 animate-bounce drop-shadow-2xl">🏆</div>
+                        <p className="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
+                          {uiLang === "bn" ? "অংশগ্রহণের জন্য ধন্যবাদ। ভিডিওটি ভালো লাগলে লাইক ও সাবস্ক্রাইব করতে ভুলবেন না!" : "Thank you for participating! Don't forget to like and subscribe."}
+                        </p>
+                        <button
+                          onClick={closePresentation}
+                          className="mt-4 sm:mt-6 px-8 sm:px-10 py-3.5 sm:py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-xl sm:text-2xl rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.5)] hover:scale-105 active:scale-95 transition-all border-4 border-white/20"
+                        >
+                          {uiLang === "bn" ? "ফিরে যান" : "Finish & Exit"}
+                        </button>
+                      </div>
                     </div>
                   )}
 
