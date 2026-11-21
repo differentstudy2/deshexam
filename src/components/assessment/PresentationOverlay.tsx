@@ -1225,11 +1225,6 @@ const highlightWordInElement = (
   return null;
 };
 
-import type {
-  StudioBgTheme,
-  StudioRecordingQuality,
-} from "@/lib/studio";
-
 interface PresentationOverlayProps {
   questions: any[];
   classLine: string;
@@ -1244,9 +1239,6 @@ interface PresentationOverlayProps {
   totalMarks?: number;
   negativeMarking?: number;
   typeLabel?: string;
-  /** Studio defaults — when absent, the player keeps its own defaults. */
-  initialBgTheme?: StudioBgTheme;
-  initialRecordingQuality?: StudioRecordingQuality;
 }
 
 const SevenSegmentDigit = ({
@@ -1401,8 +1393,6 @@ export default function PresentationOverlay({
   totalMarks,
   negativeMarking,
   typeLabel,
-  initialBgTheme,
-  initialRecordingQuality,
 }: PresentationOverlayProps) {
   const { user, userProfile } = useAuth();
   const [fetchedIsAdmin, setFetchedIsAdmin] = useState(false);
@@ -1575,8 +1565,9 @@ export default function PresentationOverlay({
   // --- Screen Recording State ---
   const [isRecording, setIsRecording] = useState(false);
   const [isRecordingPaused, setIsRecordingPaused] = useState(false);
-  const [recordingQuality, setRecordingQuality] =
-    useState<StudioRecordingQuality>(initialRecordingQuality ?? "high");
+  const [recordingQuality, setRecordingQuality] = useState<
+    "standard" | "high" | "ultra" | "4k"
+  >("high");
 
   // --- Webcam PIP State ---
   const [isWebcamActive, setIsWebcamActive] = useState(false);
@@ -2039,9 +2030,38 @@ export default function PresentationOverlay({
   const [presentationStage, setPresentationStage] = useState<"intro" | "slides" | "outro">("intro");
   const [showIntroSlide, setShowIntroSlide] = useState(true);
   const [showOutroSlide, setShowOutroSlide] = useState(true);
-  const [bgTheme, setBgTheme] = useState<StudioBgTheme>(
-    initialBgTheme ?? "grid",
-  );
+  const [bgTheme, setBgTheme] = useState<
+    | "default"
+    | "mesh"
+    | "grid"
+    | "dots"
+    | "video"
+    | "midnight"
+    | "aurora"
+    | "sunset"
+    | "cyberpunk"
+    | "ocean"
+    | "forest"
+    | "fire"
+    | "nebula"
+    | "hologram"
+    | "solid"
+  >("grid");
+  // Dark stage themes (midnight, aurora, ocean, …) paint a dark background
+  // while the app's dark-mode toggle stays off, so `dark:` classes do NOT
+  // apply. Option rows must use light text on these themes to stay readable.
+  const isDarkBgTheme = [
+    "video",
+    "midnight",
+    "aurora",
+    "sunset",
+    "cyberpunk",
+    "ocean",
+    "forest",
+    "fire",
+    "nebula",
+    "hologram",
+  ].includes(bgTheme);
   const [selectedVideo, setSelectedVideo] = useState(VIDEO_OPTIONS[0].url);
   const [videoOpacity, setVideoOpacity] = useState(40);
   const [bgOpacity, setBgOpacity] = useState(100);
@@ -5863,7 +5883,9 @@ export default function PresentationOverlay({
                                       ? optBgColor
                                       : bgTheme === "video"
                                         ? "bg-black/40 backdrop-blur-md"
-                                        : "bg-[rgba(15,23,42,0.09)] dark:bg-slate-800";
+                                        : isDarkBgTheme
+                                          ? "bg-white/10"
+                                          : "bg-[rgba(15,23,42,0.09)] dark:bg-slate-800";
                                   let rowBorder =
                                     bgTheme === "video"
                                       ? "border border-white/10"
@@ -6034,7 +6056,7 @@ export default function PresentationOverlay({
                                         {optLetter}
                                       </div>
                                       <div
-                                        className={`prose dark:prose-invert max-w-none flex-1 font-bold text-[17px] leading-snug [&_*]:!text-[17px] [&_*]:!leading-snug [&_*]:!m-0 ${optTextColor !== "default" ? "text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]" : "text-slate-800 dark:text-white [&_*]:!text-slate-800 dark:[&_*]:!text-white"}`}
+                                        className={`prose dark:prose-invert max-w-none flex-1 font-bold text-[17px] leading-snug [&_*]:!text-[17px] [&_*]:!leading-snug [&_*]:!m-0 ${optTextColor !== "default" ? "text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]" : isDarkBgTheme ? "text-white [&_*]:!text-white" : "text-slate-800 dark:text-white [&_*]:!text-slate-800 dark:[&_*]:!text-white"}`}
                                         style={
                                           {
                                             "--opt-color":
@@ -6369,31 +6391,31 @@ export default function PresentationOverlay({
                                   const colorThemes = [
                                     {
                                       border: "border-[#4285F4]/30",
-                                      bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
+                                      bg: isDarkBgTheme ? "bg-white/10" : "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
                                       letterBg: "bg-[#4285F4]",
                                       letterText: "text-white",
                                     }, // Blue
                                     {
                                       border: "border-[#34A853]/30",
-                                      bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
+                                      bg: isDarkBgTheme ? "bg-white/10" : "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
                                       letterBg: "bg-[#34A853]",
                                       letterText: "text-white",
                                     }, // Green
                                     {
                                       border: "border-[#F9AB00]/30",
-                                      bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
+                                      bg: isDarkBgTheme ? "bg-white/10" : "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
                                       letterBg: "bg-[#F9AB00]",
                                       letterText: "text-white",
                                     }, // Yellow/Orange
                                     {
                                       border: "border-[#EA4335]/30",
-                                      bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
+                                      bg: isDarkBgTheme ? "bg-white/10" : "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
                                       letterBg: "bg-[#EA4335]",
                                       letterText: "text-white",
                                     }, // Red
                                     {
                                       border: "border-[#9C27B0]/30",
-                                      bg: "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
+                                      bg: isDarkBgTheme ? "bg-white/10" : "bg-[rgba(15,23,42,0.09)] dark:bg-gray-800/80",
                                       letterBg: "bg-[#9C27B0]",
                                       letterText: "text-white",
                                     }, // Purple
@@ -6668,7 +6690,7 @@ export default function PresentationOverlay({
                                           {optLetter}
                                         </div>
                                         <div
-                                          className={`prose dark:prose-invert max-w-none ${optTextColor !== "default" ? "text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]" : "text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white"} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug [&>p]:whitespace-nowrap [&>p]:overflow-hidden [&>p]:text-ellipsis flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? "line-through opacity-50" : ""}`}
+                                          className={`prose dark:prose-invert max-w-none ${optTextColor !== "default" ? "text-[var(--opt-color)] [&_*]:!text-[var(--opt-color)]" : isDarkBgTheme ? "text-white [&_*]:!text-white" : "text-slate-900 dark:text-white [&_*]:!text-slate-900 dark:[&_*]:!text-white"} [&>p]:m-0 [&>p]:text-[length:var(--opt-size)] [&>p]:font-semibold [&>p]:leading-snug [&>p]:whitespace-nowrap [&>p]:overflow-hidden [&>p]:text-ellipsis flex-1 capitalize ${eliminatedOptions.includes(opt.key) && step === 0 ? "line-through opacity-50" : ""}`}
                                           style={
                                             {
                                               "--opt-color":
