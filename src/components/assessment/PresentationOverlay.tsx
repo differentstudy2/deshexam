@@ -1225,6 +1225,11 @@ const highlightWordInElement = (
   return null;
 };
 
+import type {
+  StudioBgTheme,
+  StudioRecordingQuality,
+} from "@/lib/studio";
+
 interface PresentationOverlayProps {
   questions: any[];
   classLine: string;
@@ -1239,6 +1244,9 @@ interface PresentationOverlayProps {
   totalMarks?: number;
   negativeMarking?: number;
   typeLabel?: string;
+  /** Studio defaults — when absent, the player keeps its own defaults. */
+  initialBgTheme?: StudioBgTheme;
+  initialRecordingQuality?: StudioRecordingQuality;
 }
 
 const SevenSegmentDigit = ({
@@ -1393,6 +1401,8 @@ export default function PresentationOverlay({
   totalMarks,
   negativeMarking,
   typeLabel,
+  initialBgTheme,
+  initialRecordingQuality,
 }: PresentationOverlayProps) {
   const { user, userProfile } = useAuth();
   const [fetchedIsAdmin, setFetchedIsAdmin] = useState(false);
@@ -1565,9 +1575,8 @@ export default function PresentationOverlay({
   // --- Screen Recording State ---
   const [isRecording, setIsRecording] = useState(false);
   const [isRecordingPaused, setIsRecordingPaused] = useState(false);
-  const [recordingQuality, setRecordingQuality] = useState<
-    "standard" | "high" | "ultra" | "4k"
-  >("high");
+  const [recordingQuality, setRecordingQuality] =
+    useState<StudioRecordingQuality>(initialRecordingQuality ?? "high");
 
   // --- Webcam PIP State ---
   const [isWebcamActive, setIsWebcamActive] = useState(false);
@@ -2030,23 +2039,9 @@ export default function PresentationOverlay({
   const [presentationStage, setPresentationStage] = useState<"intro" | "slides" | "outro">("intro");
   const [showIntroSlide, setShowIntroSlide] = useState(true);
   const [showOutroSlide, setShowOutroSlide] = useState(true);
-  const [bgTheme, setBgTheme] = useState<
-    | "default"
-    | "mesh"
-    | "grid"
-    | "dots"
-    | "video"
-    | "midnight"
-    | "aurora"
-    | "sunset"
-    | "cyberpunk"
-    | "ocean"
-    | "forest"
-    | "fire"
-    | "nebula"
-    | "hologram"
-    | "solid"
-  >("grid");
+  const [bgTheme, setBgTheme] = useState<StudioBgTheme>(
+    initialBgTheme ?? "grid",
+  );
   const [selectedVideo, setSelectedVideo] = useState(VIDEO_OPTIONS[0].url);
   const [videoOpacity, setVideoOpacity] = useState(40);
   const [bgOpacity, setBgOpacity] = useState(100);
