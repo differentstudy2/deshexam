@@ -5351,9 +5351,6 @@ export default function PresentationOverlay({
                   {presentationStage === "intro" && (
                     <div className="w-full flex flex-col items-center justify-center flex-1 h-full min-h-[70vh] px-2 py-4">
                       <style>{`
-                        .lx-stage { background: radial-gradient(circle at 50% 40%, #16449c 0%, #0a2257 50%, #071535 100%); }
-                        .lx-pill { background: linear-gradient(#ffe27a, #f2a900); color: #1a1200; }
-                        .lx-panel { background: rgba(13,35,85,.75); border: 2px solid rgba(80,130,255,.4); }
                         @keyframes lx-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
                         @keyframes lx-in { from { opacity: 0; } to { opacity: 1; } }
                         @keyframes lx-pop { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
@@ -5364,118 +5361,91 @@ export default function PresentationOverlay({
                           .lx-a-up, .lx-a-in, .lx-a-pop { animation: none; }
                         }
                       `}</style>
-                      {/* Launch screen — same design as the supplied DeshExam launch screen, live data only */}
-                      <div
-                        className="lx-stage w-full max-w-5xl overflow-hidden rounded-3xl text-white shadow-2xl"
-                        style={{ border: "2px solid rgba(255,198,42,.45)" }}
-                      >
-                        {/* Header bar */}
-                        <div
-                          className="lx-a-in flex flex-wrap items-center gap-x-4 gap-y-2 px-5 sm:px-7 py-3"
-                          style={{ background: "rgba(5,15,42,.92)", borderBottom: "3px solid #FFC62A" }}
-                        >
-                          <div
-                            className="grid place-items-center rounded-full font-bold shrink-0"
-                            style={{ width: 48, height: 48, border: "3px solid #FFC62A", color: "#FFC62A", fontSize: 19 }}
+                      {/* Launch screen — same card style as the quiz slides, live data only */}
+                      <div className="w-full max-w-3xl rounded-3xl border border-gray-200 bg-white px-5 py-8 text-center shadow-2xl dark:border-slate-700 dark:bg-slate-800 sm:px-10">
+                        {typeLabel ? (
+                          <span
+                            className="lx-a-pop inline-block rounded-full bg-blue-600 px-5 py-1 text-base font-bold text-white sm:text-lg"
+                            style={{ animationDelay: ".2s" }}
                           >
-                            DE
-                          </div>
-                          <div className="leading-tight">
-                            <div className="text-xl sm:text-2xl font-bold">
-                              Desh<span style={{ color: "#FFC62A" }}>Exam</span>
-                            </div>
-                            <div className="text-[10px] tracking-[3px] text-white/80">LEARN • PRACTICE • SUCCEED</div>
-                          </div>
-                          <div className="hidden md:block w-[3px] h-10 shrink-0" style={{ background: "#FFC62A" }} />
-                          <div className="text-base sm:text-xl font-semibold flex-1 min-w-[160px]">
-                            {uiLang === "bn" ? "সঠিক প্রস্তুতি, সফলতার পথে" : "Right preparation, on the path to success"}
-                          </div>
-                          <span className="hidden sm:inline-flex items-center gap-2 text-sm font-bold leading-tight">
-                            <span className="rounded-lg px-2 py-1 text-base" style={{ background: "#e41818" }}>▶</span>
-                            Subscribe DeshExam
+                            {typeLabel}
                           </span>
-                        </div>
-
-                        {/* Body */}
-                        <div className="flex flex-col items-center text-center px-5 sm:px-8 pt-6 pb-6">
-                          <img src="/launch/emb.png" alt="" width={295} height={133} className="lx-a-pop w-[130px] sm:w-[170px] h-auto" style={{ animationDelay: ".25s" }} />
-                          <img src="/launch/logo.png" alt="DeshExam" width={640} height={106} className="lx-a-pop w-[240px] sm:w-[360px] h-auto mt-2" style={{ animationDelay: ".4s" }} />
-                          {typeLabel ? (
-                            <span className="lx-pill lx-a-pop inline-block rounded-full px-6 py-1 text-lg sm:text-xl font-bold italic mt-4" style={{ animationDelay: ".55s" }}>
-                              {typeLabel}
-                            </span>
-                          ) : null}
-                          <h1 className="lx-a-up text-3xl sm:text-4xl lg:text-5xl font-bold leading-snug mt-4 max-w-4xl" style={{ animationDelay: ".65s" }}>
-                            {displayTitle || (uiLang === "bn" ? "সাধারণ জ্ঞান কুইজ" : "General Knowledge Quiz")}
-                          </h1>
-                          {displayTaxonomy ? (
-                            <h2 className="lx-a-up text-lg sm:text-2xl font-bold text-sky-300 mt-3 max-w-3xl" style={{ animationDelay: ".75s" }}>
-                              {displayTaxonomy}
-                            </h2>
-                          ) : null}
-                          <p className="lx-a-in text-base sm:text-lg text-white/85 mt-3" style={{ animationDelay: ".85s" }}>
-                            <span style={{ color: "#FFC62A" }}>—</span>&nbsp;
-                            {uiLang === "bn" ? "নিজেকে যাচাই করুন, এগিয়ে যান আরও দূরে..." : "Test yourself, and go even further..."}
-                            &nbsp;<span style={{ color: "#FFC62A" }}>—</span>
-                          </p>
-
-                          {launchInfoRows.length > 0 && (
-                            <div className="w-full max-w-xl mt-5">
-                              <span className="lx-pill lx-a-pop inline-block rounded-full px-5 py-1 text-base sm:text-lg font-bold" style={{ animationDelay: ".95s" }}>
-                                {uiLang === "bn" ? "📋 পরীক্ষার তথ্য" : "📋 Exam Info"}
-                              </span>
-                              <div className="lx-panel lx-a-up rounded-3xl px-5 py-1 mt-3 text-left" style={{ animationDelay: "1.05s" }}>
-                                {launchInfoRows.map((row, i) => (
-                                  <div
-                                    key={row.label}
-                                    className="flex items-center gap-3 py-2.5 text-base sm:text-lg"
-                                    style={{ borderBottom: i < launchInfoRows.length - 1 ? "1px solid rgba(255,255,255,.14)" : "none" }}
-                                  >
-                                    <span className="w-9 text-center text-xl">{row.icon}</span>
-                                    <span>{row.label}</span>
-                                    <span className="ml-auto font-bold" style={{ color: "#FFC62A" }}>
-                                      {row.value}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Photo strip */}
-                          <div className="hidden md:flex items-center justify-center gap-3 mt-5">
-                            <img src="/launch/student.jpg" alt="" width={480} height={420} className="lx-a-in h-24 w-auto rounded-xl object-cover" style={{ animationDelay: "1.1s" }} />
-                            <img src="/launch/books.jpg" alt="" width={290} height={181} className="lx-a-in h-24 w-auto rounded-xl object-cover" style={{ animationDelay: "1.15s" }} />
-                            <img src="/launch/bldg.jpg" alt="" width={512} height={325} className="lx-a-in h-24 w-auto rounded-xl object-cover" style={{ animationDelay: "1.2s" }} />
-                          </div>
-
-                          <button
-                            onClick={nextStep}
-                            className="lx-pill lx-a-up inline-block rounded-full px-8 sm:px-10 py-3 sm:py-4 text-2xl sm:text-3xl font-bold mt-6 hover:scale-105 active:scale-95 transition-transform"
-                            style={{ animationDelay: "1.25s", boxShadow: "0 0 40px rgba(255,198,42,.6)" }}
-                          >
-                            {uiLang === "bn" ? "▶ টেস্ট শুরু করো »" : "▶ Start Test »"}
-                          </button>
-                        </div>
-
-                        {/* Footer strip */}
-                        <div
-                          className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 sm:px-7 py-3 text-sm sm:text-base"
-                          style={{ background: "#050f2a", borderTop: "3px solid #FFC62A" }}
+                        ) : null}
+                        <h1
+                          className="lx-a-up mt-4 text-3xl font-extrabold leading-snug text-slate-900 dark:text-white sm:text-4xl lg:text-5xl"
+                          style={{ animationDelay: ".3s" }}
                         >
-                          <span>🏆 {uiLang === "bn" ? "সফলতার জন্য আজই শুরু হোক আপনার প্রস্তুতি..." : "Start your preparation for success today..."}</span>
-                          <span className="font-semibold">🌐 deshexam.vercel.app</span>
-                        </div>
+                          {displayTitle ||
+                            (uiLang === "bn"
+                              ? "সাধারণ জ্ঞান কুইজ"
+                              : "General Knowledge Quiz")}
+                        </h1>
+                        {displayTaxonomy ? (
+                          <h2
+                            className="lx-a-up mt-3 text-lg font-bold text-blue-600 dark:text-blue-400 sm:text-2xl"
+                            style={{ animationDelay: ".4s" }}
+                          >
+                            {displayTaxonomy}
+                          </h2>
+                        ) : null}
+                        <p
+                          className="lx-a-in mt-3 text-base text-slate-500 dark:text-slate-400 sm:text-lg"
+                          style={{ animationDelay: ".5s" }}
+                        >
+                          {uiLang === "bn"
+                            ? "নিজেকে যাচাই করুন, এগিয়ে যান আরও দূরে..."
+                            : "Test yourself, and go even further..."}
+                        </p>
+
+                        {launchInfoRows.length > 0 && (
+                          <div className="mx-auto mt-6 w-full max-w-xl text-left">
+                            <div
+                              className="lx-a-up rounded-2xl border border-gray-200 bg-slate-50 px-5 py-1 dark:border-slate-700 dark:bg-slate-900"
+                              style={{ animationDelay: ".6s" }}
+                            >
+                              {launchInfoRows.map((row, i) => (
+                                <div
+                                  key={row.label}
+                                  className="flex items-center gap-3 py-2.5 text-base sm:text-lg"
+                                  style={{
+                                    borderBottom:
+                                      i < launchInfoRows.length - 1
+                                        ? "1px solid rgba(100,116,139,.25)"
+                                        : "none",
+                                  }}
+                                >
+                                  <span className="w-9 text-center text-xl">
+                                    {row.icon}
+                                  </span>
+                                  <span className="font-semibold text-slate-700 dark:text-slate-300">
+                                    {row.label}
+                                  </span>
+                                  <span className="ml-auto font-bold text-blue-600 dark:text-blue-400">
+                                    {row.value}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <button
+                          onClick={nextStep}
+                          className="lx-a-up mt-7 inline-block rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-3 text-2xl font-bold text-white shadow-lg transition-transform hover:scale-105 active:scale-95 sm:px-10 sm:py-4 sm:text-3xl"
+                          style={{ animationDelay: ".7s" }}
+                        >
+                          {uiLang === "bn" ? "▶ টেস্ট শুরু করো »" : "▶ Start Test »"}
+                        </button>
                       </div>
                     </div>
                   )}
 
                   {presentationStage === "outro" && (
-                    <div className="w-full flex-1 h-full min-h-[70vh] overflow-y-auto bg-[#050d1a] px-3 sm:px-5 py-6 flex flex-col animate-in fade-in zoom-in duration-500">
+                    <div className="w-full flex-1 h-full min-h-[70vh] overflow-y-auto px-3 sm:px-5 py-6 flex flex-col animate-in fade-in zoom-in duration-500">
                       <div className="m-auto w-full max-w-5xl flex flex-col gap-4 sm:gap-5">
                         {/* Completion badge */}
                         <div className="flex justify-center">
-                          <span className="inline-flex items-center gap-2 rounded-full border-2 border-amber-400/70 bg-amber-400/10 px-4 sm:px-5 py-1.5 text-base sm:text-lg font-bold text-amber-300">
+                          <span className="inline-flex items-center gap-2 rounded-full border-2 border-blue-500/60 bg-blue-500/10 px-4 sm:px-5 py-1.5 text-base sm:text-lg font-bold text-blue-600 dark:text-blue-300">
                             ✓{" "}
                             {uiLang === "bn"
                               ? "মক টেস্ট সম্পূর্ণ হলো"
@@ -5486,45 +5456,45 @@ export default function PresentationOverlay({
                         {/* Result grid */}
                         <div className="grid gap-4 lg:grid-cols-[1.05fr_0.9fr_1.05fr]">
                           {/* Left — আপনার ফলাফল */}
-                          <div className="rounded-3xl border border-white/15 bg-[#0a1a3a]/80 p-4 sm:p-5 text-left shadow-2xl">
-                            <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-black text-amber-300">
+                          <div className="rounded-3xl border border-gray-200 bg-white p-4 text-left shadow-xl dark:border-slate-700 dark:bg-slate-800 sm:p-5">
+                            <h2 className="flex items-center gap-2 text-xl font-black text-slate-900 dark:text-white sm:text-2xl">
                               📊{" "}
                               {uiLang === "bn" ? "আপনার ফলাফল" : "Your Result"}
                             </h2>
                             <div className="mt-4 space-y-3 text-base sm:text-lg font-bold">
-                              <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+                              <div className="flex items-center gap-3 border-b border-slate-200 pb-3 dark:border-slate-700">
                                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-500 text-base text-white">
                                   ✓
                                 </span>
-                                <span className="text-slate-200">
+                                <span className="text-slate-700 dark:text-slate-200">
                                   {uiLang === "bn" ? "সঠিক উত্তর" : "Correct"}
                                 </span>
                                 <span className="ml-auto text-2xl font-black text-green-400">
                                   {outroNum(outroCorrect)}
                                 </span>
-                                <span className="text-slate-400">
+                                <span className="text-slate-500 dark:text-slate-400">
                                   ({outroNum(outroPct(outroCorrect))}%)
                                 </span>
                               </div>
-                              <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+                              <div className="flex items-center gap-3 border-b border-slate-200 pb-3 dark:border-slate-700">
                                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-500 text-base text-white">
                                   ✗
                                 </span>
-                                <span className="text-slate-200">
+                                <span className="text-slate-700 dark:text-slate-200">
                                   {uiLang === "bn" ? "ভুল উত্তর" : "Wrong"}
                                 </span>
                                 <span className="ml-auto text-2xl font-black text-red-400">
                                   {outroNum(outroWrong)}
                                 </span>
-                                <span className="text-slate-400">
+                                <span className="text-slate-500 dark:text-slate-400">
                                   ({outroNum(outroPct(outroWrong))}%)
                                 </span>
                               </div>
-                              <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+                              <div className="flex items-center gap-3 border-b border-slate-200 pb-3 dark:border-slate-700">
                                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-500 text-base text-white">
                                   −
                                 </span>
-                                <span className="text-slate-200">
+                                <span className="text-slate-700 dark:text-slate-200">
                                   {uiLang === "bn"
                                     ? "এড়িয়ে গেছেন"
                                     : "Skipped"}
@@ -5532,36 +5502,36 @@ export default function PresentationOverlay({
                                 <span className="ml-auto text-2xl font-black text-slate-300">
                                   {outroNum(outroSkipped)}
                                 </span>
-                                <span className="text-slate-400">
+                                <span className="text-slate-500 dark:text-slate-400">
                                   ({outroNum(outroPct(outroSkipped))}%)
                                 </span>
                               </div>
                             </div>
-                            <div className="mt-4 flex items-center gap-3 border-t border-white/10 pt-4">
+                            <div className="mt-4 flex items-center gap-3 border-t border-slate-200 pt-4 dark:border-slate-700">
                               <span className="text-2xl">🏆</span>
-                              <span className="font-bold text-slate-200">
+                              <span className="font-bold text-slate-700 dark:text-slate-200">
                                 {uiLang === "bn" ? "মোট নম্বর" : "Total Score"}
                               </span>
-                              <span className="ml-auto text-3xl font-black text-amber-300">
+                              <span className="ml-auto text-3xl font-black text-blue-600 dark:text-blue-400">
                                 {outroNum(outroCorrect)} /{" "}
                                 {outroNum(outroMarksTotal)}
                               </span>
                             </div>
                             <div className="mt-4">
                               <div className="flex items-center justify-between font-bold">
-                                <span className="text-slate-200">
+                                <span className="text-slate-700 dark:text-slate-200">
                                   🎯{" "}
                                   {uiLang === "bn"
                                     ? "সঠিকতার হার"
                                     : "Accuracy"}
                                 </span>
-                                <span className="text-2xl font-black text-amber-300">
+                                <span className="text-2xl font-black text-blue-600 dark:text-blue-400">
                                   {outroNum(outroAccuracy)}%
                                 </span>
                               </div>
                               <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/10">
                                 <div
-                                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 transition-all"
+                                  className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all"
                                   style={{ width: `${outroAccuracy}%` }}
                                 />
                               </div>
@@ -5569,11 +5539,11 @@ export default function PresentationOverlay({
                           </div>
 
                           {/* Centre — trophy + ribbon + rank */}
-                          <div className="order-first flex flex-col items-center justify-center gap-3 rounded-3xl border border-amber-400/30 bg-gradient-to-b from-[#0a1a3a]/60 to-transparent p-4 text-center sm:p-5 lg:order-none">
+                          <div className="order-first flex flex-col items-center justify-center gap-3 p-4 text-center sm:p-5 lg:order-none">
                             <div className="animate-bounce text-7xl drop-shadow-2xl sm:text-8xl">
                               🏆
                             </div>
-                            <div className="mt-1 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 px-5 py-2 text-2xl font-black text-[#3a2500] shadow-[0_8px_25px_rgba(245,197,24,.45)] sm:px-6 sm:text-3xl">
+                            <div className="mt-1 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600 px-5 py-2 text-2xl font-black text-white shadow-[0_8px_25px_rgba(37,99,235,.45)] sm:px-6 sm:text-3xl">
                               {outroVerdict === "great"
                                 ? uiLang === "bn"
                                   ? "দারুণ করেছেন!"
@@ -5586,7 +5556,7 @@ export default function PresentationOverlay({
                                     ? "চেষ্টা চালিয়ে যান!"
                                     : "Keep Trying!"}
                             </div>
-                            <p className="text-lg font-bold text-slate-200 sm:text-xl">
+                            <p className="text-lg font-bold text-slate-600 dark:text-slate-300 sm:text-xl">
                               {outroVerdict === "great"
                                 ? uiLang === "bn"
                                   ? "আপনি সত্যিই অসাধারণ!"
@@ -5600,14 +5570,14 @@ export default function PresentationOverlay({
                                     : "Review your mistakes and try again."}
                             </p>
                             {outroRank !== null && (
-                              <div className="mt-1 w-full rounded-2xl border border-amber-400/50 bg-[#0a1a3a]/80 px-4 py-3">
-                                <p className="text-base font-bold text-amber-200">
+                              <div className="mt-1 w-full rounded-2xl border border-indigo-300 bg-white px-4 py-3 shadow-md dark:border-indigo-500/50 dark:bg-slate-800">
+                                <p className="text-base font-bold text-indigo-600 dark:text-indigo-300">
                                   👑{" "}
                                   {uiLang === "bn"
                                     ? "আপনার অবস্থান"
                                     : "Your Rank"}
                                 </p>
-                                <p className="text-3xl font-black text-amber-300">
+                                <p className="text-3xl font-black text-indigo-600 dark:text-indigo-300">
                                   Top {outroNum(outroRank)}-এ
                                 </p>
                               </div>
@@ -5615,8 +5585,8 @@ export default function PresentationOverlay({
                           </div>
 
                           {/* Right — বিশ্লেষণ + কী শিখলেন */}
-                          <div className="rounded-3xl border border-white/15 bg-[#0a1a3a]/80 p-4 text-left shadow-2xl sm:p-5">
-                            <h2 className="flex items-center gap-2 text-xl font-black text-amber-300 sm:text-2xl">
+                          <div className="rounded-3xl border border-gray-200 bg-white p-4 text-left shadow-xl dark:border-slate-700 dark:bg-slate-800 sm:p-5">
+                            <h2 className="flex items-center gap-2 text-xl font-black text-slate-900 dark:text-white sm:text-2xl">
                               📊{" "}
                               {uiLang === "bn"
                                 ? "ফলাফলের বিশ্লেষণ"
@@ -5626,14 +5596,14 @@ export default function PresentationOverlay({
                               <div className="relative h-28 w-28 shrink-0">
                                 <svg
                                   viewBox="0 0 128 128"
-                                  className="h-28 w-28 -rotate-90"
+                                  className="h-28 w-28 -rotate-90 text-slate-200 dark:text-slate-700"
                                 >
                                   <circle
                                     cx="64"
                                     cy="64"
                                     r="54"
                                     fill="none"
-                                    stroke="rgba(255,255,255,.12)"
+                                    stroke="currentColor"
                                     strokeWidth="14"
                                   />
                                   <circle
@@ -5667,7 +5637,7 @@ export default function PresentationOverlay({
                                     strokeDashoffset={-(outroSegC + outroSegW)}
                                   />
                                 </svg>
-                                <div className="absolute inset-0 flex items-center justify-center text-2xl font-black text-white">
+                                <div className="absolute inset-0 flex items-center justify-center text-2xl font-black text-slate-900 dark:text-white">
                                   {outroNum(outroAccuracy)}%
                                 </div>
                               </div>
@@ -5675,31 +5645,31 @@ export default function PresentationOverlay({
                                 <p className="flex items-center gap-2">
                                   <span className="h-3.5 w-3.5 shrink-0 rounded-full bg-green-500" />
                                   {uiLang === "bn" ? "সঠিক" : "Correct"}
-                                  <span className="ml-auto text-slate-300">
+                                  <span className="ml-auto text-slate-500 dark:text-slate-400">
                                     {outroNum(outroPct(outroCorrect))}%
                                   </span>
                                 </p>
                                 <p className="flex items-center gap-2">
                                   <span className="h-3.5 w-3.5 shrink-0 rounded-full bg-red-500" />
                                   {uiLang === "bn" ? "ভুল" : "Wrong"}
-                                  <span className="ml-auto text-slate-300">
+                                  <span className="ml-auto text-slate-500 dark:text-slate-400">
                                     {outroNum(outroPct(outroWrong))}%
                                   </span>
                                 </p>
                                 <p className="flex items-center gap-2">
                                   <span className="h-3.5 w-3.5 shrink-0 rounded-full bg-slate-400" />
                                   {uiLang === "bn" ? "এড়িয়ে" : "Skipped"}
-                                  <span className="ml-auto text-slate-300">
+                                  <span className="ml-auto text-slate-500 dark:text-slate-400">
                                     {outroNum(outroPct(outroSkipped))}%
                                   </span>
                                 </p>
                               </div>
                             </div>
-                            <p className="mt-2 text-center text-sm font-semibold text-slate-400">
+                            <p className="mt-2 text-center text-sm font-semibold text-slate-500 dark:text-slate-400">
                               {uiLang === "bn" ? "সঠিকতার হার" : "Accuracy rate"}
                             </p>
-                            <div className="mt-4 border-t border-white/10 pt-4">
-                              <h3 className="flex items-center gap-2 text-lg font-black text-amber-300">
+                            <div className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-700">
+                              <h3 className="flex items-center gap-2 text-lg font-black text-slate-900 dark:text-white">
                                 💡{" "}
                                 {uiLang === "bn"
                                   ? "কী শিখলেন?"
@@ -5709,7 +5679,7 @@ export default function PresentationOverlay({
                                 {outroTips.map((tip, i) => (
                                   <li
                                     key={i}
-                                    className="flex items-start gap-2 text-base font-semibold text-slate-200"
+                                    className="flex items-start gap-2 text-base font-semibold text-slate-700 dark:text-slate-300"
                                   >
                                     <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-500 text-xs text-white">
                                       ✓
@@ -5726,7 +5696,7 @@ export default function PresentationOverlay({
                         <div className="flex flex-wrap items-center justify-center gap-3">
                           <button
                             onClick={retakePresentation}
-                            className="rounded-full border-2 border-white/30 bg-white/10 px-5 py-3 text-lg font-black text-white transition-transform hover:scale-105 active:scale-95 sm:px-6 sm:text-xl"
+                            className="rounded-full border-2 border-slate-300 bg-white px-5 py-3 text-lg font-black text-slate-700 shadow-sm transition-transform hover:scale-105 active:scale-95 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 sm:px-6 sm:text-xl"
                           >
                             ↻{" "}
                             {uiLang === "bn"
@@ -5735,7 +5705,7 @@ export default function PresentationOverlay({
                           </button>
                           <a
                             href="/presentation"
-                            className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 px-5 py-3 text-lg font-black text-[#3a2500] shadow-[0_8px_25px_rgba(245,197,24,.45)] transition-transform hover:scale-105 active:scale-95 sm:px-6 sm:text-xl"
+                            className="rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-lg font-black text-white shadow-[0_8px_25px_rgba(37,99,235,.45)] transition-transform hover:scale-105 active:scale-95 sm:px-6 sm:text-xl"
                           >
                             ▶{" "}
                             {uiLang === "bn"
@@ -5748,8 +5718,8 @@ export default function PresentationOverlay({
                         </div>
 
                         {/* Footer strip */}
-                        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 border-t border-amber-400/40 pt-4 text-center">
-                          <span className="text-base font-bold text-amber-200 sm:text-lg">
+                        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 border-t border-slate-200 pt-4 text-center dark:border-slate-700">
+                          <span className="text-base font-bold text-slate-500 dark:text-slate-400 sm:text-lg">
                             ❝{" "}
                             {uiLang === "bn"
                               ? "চেষ্টা চালিয়ে যান, সাফল্য একদিন আসবেই!"
@@ -5758,7 +5728,7 @@ export default function PresentationOverlay({
                           </span>
                           <a
                             href="https://deshexam.vercel.app/"
-                            className="text-base font-bold text-slate-300 hover:text-white"
+                            className="text-base font-bold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
                           >
                             🌐 deshexam.vercel.app
                           </a>
