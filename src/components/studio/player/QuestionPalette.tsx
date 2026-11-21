@@ -4,28 +4,38 @@ import { toBn } from "@/lib/wb-board";
  * Question palette — the 1..N jump grid from the studio quiz screen.
  * Gold = current question, green = answered correct, red = answered
  * wrong, muted = not answered yet. All states come from live answers.
+ * Unanswered tiles are theme-aware: white text on the dark panel
+ * would be invisible on light themes.
  */
 export default function QuestionPalette({
   total,
   index,
   answers,
   onJump,
+  dark,
 }: {
   total: number;
   index: number;
   answers: Record<number, { key: string; correct: boolean }>;
   onJump: (i: number) => void;
+  dark: boolean;
 }) {
   return (
     <div>
-      <p className="mb-2 flex items-center gap-2 text-sm font-black text-amber-400">
+      <p
+        className={`mb-2 flex items-center gap-2 text-sm font-black ${
+          dark ? "text-amber-400" : "text-amber-600"
+        }`}
+      >
         ▦ প্রশ্ন প্যালেট
       </p>
       <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8 lg:grid-cols-6">
         {Array.from({ length: total }, (_, i) => {
           const a = answers[i];
           const isCurrent = i === index;
-          let cls = "bg-white/10 text-white hover:bg-white/20";
+          let cls = dark
+            ? "bg-white/10 text-white hover:bg-white/20"
+            : "border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200";
           if (a?.correct) cls = "bg-green-600 text-white";
           else if (a && !a.correct) cls = "bg-red-600 text-white";
           if (isCurrent) cls = "bg-amber-400 text-slate-900 ring-2 ring-amber-200";
@@ -42,7 +52,11 @@ export default function QuestionPalette({
           );
         })}
       </div>
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-bold text-slate-400">
+      <div
+        className={`mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-bold ${
+          dark ? "text-slate-400" : "text-slate-500"
+        }`}
+      >
         <span>
           <span className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-green-600 align-middle" />
           উত্তর হয়েছে
@@ -52,7 +66,7 @@ export default function QuestionPalette({
           বর্তমান
         </span>
         <span>
-          <span className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-white/20 align-middle" />
+          <span className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-slate-400 align-middle" />
           বাকি
         </span>
       </div>

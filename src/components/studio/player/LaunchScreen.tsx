@@ -40,7 +40,7 @@ export default function LaunchScreen({
   }
 
   return (
-    <div className="flex min-h-full items-center justify-center px-3 py-5 sm:px-6">
+    <div className="flex min-h-full items-center justify-center px-3 py-4 sm:px-6">
       <div
         className="w-full max-w-6xl overflow-hidden rounded-3xl border border-amber-400/40 shadow-2xl"
         style={{
@@ -49,7 +49,7 @@ export default function LaunchScreen({
         }}
       >
         {/* Header */}
-        <div className="flex flex-wrap items-center gap-3 border-b border-white/10 px-4 py-3 sm:px-6">
+        <div className="flex flex-wrap items-center gap-3 border-b border-white/10 px-4 py-2 sm:px-6">
           <img src="/launch/logo.png" alt="DeshExam" className="h-9 w-auto" />
           <div className="leading-tight">
             <p className="text-base font-black text-white sm:text-lg">
@@ -68,13 +68,13 @@ export default function LaunchScreen({
         </div>
 
         {/* Body */}
-        <div className="grid gap-4 p-4 sm:p-6 lg:grid-cols-[1fr_1.5fr_1fr]">
-          {/* Left: student + points (desktop only) */}
+        <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[1fr_1.5fr_1fr]">
+          {/* Left: student + points (desktop only; photos hidden on short screens so the CTA stays in view) */}
           <div className="order-3 hidden flex-col gap-3 lg:order-1 lg:flex">
             <img
               src="/launch/student.jpg"
               alt=""
-              className="h-44 w-full rounded-2xl object-cover"
+              className="h-36 w-full rounded-2xl object-cover [@media(max-height:860px)]:hidden"
             />
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
               {[
@@ -94,7 +94,7 @@ export default function LaunchScreen({
             <img
               src="/launch/books.jpg"
               alt=""
-              className="h-20 w-full rounded-2xl object-cover"
+              className="h-16 w-full rounded-2xl object-cover [@media(max-height:860px)]:hidden"
             />
           </div>
 
@@ -118,10 +118,10 @@ export default function LaunchScreen({
             <p className="mt-4 text-sm font-semibold text-slate-300 sm:text-base">
               নিজেকে যাচাই করুন, এগিয়ে যান আরও দূরে...
             </p>
-            <div className="mt-6 flex flex-wrap items-start justify-center gap-3">
+            <div className="mt-5 flex flex-wrap items-start justify-center gap-3">
               <button
                 onClick={onStart}
-                className="rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 px-8 py-3.5 text-lg font-black text-slate-900 shadow-lg transition-transform hover:scale-105 active:scale-95"
+                className="rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 px-8 py-3 text-lg font-black text-slate-900 shadow-lg transition-transform hover:scale-105 active:scale-95"
               >
                 ▶ টেস্ট শুরু করো »
               </button>
@@ -134,7 +134,7 @@ export default function LaunchScreen({
             <img
               src="/launch/bldg.jpg"
               alt=""
-              className="hidden h-28 w-full rounded-2xl object-cover lg:block"
+              className="hidden h-24 w-full rounded-2xl object-cover lg:block [@media(max-height:860px)]:hidden"
             />
             <div className="rounded-2xl border border-amber-400/30 bg-white/5 p-4">
               <p className="mb-3 flex items-center gap-2 text-sm font-black text-amber-300">
@@ -158,7 +158,7 @@ export default function LaunchScreen({
         </div>
 
         {/* Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/10 px-4 py-3 text-xs font-bold text-slate-300 sm:px-6 sm:text-sm">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/10 px-4 py-2 text-xs font-bold text-slate-300 sm:px-6 sm:text-sm">
           <span>🏆 সফলতার জন্য আজই শুরু হোক আপনার প্রস্তুতি...</span>
           <a
             href="https://deshexam.vercel.app/"

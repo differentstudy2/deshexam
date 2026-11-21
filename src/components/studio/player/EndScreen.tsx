@@ -50,9 +50,9 @@ export default function EndScreen({
   const done = c * (accuracy / 100);
 
   return (
-    <div className="flex min-h-full items-center justify-center px-3 py-6 sm:px-6">
+    <div className="flex min-h-full items-center justify-center px-3 py-4 sm:px-6">
       <div
-        className="w-full max-w-6xl rounded-3xl border border-amber-400/40 p-4 shadow-2xl sm:p-6"
+        className="w-full max-w-6xl rounded-3xl border border-amber-400/40 p-4 shadow-2xl sm:p-5"
         style={{
           background:
             "radial-gradient(ellipse at center, #0a2257 0%, #071535 70%)",
@@ -136,8 +136,8 @@ export default function EndScreen({
           </div>
 
           {/* Trophy + verdict */}
-          <div className="flex flex-col items-center justify-center px-2 py-6 text-center">
-            <div className="text-7xl sm:text-8xl">🏆</div>
+          <div className="flex flex-col items-center justify-center px-2 py-4 text-center">
+            <div className="text-6xl sm:text-7xl">🏆</div>
             <div className="mt-4 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 px-6 py-2 text-lg font-black text-slate-900 shadow-lg">
               {verdict.title}
             </div>
@@ -221,7 +221,7 @@ export default function EndScreen({
           </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           <button
             onClick={onRetake}
             className="rounded-full border border-white/30 bg-white/5 px-6 py-2.5 font-black text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
@@ -229,7 +229,7 @@ export default function EndScreen({
             ↻ পুনরায় পরীক্ষা দিন
           </button>
           <Link
-            href="/presentation"
+            href="/studio"
             className="rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 px-6 py-2.5 font-black text-slate-900 shadow-lg transition-transform hover:scale-105 active:scale-95"
           >
             ▶ আরও মক টেস্ট দেখুন
@@ -239,7 +239,7 @@ export default function EndScreen({
           </span>
         </div>
 
-        <p className="mt-6 text-center text-sm font-semibold text-slate-400">
+        <p className="mt-4 text-center text-sm font-semibold text-slate-400">
           চেষ্টা চালিয়ে যান, সাফল্য একদিন আসবেই! ·{" "}
           <a
             href="https://deshexam.vercel.app/"

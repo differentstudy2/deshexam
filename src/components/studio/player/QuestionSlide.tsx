@@ -108,8 +108,8 @@ export default function QuestionSlide({
 
   return (
     <div className="mx-auto flex min-h-full w-full max-w-7xl flex-col px-3 py-4 sm:px-5">
-      {/* Top bar */}
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      {/* Top bar — pr-14 clears the absolute close (X) button top-right */}
+      <div className="mb-4 flex flex-wrap items-center gap-2 pr-14">
         <img src="/launch/logo.png" alt="DeshExam" className="h-8 w-auto" />
         <span
           className={`min-w-0 flex-1 truncate text-sm font-black sm:text-base ${
@@ -240,6 +240,7 @@ export default function QuestionSlide({
               index={index}
               answers={answers}
               onJump={onJump}
+              dark={dark}
             />
             <div className="mt-4 border-t border-white/10 pt-3">
               <div
