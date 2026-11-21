@@ -2326,8 +2326,14 @@ export default function PresentationOverlay({
 
   const handleThemeChange = (theme: typeof bgTheme) => {
     setBgTheme(theme);
-    setQBgColor("bg-white dark:bg-gray-800");
-    setOptBgColor("bg-white dark:bg-gray-800");
+    // Reset to "follow the theme" values — NOT a literal white card.
+    // A literal "bg-white dark:bg-gray-800" here forced white option cards
+    // even on dark themes, which made the (correctly white) option text
+    // invisible. "default"/"transparent" let the theme-aware branches
+    // decide: tinted cards + dark text on light themes, translucent
+    // cards + white text on dark themes.
+    setQBgColor("transparent");
+    setOptBgColor("default");
     setQTextColor("default");
     setOptTextColor("default");
   };
