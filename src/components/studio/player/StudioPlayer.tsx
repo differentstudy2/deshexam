@@ -101,6 +101,7 @@ export default function StudioPlayer({
           totalMarks={test.totalMarks}
           test={test}
           onRetake={p.retake}
+          onClose={onClose}
         />
       )}
     </div>

@@ -18,6 +18,7 @@ export default function EndScreen({
   totalMarks,
   test,
   onRetake,
+  onClose,
 }: {
   correct: number;
   wrong: number;
@@ -27,6 +28,9 @@ export default function EndScreen({
   totalMarks?: number;
   test?: StudioTest;
   onRetake: () => void;
+  // Closes the player back to the studio dashboard. A plain link to
+  // /studio does nothing here — the player already runs on /studio.
+  onClose?: () => void;
 }) {
   const marks = totalMarks ?? total;
   const verdict =
@@ -228,12 +232,21 @@ export default function EndScreen({
           >
             ↻ পুনরায় পরীক্ষা দিন
           </button>
-          <Link
-            href="/studio"
-            className="rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 px-6 py-2.5 font-black text-slate-900 shadow-lg transition-transform hover:scale-105 active:scale-95"
-          >
-            ▶ আরও মক টেস্ট দেখুন
-          </Link>
+          {onClose ? (
+            <button
+              onClick={onClose}
+              className="rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 px-6 py-2.5 font-black text-slate-900 shadow-lg transition-transform hover:scale-105 active:scale-95"
+            >
+              ▶ আরও মক টেস্ট দেখুন
+            </button>
+          ) : (
+            <Link
+              href="/studio"
+              className="rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 px-6 py-2.5 font-black text-slate-900 shadow-lg transition-transform hover:scale-105 active:scale-95"
+            >
+              ▶ আরও মক টেস্ট দেখুন
+            </Link>
+          )}
           <span className="rounded-full bg-gradient-to-r from-red-500 to-rose-500 px-6 py-2.5 font-black text-white shadow-lg">
             ▶ Subscribe • DeshExam
           </span>
