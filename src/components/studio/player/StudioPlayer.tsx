@@ -7,6 +7,7 @@ import { useStudioPlayer } from "./useStudioPlayer";
 import LaunchScreen from "./LaunchScreen";
 import QuestionSlide from "./QuestionSlide";
 import EndScreen from "./EndScreen";
+import RecordingButton from "./RecordingButton";
 import type { StudioPlayerProps } from "./types";
 
 /**
@@ -18,6 +19,7 @@ export default function StudioPlayer({
   questions,
   test,
   theme,
+  recordingQuality,
   onClose,
 }: StudioPlayerProps) {
   const total = questions.length;
@@ -42,6 +44,7 @@ export default function StudioPlayer({
         dark ? "text-white" : "text-slate-900"
       }`}
     >
+      <RecordingButton testTitle={test.title} quality={recordingQuality} />
       <button
         onClick={onClose}
         aria-label="বন্ধ করুন"

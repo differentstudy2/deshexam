@@ -194,6 +194,7 @@ export default function StudioClient({ assessments }: { assessments: any[] }) {
                     questions={active.questions}
                     test={active.test}
                     theme={theme}
+                    recordingQuality={recording}
                     onClose={() => setActive(null)}
                 />
             )}

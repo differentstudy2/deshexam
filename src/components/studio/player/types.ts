@@ -1,4 +1,5 @@
 import type { StudioBgTheme } from "@/lib/studio";
+import type { StudioRecordingQuality } from "@/lib/studio";
 
 export type StudioStage = "launch" | "questions" | "end";
 
@@ -19,5 +20,6 @@ export interface StudioPlayerProps {
   questions: any[];
   test: StudioTest;
   theme: StudioBgTheme;
+  recordingQuality: StudioRecordingQuality;
   onClose: () => void;
 }

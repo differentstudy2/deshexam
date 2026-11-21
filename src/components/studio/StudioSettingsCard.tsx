@@ -10,8 +10,7 @@ import {
 
 /**
  * Studio settings — theme applies to the studio player right away.
- * Recording quality is saved for the recording module (next step);
- * the player does not record yet, and the card says so honestly.
+ * Recording quality is passed to the player's Record button.
  */
 export default function StudioSettingsCard({
   theme,
@@ -72,7 +71,8 @@ export default function StudioSettingsCard({
           ))}
         </div>
         <p className="mt-2 text-xs font-semibold text-slate-500">
-          রেকর্ডিং এখনও স্টুডিও প্লেয়ারে আসেনি — আলাদা ফাইলে আসছে।
+          রেকর্ডিং প্লেয়ারের ওপরের লাল Record বোতাম থেকে শুরু হবে — থামালে
+          .webm ফাইল ডাউনলোড হবে।
         </p>
       </div>
     </div>
