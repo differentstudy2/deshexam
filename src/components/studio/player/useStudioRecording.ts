@@ -155,3 +155,5 @@ export function useStudioRecording(
 
   return { state, elapsed, error, supported, start, stop, pause, resume };
 }
+
+export type StudioRecording = ReturnType<typeof useStudioRecording>;

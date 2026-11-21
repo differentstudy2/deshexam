@@ -1,24 +1,16 @@
 "use client";
 
 import { Circle, Pause, Play, Square } from "lucide-react";
-import type { StudioRecordingQuality } from "@/lib/studio";
-import { useStudioRecording } from "./useStudioRecording";
+import type { StudioRecording } from "./useStudioRecording";
 import { formatStudioTime } from "./useStudioPlayer";
 
 /**
- * Studio record button — desktop only (screen capture needs a desktop
- * browser). Shows a red dot + timer while recording, pause/resume
- * while running, and a plain error line when sharing is denied.
+ * Studio record control — presentational only. The recorder hook lives
+ * in StudioPlayer so one recording survives stage changes (launch →
+ * questions → result). Desktop only: screen capture needs a desktop
+ * browser. Rendered inline (launch CTA row + question toolbar).
  */
-export default function RecordingButton({
-  testTitle,
-  quality,
-}: {
-  testTitle: string;
-  quality: StudioRecordingQuality;
-}) {
-  const rec = useStudioRecording(testTitle, quality);
-
+export default function RecordingButton({ rec }: { rec: StudioRecording }) {
   if (!rec.supported) return null;
 
   const chip =
@@ -26,23 +18,23 @@ export default function RecordingButton({
 
   if (rec.state === "idle") {
     return (
-      <div className="absolute left-4 top-4 z-10 flex flex-col items-start gap-2">
+      <span className="inline-flex flex-col items-start gap-1">
         <button onClick={rec.start} className={`${chip} bg-red-600 text-white`}>
           <Circle className="h-4 w-4 fill-current" />
           Record
         </button>
         {rec.error ? (
-          <p className="max-w-[260px] rounded-xl bg-red-600 px-3 py-2 text-xs font-bold text-white shadow-lg">
+          <span className="max-w-[260px] rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-bold text-white shadow-lg">
             {rec.error}
-          </p>
+          </span>
         ) : null}
-      </div>
+      </span>
     );
   }
 
   return (
-    <div className="absolute left-4 top-4 z-10 flex flex-col items-start gap-2">
-      <div className="flex items-center gap-2">
+    <span className="inline-flex flex-col items-start gap-1">
+      <span className="inline-flex items-center gap-2">
         <span className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-sm font-black text-white shadow-lg">
           <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-white" />
           {rec.state === "paused" ? "Paused" : "REC"}{" "}
@@ -73,10 +65,10 @@ export default function RecordingButton({
         >
           <Square className="h-4 w-4 fill-current" />
         </button>
-      </div>
-      <p className="max-w-[260px] rounded-xl bg-black/60 px-3 py-2 text-xs font-bold text-white shadow-lg">
+      </span>
+      <span className="max-w-[260px] rounded-lg bg-black/60 px-2.5 py-1.5 text-xs font-bold text-white shadow-lg">
         রেকর্ডিং চলছে — থামালে .webm ফাইল ডাউনলোড হবে।
-      </p>
-    </div>
+      </span>
+    </span>
   );
 }

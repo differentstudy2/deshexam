@@ -62,6 +62,16 @@ export function useStudioPlayer(total: number) {
     setIndex((i) => Math.max(0, i - 1));
   }, []);
 
+  // Jump from the question palette. Answers are kept per question, so a
+  // jumped-to question shows its recorded answer (or a fresh state).
+  const goTo = useCallback(
+    (i: number) => {
+      setSelected(null);
+      setIndex(Math.max(0, Math.min(total - 1, i)));
+    },
+    [total],
+  );
+
   const retake = useCallback(() => {
     setAnswers({});
     setSelected(null);
@@ -85,6 +95,7 @@ export function useStudioPlayer(total: number) {
     pick,
     next,
     prev,
+    goTo,
     retake,
   };
 }

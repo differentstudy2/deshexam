@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { X } from "lucide-react";
 import { isDarkStudioTheme, studioThemeBg } from "./themes";
 import { useStudioPlayer } from "./useStudioPlayer";
+import { useStudioRecording } from "./useStudioRecording";
 import LaunchScreen from "./LaunchScreen";
 import QuestionSlide from "./QuestionSlide";
 import EndScreen from "./EndScreen";
@@ -13,7 +14,8 @@ import type { StudioPlayerProps } from "./types";
 /**
  * Studio player — the small main file. It only composes the stages:
  * launch → questions → result. State lives in useStudioPlayer,
- * each screen lives in its own file.
+ * each screen lives in its own file. The recorder hook lives here so
+ * one recording survives stage changes.
  */
 export default function StudioPlayer({
   questions,
@@ -24,6 +26,7 @@ export default function StudioPlayer({
 }: StudioPlayerProps) {
   const total = questions.length;
   const p = useStudioPlayer(total);
+  const rec = useStudioRecording(test.title, recordingQuality);
   const dark = isDarkStudioTheme(theme);
   const q = questions[p.index];
   const { stage, next, prev } = p;
@@ -40,11 +43,12 @@ export default function StudioPlayer({
 
   return (
     <div
-      className={`fixed inset-0 z-50 overflow-y-auto ${studioThemeBg(theme)} ${
+      // z-[110] sits above the site cookie banner (z-[100]) so nothing
+      // covers the player while it is open.
+      className={`fixed inset-0 z-[110] overflow-y-auto ${studioThemeBg(theme)} ${
         dark ? "text-white" : "text-slate-900"
       }`}
     >
-      <RecordingButton testTitle={test.title} quality={recordingQuality} />
       <button
         onClick={onClose}
         aria-label="বন্ধ করুন"
@@ -58,7 +62,12 @@ export default function StudioPlayer({
       </button>
 
       {stage === "launch" && (
-        <LaunchScreen test={test} questionCount={total} onStart={p.start} />
+        <LaunchScreen
+          test={test}
+          questionCount={total}
+          onStart={p.start}
+          recording={<RecordingButton rec={rec} />}
+        />
       )}
 
       {stage === "questions" && q && (
@@ -72,9 +81,13 @@ export default function StudioPlayer({
           elapsed={p.elapsed}
           correctCount={p.correct}
           wrongCount={p.wrong}
+          test={test}
+          answers={p.answers}
           onPick={(key, isCorrect) => p.pick(p.index, key, isCorrect)}
           onNext={p.next}
           onPrev={p.prev}
+          onJump={p.goTo}
+          recording={<RecordingButton rec={rec} />}
         />
       )}
 
@@ -86,6 +99,7 @@ export default function StudioPlayer({
           total={total}
           accuracy={p.accuracy}
           totalMarks={test.totalMarks}
+          test={test}
           onRetake={p.retake}
         />
       )}

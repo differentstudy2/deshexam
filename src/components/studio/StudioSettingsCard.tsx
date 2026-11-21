@@ -71,8 +71,8 @@ export default function StudioSettingsCard({
           ))}
         </div>
         <p className="mt-2 text-xs font-semibold text-slate-500">
-          রেকর্ডিং প্লেয়ারের ওপরের লাল Record বোতাম থেকে শুরু হবে — থামালে
-          .webm ফাইল ডাউনলোড হবে।
+          রেকর্ডিং লঞ্চ স্ক্রিনের "টেস্ট শুরু করো"-র পাশে আর প্রশ্নের
+          নিচের টুলবারে থাকবে — থামালে .webm ফাইল ডাউনলোড হবে।
         </p>
       </div>
     </div>
