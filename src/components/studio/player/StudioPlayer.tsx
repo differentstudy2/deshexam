@@ -23,6 +23,8 @@ export default function StudioPlayer({
   theme,
   recordingQuality,
   onClose,
+  onThemeChange,
+  onRecordingQualityChange,
 }: StudioPlayerProps) {
   const total = questions.length;
   const p = useStudioPlayer(total);
@@ -85,8 +87,13 @@ export default function StudioPlayer({
           answers={p.answers}
           onPick={(key, isCorrect) => p.pick(p.index, key, isCorrect)}
           onNext={p.next}
-          onPrev={p.prev}
           onJump={p.goTo}
+          onRetry={p.retryCurrent}
+          theme={theme}
+          recordingQuality={recordingQuality}
+          onThemeChange={onThemeChange}
+          onRecordingQualityChange={onRecordingQualityChange}
+          isRecording={rec.state === "recording" || rec.state === "paused"}
           recording={<RecordingButton rec={rec} />}
         />
       )}

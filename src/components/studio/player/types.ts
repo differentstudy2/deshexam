@@ -14,6 +14,8 @@ export interface StudioTest {
   durationMin?: number;
   totalMarks?: number;
   negativeMarking?: number;
+  /** Shown only when the assessment record really has one. */
+  difficulty?: string;
 }
 
 export interface StudioPlayerProps {
@@ -22,4 +24,6 @@ export interface StudioPlayerProps {
   theme: StudioBgTheme;
   recordingQuality: StudioRecordingQuality;
   onClose: () => void;
+  onThemeChange?: (t: StudioBgTheme) => void;
+  onRecordingQualityChange?: (q: StudioRecordingQuality) => void;
 }

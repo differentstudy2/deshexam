@@ -72,6 +72,17 @@ export function useStudioPlayer(total: number) {
     [total],
   );
 
+  // Retry the current question: clear its recorded answer so the
+  // student can answer it again (the new pick scores again).
+  const retryCurrent = useCallback(() => {
+    setAnswers((prev) => {
+      const next = { ...prev };
+      delete next[index];
+      return next;
+    });
+    setSelected(null);
+  }, [index]);
+
   const retake = useCallback(() => {
     setAnswers({});
     setSelected(null);
@@ -96,6 +107,7 @@ export function useStudioPlayer(total: number) {
     next,
     prev,
     goTo,
+    retryCurrent,
     retake,
   };
 }

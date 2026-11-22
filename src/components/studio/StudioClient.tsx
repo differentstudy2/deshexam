@@ -105,6 +105,7 @@ export default function StudioClient({ assessments }: { assessments: any[] }) {
         durationMin: test.durationMin ?? test.timeLimitMin ?? undefined,
         totalMarks: test.totalMarks ?? undefined,
         negativeMarking: test.negativeMarking ?? undefined,
+        difficulty: test.difficulty ?? test.level ?? undefined,
     });
 
     const handlePresent = async (test: any) => {
@@ -196,6 +197,8 @@ export default function StudioClient({ assessments }: { assessments: any[] }) {
                     theme={theme}
                     recordingQuality={recording}
                     onClose={() => setActive(null)}
+                    onThemeChange={saveTheme}
+                    onRecordingQualityChange={saveRecording}
                 />
             )}
         </div>
