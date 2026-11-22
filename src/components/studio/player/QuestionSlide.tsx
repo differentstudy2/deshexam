@@ -133,15 +133,40 @@ export default function QuestionSlide({
       : null;
 
   const [isFs, setIsFs] = useState(false);
+  const [fsError, setFsError] = useState(false);
   useEffect(() => {
     const onFs = () => setIsFs(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", onFs);
     return () => document.removeEventListener("fullscreenchange", onFs);
   }, []);
   const toggleFs = () => {
-    if (document.fullscreenElement) void document.exitFullscreen();
-    else void document.documentElement.requestFullscreen?.();
+    if (document.fullscreenElement) {
+      void document.exitFullscreen().catch(() => {});
+      return;
+    }
+    // Some browsers (headless / embedded) refuse fullscreen — tell the
+    // user instead of failing silently.
+    const p = document.documentElement.requestFullscreen?.();
+    if (p && typeof p.catch === "function") {
+      p.catch(() => {
+        setFsError(true);
+        setTimeout(() => setFsError(false), 4000);
+      });
+    } else if (!p) {
+      setFsError(true);
+      setTimeout(() => setFsError(false), 4000);
+    }
   };
+
+  /** Difficulty from the live record, shown in Bengali when known. */
+  const DIFFICULTY_BN: Record<string, string> = {
+    Easy: "সহজ",
+    Medium: "মাঝারি",
+    Hard: "কঠিন",
+  };
+  const difficultyLabel = test.difficulty
+    ? (DIFFICULTY_BN[test.difficulty] ?? test.difficulty)
+    : null;
 
   const music = useStudioMusic();
 
@@ -337,9 +362,9 @@ export default function QuestionSlide({
                   : "নেগেটিভ নেই"}
               </span>
             ) : null}
-            {test.difficulty ? (
+            {difficultyLabel ? (
               <span className="rounded-full bg-slate-500 px-4 py-2 text-sm font-black text-white shadow">
-                📊 {test.difficulty}
+                📊 {difficultyLabel}
               </span>
             ) : null}
             <span
@@ -528,6 +553,11 @@ export default function QuestionSlide({
           )}
           পূর্ণ পর্দা
         </button>
+        {fsError ? (
+          <span className="rounded-full bg-red-600 px-3 py-2 text-xs font-bold text-white">
+            এই ব্রাউজারে পূর্ণ পর্দা সম্ভব নয়
+          </span>
+        ) : null}
         <button onClick={doShot} className={TOOL_BTN}>
           <Camera className="h-4 w-4" />
           স্ক্রিনশট
